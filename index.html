@@ -54,7 +54,7 @@
             },
             scaleUp: {
               '0%': { opacity: '0', transform: 'scale(0.95)' },
-              '100%': { opacity: '1', transform: 'scale(1)' },
+              '100%': { opacity: '1', transform: 'scale(1)' }
             }
           }
         }
@@ -65,12 +65,10 @@
   <!-- FontAwesome for Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
-  <!-- React and ReactDOM -->
-  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
-  
-  <!-- Babel to compile JSX in the browser -->
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <!-- Pinned Stable React, ReactDOM & Babel Standalone from highly reliable cdnjs -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.24.7/babel.min.js" crossorigin="anonymous"></script>
 
   <style>
     html {
@@ -344,26 +342,35 @@
 
     // -- Components --
 
-    // Custom Scroll Reveal Component
+    // Custom Scroll Reveal Component with built-in Safety Timeout
     const Reveal = ({ children, delay = 0, className = "" }) => {
       const ref = useRef(null);
       const [isVisible, setIsVisible] = useState(false);
 
       useEffect(() => {
+        // Failsafe timeout so content is guaranteed to render, 
+        // even if the scroll observer is blocked or fails in certain environments
+        const fallbackTimer = setTimeout(() => {
+          setIsVisible(true);
+        }, 600 + delay);
+
         const observer = new IntersectionObserver(
           ([entry]) => {
             if (entry.isIntersecting) {
               setIsVisible(true);
+              clearTimeout(fallbackTimer);
               observer.unobserve(entry.target);
             }
           },
-          { threshold: 0.15 }
+          { threshold: 0.05 }
         );
         if (ref.current) observer.observe(ref.current);
+        
         return () => {
+          clearTimeout(fallbackTimer);
           if (ref.current) observer.unobserve(ref.current);
         };
-      }, []);
+      }, [delay]);
 
       return (
         <div
@@ -923,9 +930,11 @@
                                       alt={`${post.title} ${index + 1}`} 
                                       className="w-full h-full object-cover transition-transform duration-700 group-hover/img:scale-110" 
                                       onError={(e) => {
-                                        // Smart fallback so it looks good when previewing without local files
-                                        e.target.onerror = null; 
-                                        e.target.src = "https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=800&q=80";
+                                        // Infinite loop protected fallback mechanism
+                                        if (!e.target.dataset.fallbackTriggered) {
+                                          e.target.dataset.fallbackTriggered = "true";
+                                          e.target.src = "https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=800&q=80";
+                                        }
                                       }}
                                     />
                                     {/* Expand overlay */}
@@ -985,8 +994,10 @@
                 className="max-w-full max-h-full rounded-lg shadow-2xl object-contain animate-scale-up-modal cursor-default"
                 onClick={(e) => e.stopPropagation()} 
                 onError={(e) => {
-                  e.target.onerror = null; 
-                  e.target.src = "https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1600&q=80";
+                  if (!e.target.dataset.fallbackTriggered) {
+                    e.target.dataset.fallbackTriggered = "true";
+                    e.target.src = "https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1600&q=80";
+                  }
                 }}
               />
             </div>

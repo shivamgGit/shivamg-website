@@ -85,8 +85,33 @@
     }
 
     html { scroll-behavior: smooth; transition: background-color 0.4s ease; }
-    body { font-family: 'Inter', system-ui, sans-serif; }
+    html { scroll-padding-top: 5.5rem; }
+    body { font-family: 'Inter', system-ui, sans-serif; overflow-x: hidden; }
     h1, h2, h3, h4, h5, .font-display { font-family: 'Space Grotesk', system-ui, sans-serif; }
+
+    /* A restrained visual language: one accent, soft depth, and readable motion. */
+    ::selection { background: var(--theme-primary); color: white; }
+    :focus-visible { outline: 2px solid var(--theme-primary); outline-offset: 4px; }
+    .hero-grid {
+      background-image: linear-gradient(var(--theme-primary-soft) 1px, transparent 1px), linear-gradient(90deg, var(--theme-primary-soft) 1px, transparent 1px);
+      background-size: 3.5rem 3.5rem;
+      -webkit-mask-image: radial-gradient(ellipse 72% 64% at 50% 42%, black 18%, transparent 72%);
+      mask-image: radial-gradient(ellipse 72% 64% at 50% 42%, black 18%, transparent 72%);
+      opacity: 0.22;
+    }
+    .hero-orb {
+      width: 32rem; height: 32rem; border-radius: 999px;
+      background: radial-gradient(circle, var(--theme-primary-soft) 0%, transparent 68%);
+      filter: blur(10px); animation: drift 11s ease-in-out infinite;
+    }
+    .nav-surface { box-shadow: 0 12px 35px rgba(0, 0, 0, 0.10); }
+    .section-rule { transition: width 0.35s ease; }
+    section:hover .section-rule { width: 4.5rem; }
+    @keyframes drift { 0%, 100% { transform: translate3d(-4%, -2%, 0) scale(0.96); } 50% { transform: translate3d(4%, 3%, 0) scale(1.04); } }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: 0.01ms !important; }
+      .hero-orb { display: none; }
+    }
 
     /* Custom glow hover dynamic classes */
     .glow-hover {
@@ -590,6 +615,7 @@
       const [activeActivityTab, setActiveActivityTab] = useState('conferences');
       const [currentPage, setCurrentPage] = useState('home');
       const [selectedImage, setSelectedImage] = useState(null);
+      const [isMenuOpen, setIsMenuOpen] = useState(false);
 
       // Effect to monitor document body background and theme class
       useEffect(() => {
@@ -612,6 +638,7 @@
 
       const navigateTo = (e, page, sectionId = null) => {
         e.preventDefault();
+        setIsMenuOpen(false);
         setCurrentPage(page);
         setTimeout(() => {
           if (sectionId) { 
@@ -657,7 +684,7 @@
           {/* ── STREAMING_CHUNK:Rendering navigation bar with dark/light mode switcher... ── */}
           <nav className={`fixed w-full z-50 transition-all duration-300 ${
             isScrolled 
-              ? (isDark ? 'bg-cosmic-void/80 backdrop-blur-lg shadow-xl border-b border-white/[0.05] py-3' : 'bg-cream/95 backdrop-blur-md shadow-sm border-b border-stone-200/70 py-3') 
+              ? (isDark ? 'nav-surface bg-cosmic-void/80 backdrop-blur-lg shadow-xl border-b border-white/[0.05] py-3' : 'nav-surface bg-cream/95 backdrop-blur-md shadow-sm border-b border-stone-200/70 py-3') 
               : 'bg-transparent py-5'
           }`}>
             <div className="max-w-6xl mx-auto px-6 flex justify-between items-center">
@@ -682,6 +709,16 @@
                   <a href="#contact"      onClick={(e) => { e.preventDefault(); document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' }); }} className={`nav-link hover:text-white transition-colors ${!isDark && 'hover:text-stone-900'}`}>Contact</a>
                 </div>
 
+                <button
+                  type="button"
+                  onClick={() => setIsMenuOpen(!isMenuOpen)}
+                  aria-label="Toggle navigation"
+                  aria-expanded={isMenuOpen}
+                  className={`md:hidden w-9 h-9 rounded-full border transition-colors ${isDark ? 'border-white/[0.12] text-zinc-200 hover:border-glowred/60' : 'border-stone-300 text-stone-700 hover:border-darkred-400'}`}
+                >
+                  <i className={`fa-solid ${isMenuOpen ? 'fa-xmark' : 'fa-bars'} text-xs`}></i>
+                </button>
+
                 {/* Aesthetic Theme Switcher Button */}
                 <button 
                   onClick={() => setIsDark(!isDark)}
@@ -698,14 +735,26 @@
 
               </div>
             </div>
+            {isMenuOpen && (
+              <div className={`md:hidden mx-4 mb-3 rounded-xl border p-2 animate-fade-in ${isDark ? 'bg-cosmic-dust/95 border-white/[0.08]' : 'bg-cream-50 border-stone-200'}`}>
+                {[
+                  ['About', 'home', 'about'], ['Research', 'home', 'research'], ['CV', 'home', 'experience'], ['Publications', 'home', 'publications'], ['Activities', 'activities'], ['Gallery', 'blog']
+                ].map(([label, page, section]) => (
+                  <a key={label} href={section ? `#${section}` : '#'} onClick={(e) => navigateTo(e, page, section)} className={`block rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${isDark ? 'text-zinc-300 hover:bg-white/[0.06] hover:text-glowred' : 'text-stone-600 hover:bg-darkred-50 hover:text-darkred-800'}`}>{label}</a>
+                ))}
+                <a href="#contact" onClick={(e) => { e.preventDefault(); setIsMenuOpen(false); document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' }); }} className={`block rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${isDark ? 'text-zinc-300 hover:bg-white/[0.06] hover:text-glowred' : 'text-stone-600 hover:bg-darkred-50 hover:text-darkred-800'}`}>Contact</a>
+              </div>
+            )}
           </nav>
 
           {/* ══ HOME PAGE ══ */}
           {currentPage === 'home' && (
             <>
               {}
-              <section className="relative pt-44 pb-32 md:pt-60 md:pb-44 px-6 overflow-hidden cursor-pointer" title=" ">
+              <section className="relative pt-44 pb-32 md:pt-60 md:pb-44 px-6 overflow-hidden" aria-label="Introduction">
                 <ParticleBackground isDark={isDark} />
+                <div className="hero-grid absolute inset-0 pointer-events-none" aria-hidden="true"></div>
+                <div className="hero-orb absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none" aria-hidden="true"></div>
                 <div className="max-w-5xl mx-auto relative z-10 flex flex-col items-center text-center">
 
                   <Reveal delay={0}>

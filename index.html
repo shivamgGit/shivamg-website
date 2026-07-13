@@ -84,7 +84,7 @@
       --theme-primary-soft: rgba(123, 31, 31, 0.15);
     }
 
-    html { scroll-behavior: smooth; transition: background-color 0.4s ease; }
+    html { scroll-behavior: smooth; transition: background-color 0.4s ease; font-size: 16.5px; }
     html { scroll-padding-top: 5.5rem; }
     body { font-family: 'Inter', system-ui, sans-serif; overflow-x: hidden; }
     h1, h2, h3, h4, h5, .font-display { font-family: 'Space Grotesk', system-ui, sans-serif; }
@@ -676,6 +676,29 @@
         </button>
       );
 
+      const ActivityCard = ({ item, index }) => (
+        <Reveal delay={index * 70}>
+          <article className={`group rounded-xl border p-5 transition-all duration-300 ${
+            isDark
+              ? 'bg-white/[0.015] border-white/[0.06] hover:bg-white/[0.03] hover:border-glowred/30'
+              : 'bg-cream-50 border-stone-200 hover:border-darkred-300 hover:translate-x-1'
+          }`}>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <div className="min-w-0">
+                <p className={`eyebrow mb-2 ${isDark ? 'text-glowred' : 'text-darkred-600'}`}>{item.type}</p>
+                <h3 className={`text-base font-semibold leading-snug transition-colors ${
+                  isDark ? 'text-white group-hover:text-glowred' : 'text-stone-900 group-hover:text-darkred-800'
+                }`}>{item.title}</h3>
+              </div>
+              <span className={`shrink-0 text-xs font-medium ${isDark ? 'text-zinc-500' : 'text-stone-400'}`}>{item.date}</span>
+            </div>
+            <p className={`mt-3 border-t pt-3 text-sm leading-relaxed ${
+              isDark ? 'border-white/[0.06] text-zinc-400' : 'border-stone-100 text-stone-500'
+            }`}>{item.details}</p>
+          </article>
+        </Reveal>
+      );
+
       return (
         <div className={`min-h-screen transition-colors duration-450 ${
           isDark ? 'bg-cosmic-void text-zinc-300 selection:bg-glowred-soft selection:text-white' : 'bg-cream text-stone-800 selection:bg-darkred-200 selection:text-darkred-950'
@@ -692,7 +715,7 @@
               <a href="#" onClick={(e) => navigateTo(e, 'home')} className="flex items-center gap-2.5 group">
                 <i className={`fa-solid fa-atom text-lg animate-spin-slow ${isDark ? 'text-glowred' : 'text-darkred-700'}`}></i>
                 <span className={`font-display text-sm font-semibold tracking-tight ${isDark ? 'text-zinc-100' : 'text-stone-900'}`}>
-                  Shivam <span className={isDark ? 'text-glowred' : 'text-darkred-700'}>Gola</span>
+                  Shivam Gola<span className={isDark ? 'text-glowred' : 'text-darkred-700'}> </span>
                 </span>
               </a>
 
@@ -1023,12 +1046,12 @@
                             {String(idx + 1).padStart(2, '0')}
                           </span>
                           <div>
-                            <p className={`text-xs mb-1 ${isDark ? 'text-zinc-500' : 'text-stone-400'}`}>{pub.authors}</p>
                             <a href={pub.link} target="_blank" rel="noopener noreferrer" className={`text-sm font-semibold transition-colors leading-snug block mb-1.5 ${
                               isDark ? 'text-zinc-100 group-hover:text-glowred' : 'text-stone-800 group-hover:text-darkred-800'
                             }`}>
                               {pub.title}
                             </a>
+                            <p className={`text-xs mb-1 ${isDark ? 'text-zinc-400' : 'text-stone-500'}`}>{pub.authors}</p>
                             <p className={`text-xs italic ${isDark ? 'text-zinc-500' : 'text-stone-400'}`}>{pub.journal}</p>
                           </div>
                         </div>
@@ -1044,40 +1067,30 @@
           {currentPage === 'activities' && (
             <div className={`pt-28 pb-16 min-h-screen animate-fade-in ${isDark ? 'bg-cosmic-void' : 'bg-cream'}`}>
               <div className="max-w-4xl mx-auto px-6">
-
                 <div className="mb-10">
-                  <SectionHeader eyebrow="Contributions" title="Academic Engagement" />
+                  <SectionHeader eyebrow="Contributions" title={activeActivityTab === 'conferences' ? 'Academic Activities' : 'Research Experience'} />
+                  <Reveal delay={120}>
+                    <p className={`mt-7 max-w-2xl text-sm leading-relaxed ${isDark ? 'text-zinc-400' : 'text-stone-500'}`}>
+                   
+                    </p>
+                  </Reveal>
                 </div>
 
-                <Reveal delay={100}>
-                  <div className={`flex items-center gap-8 mb-10 border-b ${isDark ? 'border-white/[0.08]' : 'border-stone-200'}`}>
-                    <TabBtn label="Conferences & Seminars" icon="fa-users"  value="conferences" state={activeActivityTab} setState={setActiveActivityTab} />
-                    <TabBtn label="Research Visits"         icon="fa-plane"  value="visits"      state={activeActivityTab} setState={setActiveActivityTab} />
+                <Reveal delay={180}>
+                  <div className={`mb-8 flex items-center gap-7 border-b ${isDark ? 'border-white/[0.08]' : 'border-stone-200'}`}>
+                    <TabBtn label="Conferences & Seminars" icon="fa-graduation-cap" value="conferences" state={activeActivityTab} setState={setActiveActivityTab} />
+                    <TabBtn label="Research Visits" icon="fa-flask" value="visits" state={activeActivityTab} setState={setActiveActivityTab} />
                   </div>
                 </Reveal>
 
-                <Reveal delay={200}>
-                  <div className="space-y-6">
-                    {(activeActivityTab === 'conferences' ? conferencesList : visitsList).map((item, idx) => (
-                      <div key={idx} className={`relative pl-5 border-l transition-colors duration-250 animate-fade-in ${
-                        isDark ? 'border-white/[0.1] hover:border-glowred/40' : 'border-stone-200 hover:border-darkred-400'
-                      }`} style={{ animationDelay: `${idx * 0.04}s` }}>
-                        <div className={`absolute w-2.5 h-2.5 rounded-full -left-[5px] top-1.5 transition-all duration-250 ${
-                          isDark ? 'bg-white/[0.15] shadow-sm shadow-glowred/30 group-hover:bg-glowred' : 'bg-stone-300 group-hover:bg-darkred-600'
-                        }`}></div>
-                        <div className="flex flex-wrap items-center gap-2 mb-1.5">
-                          <span className={`eyebrow ${isDark ? 'text-glowred' : 'text-darkred-600'}`}>{item.type}</span>
-                          <span className={`text-xs ${isDark ? 'text-white/[0.15]' : 'text-stone-300'}`}>·</span>
-                          <span className={`text-xs ${isDark ? 'text-zinc-500' : 'text-stone-400'}`}>{item.date}</span>
-                        </div>
-                        <h3 className={`text-sm font-semibold mb-1 transition-colors ${
-                          isDark ? 'text-white group-hover:text-glowred' : 'text-stone-900 group-hover:text-darkred-800'
-                        }`}>{item.title}</h3>
-                        <p className={`text-sm leading-relaxed ${isDark ? 'text-zinc-400' : 'text-stone-400'}`}>{item.details}</p>
-                      </div>
-                    ))}
+                <section aria-label={activeActivityTab === 'conferences' ? 'Academic Activities' : 'Research Experience'}>
+                  <Reveal>
+                    
+                  </Reveal>
+                  <div className="grid gap-4">
+                    {(activeActivityTab === 'conferences' ? conferencesList : visitsList).map((item, idx) => <ActivityCard key={item.title} item={item} index={idx} />)}
                   </div>
-                </Reveal>
+                </section>
               </div>
             </div>
           )}
@@ -1088,7 +1101,7 @@
               <div className="max-w-5xl mx-auto px-6">
 
                 <div className="mb-12">
-                  <SectionHeader eyebrow="Gallery" title="Travel & Field Photography" />
+                  <SectionHeader eyebrow="Gallery" title="Travel & Photography" />
                   <p className={`text-xs mt-4 ${isDark ? 'text-zinc-500' : 'text-stone-400'}`}>Memories from various trips and places.</p>
                 </div>
 
@@ -1183,7 +1196,7 @@
           {/* ── STREAMING_CHUNK:Rendering activities, travel gallery, and dark footer details... ── */}
           <footer id="contact" className={`transition-colors duration-450 py-16 border-t-2 ${
             isDark 
-              ? 'bg-cosmic-void text-zinc-400 border-glowred/20 shadow-inner' 
+              ? 'bg-cosmic-dust text-zinc-400 border-glowred/30 shadow-inner' 
               : 'bg-stone-950 text-stone-400 border-darkred-900/50'
           }`}>
             <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-12">

@@ -228,7 +228,6 @@
       );
     };
 
-    /* ── STREAMING_CHUNK:Building dynamic Space-Time Lensing physics grid with cinematic black hole... ── */
     const SpaceTimeGridBackground = ({ isDark }) => {
       const canvas2DRef = useRef(null);
       const canvas3DRef = useRef(null);
@@ -312,7 +311,14 @@
             void main() {
                 // Normalize and apply dynamic click center offset
                 vec2 uv = (vUv - uCenter) * 2.0;
-                uv.x *= uResolution.x / uResolution.y;
+                
+                // FIX: Ensure correct aspect ratio scaling for both portrait (mobile) and landscape
+                // This prevents the black hole from being horizontally squished or completely cropped out on narrow screens.
+                if (uResolution.x < uResolution.y) {
+                    uv.y *= uResolution.y / uResolution.x;
+                } else {
+                    uv.x *= uResolution.x / uResolution.y;
+                }
                 
                 // Dynamic scaling for massive collapse expansion
                 uv /= max(0.001, uScale);
@@ -357,7 +363,6 @@
                         if(rDisk > 1.2 && rDisk < 14.0) {
                             float spinSpeed = 3.0 / pow(rDisk, 1.5); 
                             
-                            // FIX: Less radial shear to stop the noise from stretching into thin sharp lines
                             float angleOffset = (uTime * spinSpeed) + (rDisk * 0.35);
                             
                             // Rotate Cartesian coordinates instead of using atan() to prevent the wrap-around seam
@@ -367,7 +372,6 @@
                             
                             vec2 uvNoise = rotatedP * 2.0;
                             
-                            // Softened the noise blending
                             float fire = fbm(uvNoise - vec2(uTime * 1.0, uTime * 0.5));
                             float fire2 = fbm(uvNoise * 1.5 + vec2(uTime * 1.5, uTime * 0.8));
                             fire = smoothstep(0.1, 0.9, fire * 0.6 + fire2 * 0.4);
@@ -376,7 +380,6 @@
                             
                             vec3 fireCol = mix(vec3(0.2, 0.0, 0.0), vec3(1.0, 0.35, 0.0), fire);
                             
-                            // Softened the yellow core exponent from 3.0 to 1.5 to prevent a sharp yellow line
                             fireCol = mix(fireCol, vec3(1.0, 0.8, 0.3), pow(fire, 1.5));
                             fireCol *= 2.5; 
 
@@ -400,8 +403,8 @@
                 col = pow(col, vec3(1.0 / 2.2)); 
 
                 // Dynamic Alpha Map for Overlay over 2D Canvas
-                float isBlackHole = smoothstep(1.05, 0.95, minR); // Solid Black inside Event Horizon
-                float fireAlpha = smoothstep(0.0, 0.1, dot(col, vec3(0.333))); // Transparent void outside
+                float isBlackHole = smoothstep(1.05, 0.95, minR); 
+                float fireAlpha = smoothstep(0.0, 0.1, dot(col, vec3(0.333))); 
                 float finalAlpha = max(fireAlpha, isBlackHole);
 
                 // Smooth edges fading to blend with external canvas particles
@@ -436,18 +439,31 @@
         const onPointerMove = (e) => {
             const rect = canvas2D.getBoundingClientRect();
             if (!rect) return;
-            const x = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-            const y = Math.max(0, Math.min(1, (e.clientY - rect.top) / rect.height));
+            // Enhanced touch support for mobile pointer coordinate stability
+            const clientX = e.touches && e.touches.length > 0 ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches && e.touches.length > 0 ? e.touches[0].clientY : e.clientY;
+            
+            if (clientX === undefined || clientY === undefined) return;
+
+            const x = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+            const y = Math.max(0, Math.min(1, (clientY - rect.top) / rect.height));
             targetMouse.x = x;
             targetMouse.y = 1.0 - y;
         };
+        
         window.addEventListener('mousemove', onPointerMove);
+        window.addEventListener('touchmove', onPointerMove, { passive: true });
 
         const createBlackHole = (event) => {
           if (blackHole || sceneCollapsed) return;
           const rect = canvas2D.getBoundingClientRect();
-          const clickX = event.clientX - rect.left;
-          const clickY = event.clientY - rect.top;
+          const clientX = event.touches && event.touches.length > 0 ? event.touches[0].clientX : event.clientX;
+          const clientY = event.touches && event.touches.length > 0 ? event.touches[0].clientY : event.clientY;
+
+          if (clientX === undefined || clientY === undefined) return;
+          
+          const clickX = clientX - rect.left;
+          const clickY = clientY - rect.top;
 
           // Activate 2D pulling logic
           blackHole = {
@@ -574,7 +590,11 @@
           const project = (x, y, z, verticalOffset = 0) => {
               const fov = 900;
               if (z < -800) return null;
-              const sceneScale = Math.min(0.29, w / 4300, h / 2500);
+              
+              // FIX: Adjusted sceneScale so it remains large and visible on mobile screens.
+              // Previously, the strict max boundaries severely shrunk the visual element on narrow displays.
+              const sceneScale = w < 768 ? Math.min(0.5, w / 1200) : Math.min(0.29, w / 4300, h / 2500);
+              
               const scale = (fov / (fov + z)) * sceneScale;
               const sx = w / 2 + x * scale;
               const sy = h * 0.64 + verticalOffset - (z * 0.22) * scale + y * scale;
@@ -780,12 +800,10 @@
           uniforms.uTime.value = time * 0.016; 
 
           if (blackHole) {
-              // Rapid cinematic fade in, followed by a sudden disappearance when completely collapsed
               const fadeIn = Math.min(1, (time - blackHole.startedAt) / 45);
               const fadeOut = 1.0 - Math.pow(Math.max(0, (collapseProgress - 0.8) / 0.2), 2.0); 
               uniforms.uOpacity.value = fadeIn * fadeOut;
               
-              // Scale animation: Small pop in -> normalize -> erupt massive collapse
               let s = 1.0;
               if (collapseProgress < 0.15) {
                   s = 0.01 + 0.99 * Math.pow(collapseProgress / 0.15, 0.5); 
@@ -812,6 +830,7 @@
         return () => {
           window.removeEventListener('resize', resizeCanvas);
           window.removeEventListener('mousemove', onPointerMove);
+          window.removeEventListener('touchmove', onPointerMove);
           canvas2D.removeEventListener('click', createBlackHole);
           cancelAnimationFrame(animationFrameId);
         };
@@ -883,50 +902,24 @@
           <nav className={`fixed w-full z-50 transition-all duration-300 ${isScrolled ? (isDark ? 'nav-surface bg-cosmic-void/80 backdrop-blur-lg shadow-xl border-b border-white/[0.05] py-3' : 'nav-surface bg-cream/95 backdrop-blur-md shadow-sm border-b border-stone-200/70 py-3') : 'bg-transparent py-5'}`}>
             <div className="max-w-6xl mx-auto px-6 flex justify-between items-center">
               
-           
-
-<a
-  href="#"
-  onClick={(e) => navigateTo(e, 'home')}
-  className="flex items-center gap-3 group"
->
-  <i
-    className={`fa-solid fa-atom text-lg animate-spin-slow ${
-      isDark ? 'text-glowred' : 'text-darkred-700'
-    }`}
-  ></i>
-
-  <div className="leading-tight">
-    <div
-      className={`font-display font-semibold text-sm ${
-        isDark ? 'text-zinc-100' : 'text-stone-900'
-      }`}
-    >
-      Dr. Shivam Gola
-    </div>
-
-    <div
-      className={`text-xs ${
-        isDark ? 'text-zinc-400' : 'text-stone-500'
-      }`}
-    >
-      Astroparticle Physics
-    </div>
-  </div>
-</a>
-
-
+              <a href="#" onClick={(e) => navigateTo(e, 'home')} className="flex items-center gap-3 group">
+                <i className={`fa-solid fa-atom text-lg animate-spin-slow ${isDark ? 'text-glowred' : 'text-darkred-700'}`}></i>
+                <div className="leading-tight">
+                  <div className={`font-display font-semibold text-sm ${isDark ? 'text-zinc-100' : 'text-stone-900'}`}>Dr. Shivam Gola</div>
+                  <div className={`text-xs ${isDark ? 'text-zinc-400' : 'text-stone-500'}`}>Astroparticle Physics</div>
+                </div>
+              </a>
 
               <div className="flex items-center gap-6">
                 
                 <div className={`hidden md:flex items-center gap-7 text-xs font-medium tracking-wide ${isDark ? 'text-zinc-400' : 'text-stone-500'}`}>
-                  <a href="#about"        onClick={(e) => navigateTo(e, 'home', 'about')}        className={`nav-link hover:text-white transition-colors ${!isDark && 'hover:text-stone-900'}`}>About</a>
-                  <a href="#research"     onClick={(e) => navigateTo(e, 'home', 'research')}     className={`nav-link hover:text-white transition-colors ${!isDark && 'hover:text-stone-900'}`}>Research</a>
-                  <a href="#experience"   onClick={(e) => navigateTo(e, 'home', 'experience')}   className={`nav-link hover:text-white transition-colors ${!isDark && 'hover:text-stone-900'}`}>CV</a>
-                  <a href="#publications" onClick={(e) => navigateTo(e, 'home', 'publications')} className={`nav-link hover:text-white transition-colors ${!isDark && 'hover:text-stone-900'}`}>Publications</a>
-                  <a href="#conferences"  onClick={(e) => navigateTo(e, 'activities')}           className={`nav-link hover:text-white transition-colors ${!isDark && 'hover:text-stone-900'} ${currentPage === 'activities' ? (isDark ? 'text-glowred active' : 'text-darkred-700 active') : ''}`}>Activities</a>
-                  <a href="#blog"         onClick={(e) => navigateTo(e, 'blog')}                 className={`nav-link hover:text-white transition-colors ${!isDark && 'hover:text-stone-900'} ${currentPage === 'blog' ? (isDark ? 'text-glowred active' : 'text-darkred-700 active') : ''}`}>Gallery</a>
-                  <a href="#contact"      onClick={(e) => { e.preventDefault(); document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' }); }} className={`nav-link hover:text-white transition-colors ${!isDark && 'hover:text-stone-900'}`}>Contact</a>
+                  <a href="#about"        onClick={(e) => navigateTo(e, 'home', 'about')}        className={`nav-link transition-colors ${isDark ? 'hover:text-white' : 'hover:text-stone-900'}`}>About</a>
+                  <a href="#research"     onClick={(e) => navigateTo(e, 'home', 'research')}     className={`nav-link transition-colors ${isDark ? 'hover:text-white' : 'hover:text-stone-900'}`}>Research</a>
+                  <a href="#experience"   onClick={(e) => navigateTo(e, 'home', 'experience')}   className={`nav-link transition-colors ${isDark ? 'hover:text-white' : 'hover:text-stone-900'}`}>CV</a>
+                  <a href="#publications" onClick={(e) => navigateTo(e, 'home', 'publications')} className={`nav-link transition-colors ${isDark ? 'hover:text-white' : 'hover:text-stone-900'}`}>Publications</a>
+                  <a href="#conferences"  onClick={(e) => navigateTo(e, 'activities')}           className={`nav-link transition-colors ${isDark ? 'hover:text-white' : 'hover:text-stone-900'} ${currentPage === 'activities' ? (isDark ? 'text-glowred active' : 'text-darkred-700 active') : ''}`}>Activities</a>
+                  <a href="#blog"         onClick={(e) => navigateTo(e, 'blog')}                 className={`nav-link transition-colors ${isDark ? 'hover:text-white' : 'hover:text-stone-900'} ${currentPage === 'blog' ? (isDark ? 'text-glowred active' : 'text-darkred-700 active') : ''}`}>Gallery</a>
+                  <a href="#contact"      onClick={(e) => { e.preventDefault(); document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' }); }} className={`nav-link transition-colors ${isDark ? 'hover:text-white' : 'hover:text-stone-900'}`}>Contact</a>
                 </div>
 
                 <button type="button" onClick={() => setIsMenuOpen(!isMenuOpen)} aria-label="Toggle navigation" aria-expanded={isMenuOpen} className={`md:hidden w-9 h-9 rounded-full border transition-colors ${isDark ? 'border-white/[0.12] text-zinc-200 hover:border-glowred/60' : 'border-stone-300 text-stone-700 hover:border-darkred-400'}`}>
@@ -940,6 +933,8 @@
 
               </div>
             </div>
+            
+            {}
             {isMenuOpen && (
               <div className={`md:hidden mx-4 mb-3 rounded-xl border p-2 animate-fade-in ${isDark ? 'bg-cosmic-dust/95 border-white/[0.08]' : 'bg-cream-50 border-stone-200'}`}>
                 {[ ['About', 'home', 'about'], ['Research', 'home', 'research'], ['CV', 'home', 'experience'], ['Publications', 'home', 'publications'], ['Activities', 'activities'], ['Gallery', 'blog'] ].map(([label, page, section]) => (
@@ -952,6 +947,7 @@
 
           {currentPage === 'home' && (
             <>
+              {}
               <section className="relative pt-40 pb-32 md:pt-52 md:pb-44 px-6 overflow-hidden" aria-label="Introduction">
                 <SpaceTimeGridBackground isDark={isDark} />
                 <div className="hero-orb absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none" aria-hidden="true"></div>
@@ -992,6 +988,7 @@
                 </div>
               </section>
 
+              {}
               <section id="about" className={`py-24 overflow-hidden border-t ${isDark ? 'bg-cosmic-dust border-white/[0.04]' : 'bg-cream border-stone-200/50'}`}>
                 <div className="max-w-6xl mx-auto px-6">
                   <div className="grid md:grid-cols-3 gap-14">
@@ -1029,6 +1026,7 @@
                 </div>
               </section>
 
+              {}
               <section id="research" className={`py-24 border-t ${isDark ? 'bg-cosmic-void border-white/[0.04]' : 'bg-cream-50 border-stone-200/50'}`}>
                 <div className="max-w-6xl mx-auto px-6">
                   <div className="mb-12"><SectionHeader eyebrow="Research" title="Focus & Interests" /></div>
@@ -1046,6 +1044,7 @@
                 </div>
               </section>
 
+              {}
               <section id="experience" className={`py-24 border-t ${isDark ? 'bg-cosmic-dust border-white/[0.04]' : 'bg-cream border-stone-200/50'}`}>
                 <div className="max-w-4xl mx-auto px-6">
                   <div className="mb-10"><SectionHeader eyebrow="Background" title="Experience & Education" /></div>
@@ -1090,6 +1089,7 @@
                 </div>
               </section>
 
+              {}
               <section id="publications" className={`py-24 border-t ${isDark ? 'bg-cosmic-void border-white/[0.04]' : 'bg-cream-50 border-stone-200/50'}`}>
                 <div className="max-w-5xl mx-auto px-6">
                   <Reveal>
@@ -1132,6 +1132,7 @@
             </>
           )}
 
+          {}
           {currentPage === 'activities' && (
             <div className={`pt-28 pb-16 min-h-screen animate-fade-in ${isDark ? 'bg-cosmic-void' : 'bg-cream'}`}>
               <div className="max-w-4xl mx-auto px-6">
@@ -1157,6 +1158,7 @@
             </div>
           )}
 
+          {}
           {currentPage === 'blog' && (
             <div className={`pt-28 pb-16 min-h-screen animate-fade-in ${isDark ? 'bg-cosmic-void' : 'bg-cream'}`}>
               <div className="max-w-5xl mx-auto px-6">
@@ -1195,6 +1197,7 @@
             </div>
           )}
 
+          {}
           {selectedImage && (
             <div className={`fixed inset-0 z-[100] flex items-center justify-center backdrop-blur-md p-4 md:p-12 animate-fade-in-modal cursor-zoom-out ${isDark ? 'bg-black/95' : 'bg-stone-950/97'}`} onClick={() => setSelectedImage(null)}>
               <button className="absolute top-4 right-4 md:top-6 md:right-6 text-zinc-400 hover:text-white z-10 w-9 h-9 flex items-center justify-center rounded-full bg-white/5 hover:bg-glowred transition-all duration-200" onClick={() => setSelectedImage(null)}><i className="fa-solid fa-xmark text-xs"></i></button>

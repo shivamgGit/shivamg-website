@@ -231,17 +231,19 @@
     const SpaceTimeGridBackground = ({ isDark }) => {
       const canvas2DRef = useRef(null);
       const canvas3DRef = useRef(null);
-      
+      const simTimeRef = useRef(0);
+      const realTimeRef = useRef(0);
+      const freezeFrameRef = useRef(null);
+      const autoBlackHoleTriggeredRef = useRef(false);
+
       useEffect(() => {
-        // --- 2D CANVAS INITIALIZATION ---
         const canvas2D = canvas2DRef.current;
         const ctx = canvas2D.getContext('2d');
         
-        // --- THREE.JS M87* BLACK HOLE INITIALIZATION ---
         const canvas3D = canvas3DRef.current;
         const renderer = new THREE.WebGLRenderer({ canvas: canvas3D, alpha: true, antialias: false, powerPreference: "high-performance" });
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.25)); // Cap for performance stability
-        renderer.setClearColor(0x000000, 0); // Completely transparent backdrop
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.25)); 
+        renderer.setClearColor(0x000000, 0); 
 
         const scene = new THREE.Scene();
         const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
@@ -309,21 +311,16 @@
             }
 
             void main() {
-                // Normalize and apply dynamic click center offset
                 vec2 uv = (vUv - uCenter) * 2.0;
                 
-                // FIX: Ensure correct aspect ratio scaling for both portrait (mobile) and landscape
-                // This prevents the black hole from being horizontally squished or completely cropped out on narrow screens.
                 if (uResolution.x < uResolution.y) {
                     uv.y *= uResolution.y / uResolution.x;
                 } else {
                     uv.x *= uResolution.x / uResolution.y;
                 }
                 
-                // Dynamic scaling for massive collapse expansion
                 uv /= max(0.001, uScale);
 
-                // Camera Setup for M87 view
                 vec3 ro = vec3(0.0, 10.5, 66.0); 
                 float rotX = (uMouse.y - 0.5) * 2.5; 
                 float rotY = (uMouse.x - 0.5) * 6.28 + (uTime * 0.05); 
@@ -345,7 +342,6 @@
                 float hitDisk = 0.0;
                 float minR = 1000.0; 
                 
-                // Optimized Raymarching Loop
                 for(int i = 0; i < 300; i++) {
                     float r = length(p);
                     minR = min(minR, r);
@@ -365,7 +361,6 @@
                             
                             float angleOffset = (uTime * spinSpeed) + (rDisk * 0.35);
                             
-                            // Rotate Cartesian coordinates instead of using atan() to prevent the wrap-around seam
                             float s = sin(-angleOffset);
                             float c = cos(-angleOffset);
                             vec2 rotatedP = mat2(c, -s, s, c) * p.xz;
@@ -397,17 +392,14 @@
                     prevY = p.y;
                 }
 
-                // Post-Processing
                 col *= 1.4;
                 col = col / (1.0 + col); 
                 col = pow(col, vec3(1.0 / 2.2)); 
 
-                // Dynamic Alpha Map for Overlay over 2D Canvas
                 float isBlackHole = smoothstep(1.05, 0.95, minR); 
                 float fireAlpha = smoothstep(0.0, 0.1, dot(col, vec3(0.333))); 
                 float finalAlpha = max(fireAlpha, isBlackHole);
 
-                // Smooth edges fading to blend with external canvas particles
                 float edgeDist = length((vUv - uCenter) * 2.0);
                 float edgeMask = 1.0 - smoothstep(0.7, 1.2, edgeDist * uScale);
                 finalAlpha *= edgeMask;
@@ -429,7 +421,6 @@
         scene.add(mesh);
 
         let animationFrameId;
-        let time = 0;
         let blackHole = null;
         let sceneCollapsed = false;
 
@@ -439,7 +430,6 @@
         const onPointerMove = (e) => {
             const rect = canvas2D.getBoundingClientRect();
             if (!rect) return;
-            // Enhanced touch support for mobile pointer coordinate stability
             const clientX = e.touches && e.touches.length > 0 ? e.touches[0].clientX : e.clientX;
             const clientY = e.touches && e.touches.length > 0 ? e.touches[0].clientY : e.clientY;
             
@@ -454,26 +444,36 @@
         window.addEventListener('mousemove', onPointerMove);
         window.addEventListener('touchmove', onPointerMove, { passive: true });
 
-        const createBlackHole = (event) => {
-          if (blackHole || sceneCollapsed) return;
+        const createBlackHole = (event = null) => {
+          if (blackHole) return;
+          if (sceneCollapsed) {
+            sceneCollapsed = false;
+            simTimeRef.current = 0;
+            freezeFrameRef.current = null;
+            autoBlackHoleTriggeredRef.current = false;
+          }
           const rect = canvas2D.getBoundingClientRect();
-          const clientX = event.touches && event.touches.length > 0 ? event.touches[0].clientX : event.clientX;
-          const clientY = event.touches && event.touches.length > 0 ? event.touches[0].clientY : event.clientY;
+          let clickX, clickY;
 
-          if (clientX === undefined || clientY === undefined) return;
-          
-          const clickX = clientX - rect.left;
-          const clickY = clientY - rect.top;
+          if (event) {
+            const clientX = event.touches && event.touches.length > 0 ? event.touches[0].clientX : event.clientX;
+            const clientY = event.touches && event.touches.length > 0 ? event.touches[0].clientY : event.clientY;
+            if (clientX === undefined || clientY === undefined) return;
+            clickX = clientX - rect.left;
+            clickY = clientY - rect.top;
+          } else {
+            // Position automatic black hole in the bottom-right corner of the frame
+            clickX = rect.width * 0.85;
+            clickY = rect.height * 0.85;
+          }
 
-          // Activate 2D pulling logic
           blackHole = {
             x: clickX,
             y: clickY,
-            startedAt: time,
+            startedAt: realTimeRef.current,
             spin: Math.random() > 0.5 ? 1 : -1
           };
 
-          // Center the 3D M87 simulation exactly at the click origin
           uniforms.uCenter.value.set(
               clickX / rect.width,
               1.0 - (clickY / rect.height)
@@ -484,12 +484,10 @@
           const dpr = window.devicePixelRatio || 1;
           const rect = canvas2D.parentElement ? canvas2D.parentElement.getBoundingClientRect() : { width: window.innerWidth, height: window.innerHeight };
           
-          // Size 2D Canvas
           canvas2D.width = rect.width * dpr;
           canvas2D.height = rect.height * dpr;
           ctx.scale(dpr, dpr);
           
-          // Size 3D Canvas
           renderer.setSize(rect.width, rect.height);
           uniforms.uResolution.value.set(rect.width, rect.height);
         };
@@ -498,7 +496,6 @@
         canvas2D.addEventListener('click', createBlackHole);
         setTimeout(resizeCanvas, 0);
 
-        // Theoretical Physics Scene Setup for Bullet Cluster Collision
         const darkTheme = {
             base: [255, 255, 255],     
             well: [255, 51, 75],       
@@ -515,7 +512,6 @@
             particleColor: '123, 31, 31'
         };
 
-        // Grid resolution and dimensions
         const xSteps = 60;
         const zSteps = 50;
         const spacingX = 90;
@@ -523,39 +519,56 @@
 
         const particles = [];
         const numDMParticles = 900;       
-        const numGasParticles = 600;      
-        const numStreamParticles = 300;   
+        const numGasParticles = 750;      
+        const numStreamParticles = 350;   
 
         for (let i = 0; i < numDMParticles; i++) {
           const haloIdx = Math.floor(Math.random() * 2);
-          const rFactor = Math.pow(Math.random(), 2.5);
+          const rFactor = Math.pow(Math.random(), 2.2);
           particles.push({
             type: 'halo_dm', haloIdx, rFactor,
             theta: Math.random() * Math.PI * 2, phi: Math.acos((Math.random() * 2) - 1),
-            speed: (Math.random() - 0.5) * 0.012 / (rFactor + 0.1), size: Math.random() * 5.76 + 1.92,
+            speed: (Math.random() - 0.5) * 0.012 / (rFactor + 0.1), size: Math.random() * 5.5 + 1.8,
             baseAlpha: (1 - rFactor) * 0.9, isBlueTint: haloIdx === 0
           });
         }
 
         for (let i = 0; i < numGasParticles; i++) {
-          const gasIdx = 2 + Math.floor(Math.random() * 2);
+          const gasIdx = Math.floor(Math.random() * 2); 
           particles.push({
-            type: 'gas_plasma', gasIdx, rFactor: Math.pow(Math.random(), 1.8),
-            theta: Math.random() * Math.PI * 2, turbSpeed: (Math.random() - 0.5) * 0.025,
-            size: Math.random() * 6.4 + 2.08, baseAlpha: Math.random() * 0.85 + 0.15, colorVariant: Math.random()
+            type: 'gas_plasma', gasIdx, rFactor: Math.pow(Math.random(), 1.6),
+            theta: Math.random() * Math.PI * 2, turbSpeed: (Math.random() - 0.5) * 0.02,
+            size: Math.random() * 6.5 + 2.0, baseAlpha: Math.random() * 0.85 + 0.15, colorVariant: Math.random()
           });
         }
 
         for (let i = 0; i < numStreamParticles; i++) {
           particles.push({
-            type: 'stream', fromHalo: Math.floor(Math.random() * 2), toGas: 2 + Math.floor(Math.random() * 2),
-            progress: Math.random(), speed: (Math.random() * 0.008 + 0.002) * (Math.random() > 0.5 ? 1 : -1),
-            spread: (Math.random() - 0.5) * 160, size: Math.random() * 4.16 + 1.28, baseAlpha: Math.random() * 0.6 + 0.2
+            type: 'stripped_gas',
+            progress: Math.random(), speed: (Math.random() * 0.008 + 0.002),
+            spread: (Math.random() - 0.5) * 180, size: Math.random() * 4.2 + 1.2, baseAlpha: Math.random() * 0.6 + 0.2
           });
         }
 
+        const maxFrames = 750;
+
         const animate = () => {
-          time += 1;
+          realTimeRef.current += 1;
+          if (simTimeRef.current < maxFrames) {
+              simTimeRef.current += 1;
+          } else {
+              if (freezeFrameRef.current === null) {
+                  freezeFrameRef.current = realTimeRef.current;
+              }
+              // Mandatory automatic black hole swallow after 1.5 seconds (90 frames at 60fps)
+              if (realTimeRef.current - freezeFrameRef.current >= 90 && !blackHole && !autoBlackHoleTriggeredRef.current && !sceneCollapsed) {
+                  autoBlackHoleTriggeredRef.current = true;
+                  createBlackHole(null);
+              }
+          }
+
+          const time = simTimeRef.current;
+          const rTime = realTimeRef.current;
           const rect = canvas2D.getBoundingClientRect();
           const w = rect.width;
           const h = rect.height;
@@ -568,36 +581,43 @@
           ctx.clearRect(0, 0, w, h);
           ctx.globalCompositeOperation = 'source-over';
 
-          // Accelerated collapse for snappier interaction
-          const collapseProgress = blackHole ? Math.min(1, (time - blackHole.startedAt) / 400) : 0;
+          const collapseProgress = blackHole ? Math.min(1, (rTime - blackHole.startedAt) / 380) : 0;
           const blackHoleRadius = blackHole ? Math.max(28, Math.min(52, Math.min(w, h) * 0.075)) : 0;
           ctx.globalAlpha = sceneCollapsed ? 0 : 1;
 
-          const cycle = time * 0.005;
-          const pos = Math.sin(cycle); 
-          const vel = Math.cos(cycle);
+          const u = (time / maxFrames) * 2 - 1;
           
-          const gasPos1 = pos * 460 - Math.pow(vel, 3) * 120;
-          const gasPos2 = -pos * 420 + Math.pow(vel, 3) * 100;
+          // Sigmoid function for ultra-smooth fluid drag & ram-pressure stripping
+          const S = 1.0 / (1.0 + Math.exp(-8.0 * u));
+          const deflection = 65 * Math.tanh(1.8 * u);
 
+          // Collisionless Dark Matter halos pass straight through
+          const primaryX = u * 2500;
+          const secondaryX = -u * 2300;
+
+          // Normal Baryonic Gas stalls directly in the center (Left In-Between)
+          const centralGas1 = 70;   
+          const centralGas2 = -70;  
+          const gasPos1 = primaryX * (1 - S) + centralGas1 * S;
+          const gasPos2 = secondaryX * (1 - S) + centralGas2 * S;
+
+          // Active Halos: DM moves to sides; Normal Baryonic Gas sits trapped in the center
           const activeHalos = [
-              { name: 'DM_Primary', x: pos * 850, z: -30 + Math.cos(time * 0.003) * 70, r: 780, mass: 380, color: isDark ? {r: 65, g: 130, b: 255, a: 0.22} : {r: 35, g: 70, b: 190, a: 0.12} },
-              { name: 'DM_Secondary', x: -pos * 780, z: 40 + Math.sin(time * 0.0035) * 70, r: 680, mass: 320, color: isDark ? {r: 0, g: 200, b: 255, a: 0.18} : {r: 15, g: 110, b: 180, a: 0.10} },
-              { name: 'Gas_Primary', x: gasPos1, z: -10 + Math.sin(time * 0.008) * 45, r: 480, mass: 200, color: isDark ? {r: 255, g: 51, b: 90, a: 0.32} : {r: 190, g: 25, b: 55, a: 0.16} },
-              { name: 'Gas_Secondary', x: gasPos2, z: 20 + Math.cos(time * 0.007) * 45, r: 420, mass: 170, color: isDark ? {r: 255, g: 120, b: 40, a: 0.26} : {r: 180, g: 75, b: 15, a: 0.13} }
+              { name: 'DM_Primary', x: primaryX, z: -85 + deflection, r: 760, mass: 380, color: isDark ? {r: 65, g: 130, b: 255, a: 0.22} : {r: 35, g: 70, b: 190, a: 0.12} },
+              { name: 'DM_Secondary', x: secondaryX, z: 95 - deflection * 0.85, r: 660, mass: 320, color: isDark ? {r: 0, g: 200, b: 255, a: 0.18} : {r: 15, g: 110, b: 180, a: 0.10} },
+              { name: 'Gas_Primary', x: gasPos1, z: -85 + deflection, r: 520, mass: 210, color: isDark ? {r: 255, g: 51, b: 90, a: 0.38} : {r: 190, g: 25, b: 55, a: 0.22} },
+              { name: 'Gas_Secondary', x: gasPos2, z: 95 - deflection * 0.85, r: 460, mass: 180, color: isDark ? {r: 255, g: 120, b: 40, a: 0.34} : {r: 180, g: 75, b: 15, a: 0.18} }
           ];
 
-          const project = (x, y, z, verticalOffset = 0) => {
+          const project = (x, y, z) => {
               const fov = 900;
               if (z < -800) return null;
               
-              // FIX: Adjusted sceneScale so it remains large and visible on mobile screens.
-              // Previously, the strict max boundaries severely shrunk the visual element on narrow displays.
               const sceneScale = w < 768 ? Math.min(0.5, w / 1200) : Math.min(0.29, w / 4300, h / 2500);
               
               const scale = (fov / (fov + z)) * sceneScale;
               const sx = w / 2 + x * scale;
-              const sy = h * 0.64 + verticalOffset - (z * 0.22) * scale + y * scale;
+              const sy = h * 0.52 - (z * 0.22) * scale + y * scale;
               return { sx, sy, scale, z };
           };
 
@@ -618,15 +638,8 @@
                       wellIntensity = Math.max(wellIntensity, Math.abs(halo.mass) > 0 ? influence : 0);
                   });
 
-                  const distToCenterSq = x*x + z*z;
-                  const collisionIntensity = Math.exp(-distToCenterSq / (500 * 500)) * Math.max(0, 1 - Math.abs(pos) * 1.5);
-                  const bowShock = Math.sin(Math.sqrt(distToCenterSq) * 0.03 - time * 0.1) * collisionIntensity * 45;
-                  const wave = Math.sin(x * 0.002 + time * 0.015) * Math.cos(z * 0.002 + time * 0.015) * 12;
-                  y += wave + bowShock;
-
                   const proj = project(x, y, z);
                   if (proj) {
-                      // 2D Grid Lensing (matching the 3D M87 visual)
                       if (blackHole) {
                           const dx = blackHole.x - proj.sx;
                           const dy = blackHole.y - proj.sy;
@@ -647,7 +660,7 @@
           const sortedHalos = [...activeHalos].sort((a,b) => b.z - a.z);
           
           sortedHalos.forEach(halo => {
-             const proj = project(halo.x, Math.max(0, halo.mass), halo.z, -h * 0.36); 
+             const proj = project(halo.x, halo.mass * 0.5, halo.z); 
              if(!proj) return;
              
              let radius = halo.r * proj.scale * 1.8;
@@ -711,25 +724,30 @@
               let customColor = null;
               
               if (p.type === 'halo_dm') {
-                  p.theta += p.speed;
                   const halo = activeHalos[p.haloIdx];
                   const r = p.rFactor * (halo.r * 0.65);
                   const px3d = r * Math.sin(p.phi) * Math.cos(p.theta);
                   const py3d = (r * Math.cos(p.phi)) * 0.28;
                   const pz3d = r * Math.sin(p.phi) * Math.sin(p.theta);
-                  const clusterRot = time * 0.0015;
-                  worldX = halo.x + px3d * Math.cos(clusterRot) - pz3d * Math.sin(clusterRot);
-                  worldZ = halo.z + px3d * Math.sin(clusterRot) + pz3d * Math.cos(clusterRot);
+                  worldX = halo.x + px3d;
+                  worldZ = halo.z + pz3d;
                   worldY = py3d;
                   customColor = isDark ? (p.isBlueTint ? '150, 190, 255' : '110, 220, 255') : (p.isBlueTint ? '30, 60, 160' : '20, 95, 150');
               } else if (p.type === 'gas_plasma') {
                   p.theta += p.turbSpeed;
-                  const gas = activeHalos[p.gasIdx];
-                  const compression = Math.max(0.45, Math.min(1.2, Math.abs(pos) * 1.5));
-                  const r = p.rFactor * (gas.r * 0.75) * compression;
-                  worldX = gas.x + Math.cos(p.theta) * r + Math.sin(time * 0.02 + p.rFactor * 5) * 30;
-                  worldZ = gas.z + Math.sin(p.theta) * (r * 0.65);
-                  worldY = (Math.sin(p.theta * 2 + time * 0.03) * 45) * (1 - Math.abs(pos));
+                  const isPrimary = (p.gasIdx === 0);
+                  const gasX = isPrimary ? gasPos1 : gasPos2;
+                  
+                  const r = p.rFactor * 340;
+                  const compressionX = 1.0 - 0.52 * Math.exp(-6.0 * u * u);
+                  const stretchZ = 1.0 + 0.45 * Math.exp(-6.0 * u * u);
+
+                  const localX = Math.cos(p.theta) * r * compressionX;
+                  const localZ = Math.sin(p.theta) * (r * 0.65) * stretchZ;
+                  
+                  worldX = gasX + localX;
+                  worldZ = (isPrimary ? -85 + deflection : 95 - deflection * 0.85) + localZ;
+                  worldY = Math.sin(p.theta * 2 + rTime * 0.02) * 25 * (1 - S * 0.5);
                   
                   if (isDark) {
                       if (p.colorVariant < 0.5) customColor = '255, 51, 75';
@@ -741,16 +759,14 @@
                       else customColor = '180, 90, 10';
                   }
               } else {
-                  p.progress += p.speed;
-                  if (p.progress > 1) p.progress -= 1;
-                  if (p.progress < 0) p.progress += 1;
-                  const hDM = activeHalos[p.fromHalo];
-                  const hGas = activeHalos[p.toGas];
-                  const baseX = hDM.x + (hGas.x - hDM.x) * p.progress;
-                  const baseZ = hDM.z + (hGas.z - hDM.z) * p.progress;
-                  worldX = baseX + Math.sin(p.progress * Math.PI * 2 + time * 0.01) * p.spread;
-                  worldZ = baseZ + Math.cos(p.progress * Math.PI * 2 + time * 0.01) * (p.spread * 0.5);
-                  worldY = Math.sin(p.progress * Math.PI) * 30;
+                  // Stripped filaments stretching from central gas to outgoing DM halos
+                  const dir = (p.spread > 0 ? 1 : -1);
+                  const dmTargetX = dir === 1 ? primaryX : secondaryX;
+                  const gasTargetX = dir === 1 ? gasPos1 : gasPos2;
+                  
+                  worldX = gasTargetX + (dmTargetX - gasTargetX) * p.progress * S;
+                  worldZ = (dir === 1 ? -85 + deflection : 95 - deflection * 0.85) + Math.sin(p.progress * Math.PI * 2 + rTime * 0.01) * (p.spread * 0.4);
+                  worldY = Math.sin(p.progress * Math.PI) * 20 * S;
                   customColor = isDark ? '210, 140, 255' : '120, 55, 160';
               }
               
@@ -758,20 +774,18 @@
                   const dx = worldX - h.x;
                   const dz = worldZ - h.z;
                   const influence = Math.exp(-(dx*dx + dz*dz) / (h.r * h.r));
-                  worldY += h.mass * influence; 
+                  worldY += h.mass * influence;
               });
 
-              const distToCenterSq = worldX*worldX + worldZ*worldZ;
-              const collisionIntensity = Math.exp(-distToCenterSq / (500 * 500)) * Math.max(0, 1 - Math.abs(pos) * 1.5);
-              const bowShock = Math.sin(Math.sqrt(distToCenterSq) * 0.03 - time * 0.1) * collisionIntensity * 45;
-              const wave = Math.sin(worldX * 0.002 + time * 0.015) * Math.cos(worldZ * 0.002 + time * 0.015) * 12;
-              worldY += wave + bowShock;
-
-              const proj = project(worldX, worldY, worldZ, -h * 0.36);
+              const proj = project(worldX, worldY, worldZ);
               
               if (proj && proj.scale > 0.05) {
                   const depthAlpha = Math.max(0, Math.min(1, (proj.scale - 0.1) * 2.5));
                   let finalAlpha = p.baseAlpha * depthAlpha;
+
+                  if (p.type === 'stripped_gas') {
+                      finalAlpha *= S;
+                  }
 
                   if (blackHole) {
                       const dx = blackHole.x - proj.sx;
@@ -794,13 +808,12 @@
               }
           });
 
-          // --- 3D M87* BLACK HOLE ANIMATION & SYNCHRONIZATION ---
           currentMouse.lerp(targetMouse, 0.05);
           uniforms.uMouse.value.copy(currentMouse);
-          uniforms.uTime.value = time * 0.016; 
+          uniforms.uTime.value = rTime * 0.016; 
 
           if (blackHole) {
-              const fadeIn = Math.min(1, (time - blackHole.startedAt) / 45);
+              const fadeIn = Math.min(1, (rTime - blackHole.startedAt) / 45);
               const fadeOut = 1.0 - Math.pow(Math.max(0, (collapseProgress - 0.8) / 0.2), 2.0); 
               uniforms.uOpacity.value = fadeIn * fadeOut;
               
@@ -838,9 +851,7 @@
 
       return (
         <div className="absolute inset-0 w-full h-full z-0 overflow-hidden">
-            {/* 2D Grid & Physics Particles */}
             <canvas ref={canvas2DRef} className="absolute inset-0 w-full h-full z-0 cursor-crosshair transition-opacity duration-1000 opacity-100" />
-            {/* 3D M87* Simulation Overlay */}
             <canvas ref={canvas3DRef} className="absolute inset-0 w-full h-full z-10 pointer-events-none" />
         </div>
       );
@@ -934,7 +945,6 @@
               </div>
             </div>
             
-            {}
             {isMenuOpen && (
               <div className={`md:hidden mx-4 mb-3 rounded-xl border p-2 animate-fade-in ${isDark ? 'bg-cosmic-dust/95 border-white/[0.08]' : 'bg-cream-50 border-stone-200'}`}>
                 {[ ['About', 'home', 'about'], ['Research', 'home', 'research'], ['CV', 'home', 'experience'], ['Publications', 'home', 'publications'], ['Activities', 'activities'], ['Gallery', 'blog'] ].map(([label, page, section]) => (
@@ -947,14 +957,13 @@
 
           {currentPage === 'home' && (
             <>
-              {}
               <section className="relative pt-40 pb-32 md:pt-52 md:pb-44 px-6 overflow-hidden" aria-label="Introduction">
                 <SpaceTimeGridBackground isDark={isDark} />
                 <div className="hero-orb absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none" aria-hidden="true"></div>
                 
                 <div className="max-w-6xl mx-auto relative z-10 flex flex-col items-center text-center md:items-start md:text-left">
                   <Reveal delay={0}>
-                    <p className={`eyebrow mb-6 tracking-widest ${isDark ? 'text-glowred' : 'text-darkred-700'}`}> </p>
+                    <p className={`eyebrow mb-6 tracking-widest ${isDark ? 'text-glowred' : 'text-darkred-700'}`}>  </p>
                   </Reveal>
 
                   <Reveal delay={150}>
@@ -988,7 +997,6 @@
                 </div>
               </section>
 
-              {}
               <section id="about" className={`py-24 overflow-hidden border-t ${isDark ? 'bg-cosmic-dust border-white/[0.04]' : 'bg-cream border-stone-200/50'}`}>
                 <div className="max-w-6xl mx-auto px-6">
                   <div className="grid md:grid-cols-3 gap-14">
@@ -1026,7 +1034,6 @@
                 </div>
               </section>
 
-              {}
               <section id="research" className={`py-24 border-t ${isDark ? 'bg-cosmic-void border-white/[0.04]' : 'bg-cream-50 border-stone-200/50'}`}>
                 <div className="max-w-6xl mx-auto px-6">
                   <div className="mb-12"><SectionHeader eyebrow="Research" title="Focus & Interests" /></div>
@@ -1044,7 +1051,6 @@
                 </div>
               </section>
 
-              {}
               <section id="experience" className={`py-24 border-t ${isDark ? 'bg-cosmic-dust border-white/[0.04]' : 'bg-cream border-stone-200/50'}`}>
                 <div className="max-w-4xl mx-auto px-6">
                   <div className="mb-10"><SectionHeader eyebrow="Background" title="Experience & Education" /></div>
@@ -1089,7 +1095,6 @@
                 </div>
               </section>
 
-              {}
               <section id="publications" className={`py-24 border-t ${isDark ? 'bg-cosmic-void border-white/[0.04]' : 'bg-cream-50 border-stone-200/50'}`}>
                 <div className="max-w-5xl mx-auto px-6">
                   <Reveal>
@@ -1132,7 +1137,6 @@
             </>
           )}
 
-          {}
           {currentPage === 'activities' && (
             <div className={`pt-28 pb-16 min-h-screen animate-fade-in ${isDark ? 'bg-cosmic-void' : 'bg-cream'}`}>
               <div className="max-w-4xl mx-auto px-6">
@@ -1158,7 +1162,6 @@
             </div>
           )}
 
-          {}
           {currentPage === 'blog' && (
             <div className={`pt-28 pb-16 min-h-screen animate-fade-in ${isDark ? 'bg-cosmic-void' : 'bg-cream'}`}>
               <div className="max-w-5xl mx-auto px-6">
@@ -1197,7 +1200,6 @@
             </div>
           )}
 
-          {}
           {selectedImage && (
             <div className={`fixed inset-0 z-[100] flex items-center justify-center backdrop-blur-md p-4 md:p-12 animate-fade-in-modal cursor-zoom-out ${isDark ? 'bg-black/95' : 'bg-stone-950/97'}`} onClick={() => setSelectedImage(null)}>
               <button className="absolute top-4 right-4 md:top-6 md:right-6 text-zinc-400 hover:text-white z-10 w-9 h-9 flex items-center justify-center rounded-full bg-white/5 hover:bg-glowred transition-all duration-200" onClick={() => setSelectedImage(null)}><i className="fa-solid fa-xmark text-xs"></i></button>

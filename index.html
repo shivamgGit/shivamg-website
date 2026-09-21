@@ -169,6 +169,10 @@
       { period: "Apr 2024 – Apr 2025", role: "Research Associate", institution: "Department of Physics, Indian Institute of Technology Guwahati." }
     ];
 
+    // Publications shown before the list collapses behind an expander. A nested
+    // scroll area was considered and rejected: it breaks Ctrl+F and traps scrolling.
+    const PUB_PREVIEW = 6;
+
     const achievements = [
       "CSIR-UGC NET (June 2016) — All India Rank 125", "CSIR-UGC NET (Dec 2016) — All India Rank 145",
       "JEST (2016) — All India Rank 244", "GATE (2017) — All India Rank 125"
@@ -211,9 +215,9 @@
     ];
 
     const researchInterests = [
-      { id: "NuDM", title: "Dark Matter & Neutrinos", icon: "fa-bolt", description: "A large invisible mass — dark matter — is needed to explain gravitational anomalies at scales from galaxies to the very early Universe. Experimentally established neutrino masses are another puzzle outside the Standard Model." },
-      { id: "alps", title: "Axions & Pseudo-scalars", icon: "fa-atom", description: "Axions are proposed to solve the Strong CP problem and are well-motivated cold dark matter candidates. Generic pseudo-scalar particles are also motivated as WIMP dark matter due to weaker DM-nucleon scattering cross sections." },
-      { id: "Neff", title: "Neff", icon: "fa-star", description: "The effective number of relativistic degrees of freedom is a fine probe to constrain many BSM models." }
+      { id: "NuDM", title: "Dark Matter & Neutrinos", icon: "fa-arrows-to-circle", description: "A large invisible mass — dark matter — is needed to explain gravitational anomalies at scales from galaxies to the very early Universe. Experimentally established neutrino masses are another puzzle outside the Standard Model." },
+      { id: "alps", title: "Axions & Pseudo-scalars", icon: "fa-wave-square", description: "Axions are proposed to solve the Strong CP problem and are well-motivated cold dark matter candidates. Generic pseudo-scalar particles are also motivated as WIMP dark matter due to weaker DM-nucleon scattering cross sections." },
+      { id: "Neff", title: "Neff", icon: "fa-hashtag", description: "The effective number of relativistic degrees of freedom is a fine probe to constrain many BSM models." }
     ];
 
     const PREFERS_REDUCED = typeof window !== 'undefined' && window.matchMedia
@@ -523,6 +527,14 @@
                             fireCol = mix(fireCol, vec3(1.0, 0.8, 0.3), pow(fire, 1.5));
                             fireCol *= 2.5;
 
+                            // Disk temperature falls as T ∝ M^(-1/4), so a hole that
+                            // grows must also redden: shift the blue-white end of the
+                            // ramp toward orange and drop the bolometric brightness.
+                            float cool = clamp(pow(max(uScale, 1.0), -0.25), 0.45, 1.0);
+                            fireCol.g *= mix(0.72, 1.0, cool);
+                            fireCol.b *= mix(0.30, 1.0, cool);
+                            fireCol *= mix(0.62, 1.0, cool);
+
                             // Relativistic beaming. The ray marches camera→source,
                             // so the emitter→observer direction is -v and the Doppler
                             // factor is D = 1/(1 + beta·dot(v, diskVel)); flux ~ D^4.
@@ -571,6 +583,10 @@
         let simFrame = 0;
         let blackHole = null;
         let elapsed = 0;
+        // Separate clock for the disk. Schwarzschild geometry is self-similar in M,
+        // so growing the hole is a uniform rescale — but orbital frequency goes as
+        // Ω ∝ M⁻¹, so the disk must visibly slow by the same factor it grows.
+        let diskClock = 0;
         let visible = true;
         let paused = false;
         let rafId = null;
@@ -594,6 +610,7 @@
           blackHole = null;
           simFrame = 0;
           elapsed = 0;
+          diskClock = 0;
           setPhase('run');
           if (REDUCED_MOTION) { simFrame = F_RUN * 0.62; drawFrame(0); }
         };
@@ -951,7 +968,7 @@
           // ── accretion-disk shader pass (only while a black hole exists) ─────
           currentMouse.lerp(targetMouse, 0.05);
           uniforms.uMouse.value.copy(currentMouse);
-          uniforms.uTime.value = elapsed;
+          uniforms.uTime.value = diskClock;
 
           let opacity = 0;
           if (phase === 'collapse') {
@@ -980,6 +997,8 @@
           if (!visible || paused) return;
           const step = Math.max(0, Math.min(3, dt / 16.667));
           elapsed += step / 60;
+          // Mass grows as uScale, so proper-time at fixed r/M dilates by the same factor.
+          diskClock += (step / 60) / Math.max(0.25, uniforms.uScale.value);
           drawFrame(step);
         };
 
@@ -1037,6 +1056,7 @@
       const [activeResearch, setActiveResearch] = useState(researchInterests[0].id);
       const [isScrolled, setIsScrolled] = useState(false);
       const [activeTab, setActiveTab] = useState('experience');
+      const [showAllPubs, setShowAllPubs] = useState(false);
       const [activeActivityTab, setActiveActivityTab] = useState('conferences');
       const [currentPage, setCurrentPage] = useState('home');
       const [selectedImage, setSelectedImage] = useState(null);
@@ -1111,7 +1131,7 @@
       const navItems = [
         { label: 'About', page: 'home', section: 'about' },
         { label: 'Research', page: 'home', section: 'research' },
-        { label: 'CV', page: 'home', section: 'experience' },
+        { label: 'Education', page: 'home', section: 'experience' },
         { label: 'Publications', page: 'home', section: 'publications' },
         { label: 'Activities', page: 'activities', section: null },
         { label: 'Gallery', page: 'blog', section: null },
@@ -1153,7 +1173,7 @@
         <div className={`min-h-screen transition-colors duration-450 ${isDark ? 'bg-cosmic-void text-zinc-300 selection:bg-glowred-soft selection:text-white' : 'bg-cream text-stone-800 selection:bg-darkred-200 selection:text-darkred-950'}`}>
 
           <nav className={`fixed w-full z-50 transition-all duration-300 ${isScrolled ? (isDark ? 'nav-surface bg-cosmic-void/80 backdrop-blur-lg shadow-xl border-b border-white/[0.05] py-3' : 'nav-surface bg-cream/95 backdrop-blur-md shadow-sm border-b border-stone-200/70 py-3') : 'bg-transparent py-5'}`}>
-            <div className="max-w-6xl mx-auto px-6 flex justify-between items-center">
+            <div className="max-w-5xl mx-auto px-6 flex justify-between items-center">
               
               <a href="#" onClick={(e) => navigateTo(e, 'home')} className="flex items-center gap-3 group">
                 <i className={`fa-solid fa-atom text-lg animate-spin-slow ${isDark ? 'text-glowred' : 'text-darkred-700'}`}></i>
@@ -1198,7 +1218,7 @@
             
             {isMenuOpen && (
               <div className={`md:hidden mx-4 mb-3 rounded-xl border p-2 animate-fade-in ${isDark ? 'bg-cosmic-dust/95 border-white/[0.08]' : 'bg-cream-50 border-stone-200'}`}>
-                {[ ['About', 'home', 'about'], ['Research', 'home', 'research'], ['CV', 'home', 'experience'], ['Publications', 'home', 'publications'], ['Activities', 'activities'], ['Gallery', 'blog'] ].map(([label, page, section]) => (
+                {[ ['About', 'home', 'about'], ['Research', 'home', 'research'], ['Education', 'home', 'experience'], ['Publications', 'home', 'publications'], ['Activities', 'activities'], ['Gallery', 'blog'] ].map(([label, page, section]) => (
                   <a key={label} href={section ? `#${section}` : '#'} onClick={(e) => navigateTo(e, page, section)} className={`block rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${isDark ? 'text-zinc-300 hover:bg-white/[0.06] hover:text-glowred' : 'text-stone-600 hover:bg-darkred-50 hover:text-darkred-800'}`}>{label}</a>
                 ))}
                 <a href="#contact" onClick={(e) => { e.preventDefault(); setIsMenuOpen(false); scrollToSection('contact'); }} className={`block rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${isDark ? 'text-zinc-300 hover:bg-white/[0.06] hover:text-glowred' : 'text-stone-600 hover:bg-darkred-50 hover:text-darkred-800'}`}>Contact</a>
@@ -1209,15 +1229,11 @@
 
           {currentPage === 'home' && (
             <>
-              <section className="relative pt-40 pb-32 md:pt-52 md:pb-44 px-6 overflow-hidden" aria-label="Introduction">
+              <section className="relative pt-40 pb-32 md:pt-52 md:pb-44 overflow-hidden" aria-label="Introduction">
                 <SpaceTimeGridBackground isDark={isDark} />
                 <div className="hero-orb absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none" aria-hidden="true"></div>
                 
-                <div className="max-w-6xl mx-auto relative z-10 flex flex-col items-center text-center md:items-start md:text-left">
-                  <Reveal delay={0}>
-                    <p className={`eyebrow mb-6 tracking-widest ${isDark ? 'text-glowred' : 'text-darkred-700'}`}> </p>
-                  </Reveal>
-
+                <div className="max-w-5xl mx-auto px-6 relative z-10 flex flex-col items-center text-center md:items-start md:text-left">
                   <Reveal delay={150}>
                     <h1 className={`text-4xl md:text-6xl font-bold tracking-tight mb-5 leading-none select-none ${isDark ? 'text-white' : 'text-stone-900'}`}>
                       Dr. Shivam Gola
@@ -1231,21 +1247,14 @@
                   </Reveal>
 
                   <Reveal delay={360}>
-                    <p className={`text-[10px] uppercase tracking-wider font-semibold mb-8 select-none whitespace-nowrap border px-4 py-1.5 rounded-full backdrop-blur-md ${isDark ? 'text-glowred bg-glowred/10 border-glowred/30' : 'text-darkred-700 bg-darkred-50 border-darkred-200'}`}>
-                      IIT Bombay, India
-                    </p>
-                  </Reveal>
-
-                  <Reveal delay={440}>
-                    <div className="flex flex-wrap justify-center md:justify-start gap-4">
-                      <a href="#publications" onClick={(e) => navigateTo(e, 'home', 'publications')} className={`px-6 py-3 rounded-md text-xs font-semibold tracking-wide whitespace-nowrap transition-all shadow-lg flex items-center gap-2 ${isDark ? 'bg-glowred text-white hover:bg-rose-700 shadow-glowred/20 glow-hover' : 'bg-darkred-700 text-cream hover:bg-darkred-900 shadow-darkred/20 glow-hover'}`}>
-                        <i className="fa-regular fa-file-lines"></i> Selected Publications
+                    {/* Three tiers, not three buttons: filled primary, outlined secondary,
+                        bare text link — so the eye lands on Publications first. */}
+                    <div className="mt-9 flex flex-wrap items-center justify-center md:justify-start gap-x-3 gap-y-3">
+                      <a href="#publications" onClick={(e) => navigateTo(e, 'home', 'publications')} className={`px-6 py-3 rounded-full text-xs font-semibold tracking-wide whitespace-nowrap transition-all shadow-lg flex items-center gap-2 ${isDark ? 'bg-glowred text-white hover:bg-rose-700 shadow-glowred/20 glow-hover' : 'bg-darkred-700 text-cream hover:bg-darkred-900 shadow-darkred/20 glow-hover'}`}>
+                        Selected Publications
                       </a>
-                      <a href={CV_URL} target="_blank" rel="noopener noreferrer" className={`px-6 py-3 rounded-md border text-xs font-semibold tracking-wide whitespace-nowrap transition-all flex items-center gap-2 backdrop-blur-md ${isDark ? 'bg-white/[0.05] text-zinc-300 border-white/[0.08] hover:bg-white/[0.1] hover:border-glowred/50 hover:text-white' : 'bg-cream-100 text-stone-600 border-stone-300 hover:bg-cream hover:border-darkred-400 hover:text-darkred-800'}`}>
-                        <i className="fa-solid fa-file-pdf"></i> CV (PDF)
-                      </a>
-                      <a href="#contact" onClick={(e) => { e.preventDefault(); scrollToSection('contact'); }} className={`px-6 py-3 rounded-md border text-xs font-semibold tracking-wide whitespace-nowrap transition-all flex items-center gap-2 backdrop-blur-md ${isDark ? 'bg-white/[0.05] text-zinc-300 border-white/[0.08] hover:bg-white/[0.1] hover:border-white/[0.15]' : 'bg-cream-100 text-stone-600 border-stone-300 hover:bg-cream hover:border-stone-400'}`}>
-                        <i className="fa-solid fa-envelope"></i> Contact Me
+                      <a href={CV_URL} target="_blank" rel="noopener noreferrer" className={`px-6 py-3 rounded-full border text-xs font-semibold tracking-wide whitespace-nowrap transition-all flex items-center gap-2 backdrop-blur-md ${isDark ? 'text-zinc-300 border-white/[0.14] hover:border-glowred/50 hover:text-white' : 'text-stone-600 border-stone-300 hover:border-darkred-400 hover:text-darkred-800'}`}>
+                        <i className="fa-solid fa-file-pdf text-[11px] opacity-70"></i> CV (PDF)
                       </a>
                     </div>
                   </Reveal>
@@ -1253,20 +1262,20 @@
               </section>
 
               <section id="about" className={`py-24 overflow-hidden border-t ${isDark ? 'bg-cosmic-dust border-white/[0.04]' : 'bg-cream border-stone-200/50'}`}>
-                <div className="max-w-6xl mx-auto px-6">
+                <div className="max-w-5xl mx-auto px-6">
                   <div className="grid md:grid-cols-3 gap-14">
                     <div className="md:col-span-2 space-y-6">
-                      <SectionHeader eyebrow="About" title="Theoretical Research" />
-                      <Reveal delay={150}>
+                      <SectionHeader instant eyebrow="About" title="Theoretical Research" />
+                      <Reveal instant>
                         <p className={`leading-relaxed text-sm mt-8 ${isDark ? 'text-zinc-400' : 'text-stone-500'}`}>My research focuses on understanding the nature of dark matter and uncovering the particle dynamics that shape the universe at fundamental scales. I aim to identify viable dark matter candidates and clarify how they interact with the Standard Model.</p>
                       </Reveal>
-                      <Reveal delay={250}>
+                      <Reveal instant>
                         <p className={`leading-relaxed text-sm ${isDark ? 'text-zinc-400' : 'text-stone-500'}`}>I have worked in scenarios involving WIMPs, FIMPs, Sterile Neutrinos, pseudo-Nambu–Goldstone bosons, axions and axion-like particles (ALPs). My approach combines rigorous mathematical modeling with computational tools to identify unconstrained parameter spaces for new physics.</p>
                       </Reveal>
                     </div>
 
                     <div className="space-y-5">
-                      <Reveal delay={300}>
+                      <Reveal instant>
                         <div className={`p-6 rounded-xl border backdrop-blur-sm ${isDark ? 'border-white/[0.05] bg-white/[0.02]' : 'border-stone-200 bg-cream-50'}`}>
                           <p className={`eyebrow mb-3 ${isDark ? 'text-glowred' : 'text-darkred-700'}`}>Current Position</p>
                           <p className={`text-sm font-semibold leading-snug ${isDark ? 'text-white' : 'text-stone-800'}`}>Postdoctoral Fellow</p>
@@ -1274,7 +1283,7 @@
                         </div>
                       </Reveal>
 
-                      <Reveal delay={400}>
+                      <Reveal instant>
                         <div className={`p-6 rounded-xl border backdrop-blur-sm ${isDark ? 'border-white/[0.05] bg-white/[0.02]' : 'border-stone-200 bg-cream-50'}`}>
                           <p className={`eyebrow mb-4 ${isDark ? 'text-glowred' : 'text-darkred-700'}`}>Computational Tools</p>
                           <div className="flex flex-wrap gap-2">
@@ -1290,11 +1299,11 @@
               </section>
 
               <section id="research" className={`py-24 border-t ${isDark ? 'bg-cosmic-void border-white/[0.04]' : 'bg-cream-50 border-stone-200/50'}`}>
-                <div className="max-w-6xl mx-auto px-6">
-                  <div className="mb-12"><SectionHeader eyebrow="Research" title="Focus & Interests" /></div>
+                <div className="max-w-5xl mx-auto px-6">
+                  <div className="mb-12"><SectionHeader instant eyebrow="Research" title="Focus & Interests" /></div>
                   <div className="grid md:grid-cols-3 gap-5">
                     {researchInterests.map((item, idx) => (
-                      <Reveal key={item.id} delay={idx * 110} className="h-full">
+                      <Reveal key={item.id} instant className="h-full">
                         <button onClick={() => setActiveResearch(item.id)} className={`group w-full h-full text-left p-6 rounded-xl transition-all duration-300 border ${isDark ? (activeResearch === item.id ? 'bg-white/[0.04] shadow-xl border-glowred/30 shadow-glowred/5' : 'bg-white/[0.01] hover:bg-white/[0.02] border-white/[0.06] hover:border-white/[0.12]') : (activeResearch === item.id ? 'bg-cream shadow-md border-darkred-200' : 'bg-cream/60 hover:bg-cream border-stone-200 hover:border-stone-300')}`}>
                           <div className={`mb-4 ${isDark ? 'text-glowred' : 'text-darkred-700'}`}><i className={`fa-solid ${item.icon} text-xl`}></i></div>
                           <h3 className={`text-sm font-semibold mb-1 transition-colors ${isDark ? (activeResearch === item.id ? 'text-white' : 'text-zinc-300') : (activeResearch === item.id ? 'text-darkred-800' : 'text-stone-700')}`}>{item.title}</h3>
@@ -1307,9 +1316,9 @@
               </section>
 
               <section id="experience" className={`py-24 border-t ${isDark ? 'bg-cosmic-dust border-white/[0.04]' : 'bg-cream border-stone-200/50'}`}>
-                <div className="max-w-4xl mx-auto px-6">
-                  <div className="mb-10"><SectionHeader eyebrow="Background" title="Experience & Education" /></div>
-                  <Reveal>
+                <div className="max-w-5xl mx-auto px-6">
+                  <div className="mb-10"><SectionHeader instant eyebrow="Background" title="Experience & Education" /></div>
+                  <Reveal instant>
                     <div className={`flex items-center gap-8 mb-12 border-b ${isDark ? 'border-white/[0.08]' : 'border-stone-200'}`}>
                       <TabBtn label="Experience" icon="fa-briefcase" value="experience" state={activeTab} setState={setActiveTab} />
                       <TabBtn label="Education" icon="fa-graduation-cap" value="education" state={activeTab} setState={setActiveTab} />
@@ -1320,16 +1329,16 @@
                   <div className={`space-y-4 relative before:absolute before:inset-0 before:ml-[1.1rem] before:h-full before:w-px ${isDark ? 'before:bg-gradient-to-b before:from-white/[0.1] before:via-white/[0.03] before:to-transparent' : 'before:bg-gradient-to-b before:from-stone-200 before:via-stone-100 before:to-transparent'}`}>
                     {activeTab === 'achievements' ? (
                       achievements.map((item, idx) => (
-                        <Reveal key={idx} delay={idx * 90}>
-                          <div className="relative flex items-center gap-5 group">
-                            <div className={`flex items-center justify-center w-9 h-9 rounded-full border shrink-0 z-10 transition-all ${isDark ? 'border-white/[0.1] bg-cosmic-dust text-glowred group-hover:border-glowred/40' : 'border-2 border-stone-200 bg-cream text-darkred-600 group-hover:border-darkred-300 group-hover:bg-darkred-50'}`}><i className="fa-solid fa-award text-xs"></i></div>
-                            <div className={`flex-1 p-4 rounded-xl border transition-all ${isDark ? 'bg-white/[0.01] border-white/[0.05] group-hover:border-white/[0.1]' : 'bg-cream-50 border-stone-200 group-hover:border-stone-300'}`}><p className={`text-sm font-medium ${isDark ? 'text-zinc-200' : 'text-stone-700'}`}>{item}</p></div>
+                        <Reveal key={idx} instant>
+                          <div className="relative flex items-start gap-5 group">
+                            <div className={`mt-1 flex items-center justify-center w-9 h-9 rounded-full border shrink-0 z-10 transition-all ${isDark ? 'border-white/[0.1] bg-cosmic-dust text-glowred group-hover:border-glowred/40' : 'border-2 border-stone-200 bg-cream text-darkred-600 group-hover:border-darkred-300 group-hover:bg-darkred-50'}`}><i className="fa-solid fa-award text-xs"></i></div>
+                            <div className={`flex-1 p-5 rounded-xl border transition-all ${isDark ? 'bg-white/[0.01] border-white/[0.05] group-hover:border-white/[0.1]' : 'bg-cream-50 border-stone-200 group-hover:border-stone-300'}`}><p className={`text-sm font-medium ${isDark ? 'text-zinc-200' : 'text-stone-700'}`}>{item}</p></div>
                           </div>
                         </Reveal>
                       ))
                     ) : (
                       (activeTab === 'experience' ? experience : education).map((item, idx) => (
-                        <Reveal key={idx} delay={idx * 120}>
+                        <Reveal key={idx} instant>
                           <div className="relative flex items-start gap-5 group">
                             <div className={`mt-1 flex items-center justify-center w-9 h-9 rounded-full border shrink-0 z-10 transition-all ${isDark ? 'border-white/[0.1] bg-cosmic-dust text-glowred group-hover:border-glowred/40' : 'border-2 border-stone-200 bg-cream text-darkred-600 group-hover:border-darkred-300 group-hover:bg-darkred-50'}`}>
                               {activeTab === 'experience' ? <i className="fa-solid fa-briefcase text-xs"></i> : <i className="fa-solid fa-graduation-cap text-xs"></i>}
@@ -1352,7 +1361,7 @@
 
               <section id="publications" className={`py-24 border-t ${isDark ? 'bg-cosmic-void border-white/[0.04]' : 'bg-cream-50 border-stone-200/50'}`}>
                 <div className="max-w-5xl mx-auto px-6">
-                  <Reveal>
+                  <Reveal instant>
                     <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-5">
                       <div>
                         <p className={`eyebrow mb-3 ${isDark ? 'text-glowred' : 'text-darkred-700'}`}>Research Output</p>
@@ -1365,28 +1374,44 @@
                           { label: 'iNSPIRE-HEP', href: 'https://inspirehep.net/authors/1867679' },
                           { label: 'Google Scholar', href: 'https://scholar.google.com/scholar?q=%22Shivam+Gola%22' },
                         ].map(({ label, href }) => (
-                          <a key={label} href={href} target="_blank" rel="noopener noreferrer" className={`px-3.5 py-1.5 border rounded-md text-xs font-medium transition-all flex items-center gap-1.5 backdrop-blur-sm ${isDark ? 'bg-white/[0.02] border-white/[0.08] text-zinc-400 hover:text-glowred hover:border-glowred/40' : 'bg-cream border-stone-200 text-stone-500 hover:text-darkred-700 hover:border-darkred-200'}`}>
-                            {label} <i className="fa-solid fa-arrow-up-right-from-square text-[8px]"></i>
+                          <a key={label} href={href} target="_blank" rel="noopener noreferrer" className={`px-3.5 py-1.5 border rounded-full text-xs font-medium transition-all flex items-center gap-1.5 shrink-0 backdrop-blur-sm ${isDark ? 'bg-white/[0.02] border-white/[0.08] text-zinc-400 hover:text-glowred hover:border-glowred/40' : 'bg-cream border-stone-200 text-stone-500 hover:text-darkred-700 hover:border-darkred-200'}`}>
+                            <span className="whitespace-nowrap">{label}</span>
+                            <i className="fa-solid fa-arrow-up-right-from-square text-[8px] opacity-60"></i>
                           </a>
                         ))}
                       </div>
                     </div>
                   </Reveal>
 
-                  <Reveal delay={150}>
+                  <Reveal instant>
                     <div className="space-y-3">
-                      {publications.map((pub, idx) => (
-                        <div key={idx} className={`flex items-start gap-5 p-6 rounded-xl border transition-all duration-300 group ${isDark ? 'bg-white/[0.01] border-white/[0.05] hover:border-glowred/30 hover:bg-white/[0.02]' : 'bg-cream border-stone-200 hover:border-stone-300 hover:translate-x-1'}`}>
-                          <span className={`font-display text-2xl font-bold shrink-0 leading-none mt-0.5 w-7 text-right tabular-nums ${isDark ? 'text-white/[0.08]' : 'text-stone-200'}`}>{String(idx + 1).padStart(2, '0')}</span>
+                      {(showAllPubs ? publications : publications.slice(0, PUB_PREVIEW)).map((pub, idx) => (
+                        <div key={idx} className="relative flex items-start gap-5 group">
+                          <div className={`mt-1 flex items-center justify-center w-9 h-9 rounded-full border shrink-0 z-10 transition-all ${isDark ? 'border-white/[0.1] bg-cosmic-dust text-glowred group-hover:border-glowred/40' : 'border-2 border-stone-200 bg-cream text-darkred-600 group-hover:border-darkred-300 group-hover:bg-darkred-50'}`}>
+                            <i className="fa-regular fa-file-lines text-xs"></i>
+                          </div>
+                          <div className={`flex-1 p-6 rounded-xl border transition-all duration-300 ${isDark ? 'bg-white/[0.01] border-white/[0.05] group-hover:border-glowred/30 group-hover:bg-white/[0.02]' : 'bg-cream border-stone-200 group-hover:border-stone-300'}`}>
                           <div>
                             <a href={pub.link} target="_blank" rel="noopener noreferrer" className={`text-sm font-semibold transition-colors leading-snug block mb-1.5 ${isDark ? 'text-zinc-100 group-hover:text-glowred' : 'text-stone-800 group-hover:text-darkred-800'}`}>{pub.title}</a>
                             <p className={`text-xs mb-1 ${isDark ? 'text-zinc-400' : 'text-stone-500'}`}>{pub.authors}</p>
                             <p className={`text-xs italic ${isDark ? 'text-zinc-500' : 'text-stone-400'}`}>{pub.journal}</p>
                           </div>
+                          </div>
                         </div>
                       ))}
                     </div>
                   </Reveal>
+
+                  {publications.length > PUB_PREVIEW && (
+                    <button
+                      type="button"
+                      onClick={() => setShowAllPubs(v => !v)}
+                      className={`mt-6 ml-[3.5rem] px-5 py-2.5 rounded-full border text-xs font-semibold tracking-wide transition-all flex items-center gap-2 ${isDark ? 'text-zinc-400 border-white/[0.12] hover:border-glowred/50 hover:text-white' : 'text-stone-500 border-stone-300 hover:border-darkred-400 hover:text-darkred-800'}`}
+                    >
+                      {showAllPubs ? 'Show fewer' : `Show all ${publications.length} publications`}
+                      <i className={`fa-solid ${showAllPubs ? 'fa-chevron-up' : 'fa-chevron-down'} text-[9px] opacity-70`}></i>
+                    </button>
+                  )}
                 </div>
               </section>
             </>
@@ -1394,9 +1419,9 @@
 
           {currentPage === 'activities' && (
             <div className={`pt-28 pb-16 min-h-screen animate-fade-in ${isDark ? 'bg-cosmic-void' : 'bg-cream'}`}>
-              <div className="max-w-4xl mx-auto px-6">
+              <div className="max-w-5xl mx-auto px-6">
                 <div className="mb-10">
-                  <SectionHeader instant eyebrow="Contributions" title={activeActivityTab === 'conferences' ? 'Academic Activities' : 'Research Experience'} />
+                  <SectionHeader instant eyebrow="Engagement" title="Academic Activities" />
                 </div>
 
                 <div className={`mb-8 flex items-center gap-7 border-b ${isDark ? 'border-white/[0.08]' : 'border-stone-200'}`}>
@@ -1408,7 +1433,7 @@
                   </button>
                 </div>
 
-                <section aria-label={activeActivityTab === 'conferences' ? 'Academic Activities' : 'Research Experience'}>
+                <section aria-label={activeActivityTab === 'conferences' ? 'Conferences and seminars' : 'Research visits'}>
                   <div className="grid gap-4">
                     {(activeActivityTab === 'conferences' ? conferencesList : visitsList).map((item, idx) => <ActivityCard key={item.title} item={item} index={idx} />)}
                   </div>
@@ -1420,12 +1445,12 @@
           {currentPage === 'blog' && (
             <div className={`pt-28 pb-16 min-h-screen animate-fade-in ${isDark ? 'bg-cosmic-void' : 'bg-cream'}`}>
               <div className="max-w-5xl mx-auto px-6">
-                <div className="mb-12"><SectionHeader eyebrow="Gallery" title="Travel & Photography" /><p className={`text-xs mt-4 ${isDark ? 'text-zinc-500' : 'text-stone-400'}`}>Memories from various trips and places.</p></div>
+                <div className="mb-12"><SectionHeader instant eyebrow="Gallery" title="Travel & Photography" /><p className={`text-xs mt-4 ${isDark ? 'text-zinc-500' : 'text-stone-400'}`}>Memories from various trips and places.</p></div>
 
                 <div className="grid grid-cols-1 gap-10">
                   {blogPosts.map((post, idx) => (
-                    <Reveal key={post.id} delay={idx * 100}>
-                      <div className={`rounded-2xl border overflow-hidden transition-all duration-300 ${isDark ? 'bg-white/[0.01] border-white/[0.05] hover:border-white/[0.1]' : 'bg-cream-50 border-stone-200 hover:border-stone-300'}`}>
+                    <Reveal key={post.id} instant>
+                      <div className={`rounded-xl border overflow-hidden transition-all duration-300 ${isDark ? 'bg-white/[0.01] border-white/[0.05] hover:border-white/[0.1]' : 'bg-cream-50 border-stone-200 hover:border-stone-300'}`}>
                         {post.images && post.images.length > 0 && (
                           <div className={`p-6 md:p-8 border-b ${isDark ? 'bg-white/[0.01] border-white/[0.04]' : 'bg-stone-100/80'}`}>
                             <div className={`grid gap-4 ${post.images.length === 1 ? 'grid-cols-1 max-w-2xl mx-auto' : post.images.length === 2 ? 'grid-cols-2' : 'grid-cols-2 sm:grid-cols-3'}`}>
@@ -1462,20 +1487,20 @@
             </div>
           )}
 
-          <footer id="contact" className={`transition-colors duration-450 py-16 border-t-2 ${isDark ? 'bg-cosmic-dust text-zinc-400 border-glowred/30 shadow-inner' : 'bg-darkred-700 text-darkred-100 border-darkred-900/50'}`}>
-            <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-12">
-              <Reveal>
+          <footer id="contact" className={`transition-colors duration-450 py-14 border-t-2 ${isDark ? 'bg-cosmic-dust text-zinc-400 border-glowred/30 shadow-inner' : 'bg-darkred-700 text-darkred-100 border-darkred-900/50'}`}>
+            <div className="max-w-5xl mx-auto px-6">
+              <Reveal instant>
                 <div>
                   <p className={`eyebrow mb-4 ${isDark ? 'text-zinc-600' : 'text-darkred-300'}`}>Contact</p>
                   <h2 className="font-display text-2xl font-semibold text-white mb-6">Get in Touch</h2>
-                  <div className="space-y-4">
-                    <a href="mailto:shivamg.phy@gmail.com" className={`flex items-center gap-4 text-sm transition-colors group ${isDark ? 'hover:text-white' : 'hover:text-white'}`}>
+                  <div className="flex flex-col gap-4">
+                    <a href="mailto:shivamg.phy@gmail.com" className="flex items-center gap-3 text-sm transition-colors group hover:text-white">
                       <div className={`w-8 h-8 rounded-full border flex items-center justify-center transition-all shrink-0 ${isDark ? 'bg-white/[0.03] border-white/[0.08] group-hover:bg-glowred group-hover:border-glowred/40' : 'bg-white/10 border-white/20 group-hover:bg-darkred-900 group-hover:border-darkred-950'}`}>
                         <i className={`fa-solid fa-envelope text-xs group-hover:text-white ${isDark ? 'text-zinc-400' : 'text-darkred-100'}`}></i>
                       </div>
                       shivamg.phy@gmail.com
                     </a>
-                    <div className="flex items-center gap-4 text-sm cursor-default">
+                    <div className="flex items-center gap-3 text-sm cursor-default">
                       <div className={`w-8 h-8 rounded-full border flex items-center justify-center shrink-0 ${isDark ? 'bg-white/[0.03] border-white/[0.08]' : 'bg-white/10 border-white/20'}`}>
                         <i className={`fa-solid fa-location-dot text-xs ${isDark ? 'text-zinc-400' : 'text-darkred-100'}`}></i>
                       </div>
@@ -1484,11 +1509,9 @@
                   </div>
                 </div>
               </Reveal>
-              <Reveal delay={120}>
-              </Reveal>
             </div>
-            <Reveal delay={150}>
-              <div className={`max-w-6xl mx-auto px-6 mt-16 pt-8 border-t text-xs flex flex-col sm:flex-row justify-between items-center gap-4 ${isDark ? 'border-white/[0.05] text-zinc-600' : 'border-white/10 text-darkred-200'}`}>
+            <Reveal instant>
+              <div className={`max-w-5xl mx-auto px-6 mt-10 pt-6 border-t text-xs flex flex-col sm:flex-row justify-between items-center gap-4 ${isDark ? 'border-white/[0.05] text-zinc-600' : 'border-white/10 text-darkred-200'}`}>
                 <p>© 2026 Dr. Shivam Gola. </p>
                 <div className="flex gap-5">
                   <a href="https://inspirehep.net/authors/1867679" target="_blank" rel="noopener noreferrer" className={`transition-colors ${isDark ? 'hover:text-white' : 'hover:text-white'}`}>iNSPIRE-HEP</a>

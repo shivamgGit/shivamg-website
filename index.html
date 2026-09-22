@@ -4,6 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dr. Shivam Gola — Theoretical Particle Physics</title>
+  <meta name="description" content="Dr. Shivam Gola — Postdoctoral Fellow in theoretical particle physics at IIT Bombay. Research on dark matter, axions, neutrino masses and BSM physics.">
+  <meta name="author" content="Shivam Gola">
+  <meta property="og:type" content="profile">
+  <meta property="og:title" content="Dr. Shivam Gola — Theoretical Particle Physics">
+  <meta property="og:description" content="Dark matter, axions, neutrinos and BSM phenomenology. Postdoctoral Fellow, Department of Physics, IIT Bombay.">
+  <meta name="twitter:card" content="summary">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='15' fill='%2306070B'/%3E%3Ccircle cx='16' cy='16' r='6' fill='%23FF334B'/%3E%3C/svg%3E">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -160,7 +167,7 @@
 
     const education = [
       { period: "2017 – 2024", degree: "Doctor of Philosophy (PhD)", institution: "The Institute of Mathematical Sciences, Chennai", details: "Thesis: A Phenomenological Study of WIMP models. Supervisors: Prof. V. Ravindran, Prof. Nita Sinha." },
-      { period: "2015 – 2017", degree: "Master of Sciences (MSc) in Nuclear & Physics", institution: "Institute of Sciences, Banaras Hindu University, Varanasi." },
+      { period: "2015 – 2017", degree: "Master of Science (MSc) in Nuclear Physics", institution: "Institute of Science, Banaras Hindu University, Varanasi." },
       { period: "2011 – 2014", degree: "Bachelor of Science (BSc)", institution: "Dr. B.R Ambedkar University, Agra" }
     ];
 
@@ -178,6 +185,8 @@
       "JEST (2016) — All India Rank 244", "GATE (2017) — All India Rank 125"
     ];
 
+    const computationalTools = ['Mathematica', 'FeynRules', 'SARAH & SPheno', 'MicrOmega', 'MadGraph', 'FeynArts & FeynCalc', 'CalcHEP'];
+
     const publications = [
       { title: "Dark Matter from Axions and Small Neutrino Masses", journal: "Phys. Rev. D 112 (2025) 3, 035006", authors: "Shivam Gola", link: "https://journals.aps.org/prd/abstract/10.1103/PhysRevD.112.035006" },
       { title: "Pseudo-scalar Dark Matter in a Generic U(1)X Model", journal: "Phys. Lett. B 842 (2023) 137982", authors: "Shivam Gola", link: "https://doi.org/10.1016/j.physletb.2023.137982" },
@@ -194,6 +203,44 @@
       { type: "Conference", title: "The Future is Illuminating (Online)", date: "Jun 28 – 30, 2022", details: "NCTS, Taiwan. Talk: Two-Component Scalar and Fermion Dark Matter in a Generic U(1)_X Model." },
       { type: "Conference", title: "30th International Symposium on Lepton Photon Interactions at High Energies (Online)", date: "Jan 10 – 14, 2021", details: "University of Manchester, UK. Poster: ALP Portal Majorana Dark Matter." },
       { type: "School / Workshop", title: "XXXIII SERB Main School 2019 in THEP", date: "Dec 7 – 26, 2019", details: "SGTB Khalsa College, University of Delhi, India." }
+    ];
+
+    // Slide decks. Drop a public URL (Google Drive, Zenodo, indico) into `link`;
+    // an empty link renders the entry greyed out instead of as a dead hyperlink.
+    const presentations = [
+      { title: "Contributed Talk", venue: "CCAPP 2025, SRM Institute of Science and Technology, Kattankulathur, Tamil Nadu", date: "2025", link: "https://drive.google.com/file/d/10f7mWYYzsi_zBtKFTOtsNY4NXhqUoXD-/view?usp=sharing" },
+      { title: "A Phenomenological Study of WIMP Models", venue: "PhD thesis defense, The Institute of Mathematical Sciences, Chennai", date: "2024", link: "https://drive.google.com/file/d/1f6jVkavgNPaQ-ENrbVAilqKCFUN6wHzZ/view?usp=sharing" }
+    ];
+
+    // Recommended reading. `note` is the personal one-liner — it is what makes the
+    // entry worth listing; keep it, or drop the entry.
+    const resourceBooks = [
+      { title: "Modern Quantum Mechanics", author: "J. J. Sakurai", note: "" },
+      { title: "Quantum Field Theory in a Nutshell", author: "A. Zee", note: "" }
+    ];
+
+    const resourceGroups = [
+      {
+        heading: "Lecture notes & reviews",
+        icon: "fa-book-open",
+        items: [
+          { title: "Lectures on Theoretical Physics", by: "David Tong, Cambridge", note: "The clearest set of notes on QFT, GR and statistical field theory available anywhere.", url: "https://davidtong.org/teaching/" },
+          { title: "Lecture Notes on General Relativity", by: "Sean M. Carroll", note: "A complete GR course, free online.", url: "https://ned.ipac.caltech.edu/level5/March01/Carroll3/Carroll_contents.html" },
+          { title: "Yet Another Introduction to Dark Matter", by: "Bauer & Plehn, arXiv:1705.01987", note: "Dark matter in the language of QFT — the calculations, done properly.", url: "https://arxiv.org/abs/1705.01987" },
+          { title: "Rotation Curves of Spiral Galaxies", by: "Yoshiaki Sofue", note: "Where the observational case for dark matter begins.", url: "https://ned.ipac.caltech.edu/level5/Sept16/Sofue/Sofue2.html" },
+          { title: "Dark Matter: an introduction", by: "MIT", note: "A short, readable entry point for anyone new to the problem.", url: "https://web.mit.edu/redingtn/www/netadv/Xdarkmatte.html" }
+        ]
+      },
+      {
+        heading: "Tools & Packages",
+        icon: "fa-terminal",
+        items: [
+          { title: "FeynRules", by: "UCLouvain CP3", note: "Turns a Lagrangian into model files the generators can read.", url: "https://cp3.irmp.ucl.ac.be/projects/feynrules/" },
+          { title: "SARAH", by: "Mathematica package", note: "Builds model files for a new Lagrangian — the starting point of most of my model work.", url: "https://sarah.hepforge.org/" },
+          { title: "micrOMEGAs", by: "Relic density & detection rates", note: "Relic abundance and direct/indirect detection cross sections for a given model.", url: "https://micromegasdm.github.io/" },
+          { title: "MadGraph5_aMC@NLO", by: "UCLouvain CP3", note: "Matrix elements and event generation for collider signatures.", url: "https://cp3.irmp.ucl.ac.be/projects/madgraph/" }
+        ]
+      }
     ];
 
     const visitsList = [
@@ -1025,7 +1072,6 @@
         };
       }, []);
 
-      const legendText = isDark ? 'text-zinc-500' : 'text-stone-400';
       return (
         <div className="absolute inset-0 w-full h-full z-0 overflow-hidden">
           <canvas ref={canvas2DRef} className="absolute inset-0 w-full h-full z-0 cursor-crosshair" style={{ display: simOn ? 'block' : 'none' }} />
@@ -1039,20 +1085,22 @@
           >
             <i className={`fa-solid ${simOn ? 'fa-eye-slash' : 'fa-eye'} text-[11px]`}></i>
           </button>
-          <figcaption className={`hidden lg:flex absolute bottom-6 right-20 z-20 max-w-[19rem] flex-col gap-2 pointer-events-none text-right ${legendText}`}>
-            <span className="eyebrow"> </span>
-            <span className="text-[11px] leading-relaxed">
-            
-            </span>
-            <span className="flex items-center justify-end gap-4 text-[10px] tracking-wide">
-             </span>
-          </figcaption>
         </div>
       );
     };
 
     function App() {
-      const [isDark, setIsDark] = useState(false);
+      // Theme: remember the visitor's choice, otherwise follow the OS setting.
+      const [isDark, setIsDark] = useState(() => {
+        try {
+          const saved = localStorage.getItem('sg-theme');
+          if (saved === 'dark') return true;
+          if (saved === 'light') return false;
+        } catch (err) { /* storage blocked — fall through to the OS preference */ }
+        return typeof window !== 'undefined' && window.matchMedia
+          ? window.matchMedia('(prefers-color-scheme: dark)').matches
+          : false;
+      });
       const [activeResearch, setActiveResearch] = useState(researchInterests[0].id);
       const [isScrolled, setIsScrolled] = useState(false);
       const [activeTab, setActiveTab] = useState('experience');
@@ -1063,7 +1111,10 @@
       const [isMenuOpen, setIsMenuOpen] = useState(false);
       const [activeSection, setActiveSection] = useState('');
 
-      useEffect(() => { document.documentElement.classList.toggle('light-mode', !isDark); }, [isDark]);
+      useEffect(() => {
+        document.documentElement.classList.toggle('light-mode', !isDark);
+        try { localStorage.setItem('sg-theme', isDark ? 'dark' : 'light'); } catch (err) {}
+      }, [isDark]);
       useEffect(() => { const handleScroll = () => setIsScrolled(window.scrollY > 20); window.addEventListener('scroll', handleScroll); return () => window.removeEventListener('scroll', handleScroll); }, []);
       useEffect(() => { document.body.classList.toggle('modal-open', !!selectedImage); }, [selectedImage]);
 
@@ -1135,6 +1186,7 @@
         { label: 'Publications', page: 'home', section: 'publications' },
         { label: 'Activities', page: 'activities', section: null },
         { label: 'Gallery', page: 'blog', section: null },
+        { label: 'Resources', page: 'resources', section: null },
         { label: 'Contact', page: null, section: 'contact' }
       ];
 
@@ -1178,13 +1230,13 @@
               <a href="#" onClick={(e) => navigateTo(e, 'home')} className="flex items-center gap-3 group">
                 <div className="leading-tight">
                   <div className={`font-display font-semibold text-sm ${isDark ? 'text-zinc-100' : 'text-stone-900'}`}>Dr. Shivam Gola</div>
-                  <div className={`text-xs ${isDark ? 'text-zinc-400' : 'text-stone-500'}`}>Astroparticle Physics</div>
+                  <div className={`text-xs ${isDark ? 'text-zinc-400' : 'text-stone-500'}`}>Postdoctoral Fellow</div>
                 </div>
               </a>
 
               <div className="flex items-center gap-6">
                 
-                <div className={`hidden md:flex items-center gap-7 text-xs font-medium tracking-wide ${isDark ? 'text-zinc-400' : 'text-stone-500'}`}>
+                <div className={`hidden lg:flex items-center gap-6 text-xs font-medium tracking-wide ${isDark ? 'text-zinc-400' : 'text-stone-500'}`}>
                   {navItems.map(({ label, page, section }) => {
                     const isActive = page === null
                       ? activeSection === 'contact'
@@ -1203,7 +1255,7 @@
                   })}
                 </div>
 
-                <button type="button" onClick={() => setIsMenuOpen(!isMenuOpen)} aria-label="Toggle navigation" aria-expanded={isMenuOpen} className={`md:hidden w-9 h-9 rounded-full border transition-colors ${isDark ? 'border-white/[0.12] text-zinc-200 hover:border-glowred/60' : 'border-stone-300 text-stone-700 hover:border-darkred-400'}`}>
+                <button type="button" onClick={() => setIsMenuOpen(!isMenuOpen)} aria-label="Toggle navigation" aria-expanded={isMenuOpen} className={`lg:hidden w-9 h-9 rounded-full border transition-colors ${isDark ? 'border-white/[0.12] text-zinc-200 hover:border-glowred/60' : 'border-stone-300 text-stone-700 hover:border-darkred-400'}`}>
                   <i className={`fa-solid ${isMenuOpen ? 'fa-xmark' : 'fa-bars'} text-xs`}></i>
                 </button>
 
@@ -1216,8 +1268,8 @@
             </div>
             
             {isMenuOpen && (
-              <div className={`md:hidden mx-4 mb-3 rounded-xl border p-2 animate-fade-in ${isDark ? 'bg-cosmic-dust/95 border-white/[0.08]' : 'bg-cream-50 border-stone-200'}`}>
-                {[ ['About', 'home', 'about'], ['Research', 'home', 'research'], ['Education', 'home', 'experience'], ['Publications', 'home', 'publications'], ['Activities', 'activities'], ['Gallery', 'blog'] ].map(([label, page, section]) => (
+              <div className={`lg:hidden mx-4 mb-3 rounded-xl border p-2 animate-fade-in ${isDark ? 'bg-cosmic-dust/95 border-white/[0.08]' : 'bg-cream-50 border-stone-200'}`}>
+                {[ ['About', 'home', 'about'], ['Research', 'home', 'research'], ['Education', 'home', 'experience'], ['Publications', 'home', 'publications'], ['Activities', 'activities'], ['Gallery', 'blog'], ['Resources', 'resources'] ].map(([label, page, section]) => (
                   <a key={label} href={section ? `#${section}` : '#'} onClick={(e) => navigateTo(e, page, section)} className={`block rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${isDark ? 'text-zinc-300 hover:bg-white/[0.06] hover:text-glowred' : 'text-stone-600 hover:bg-darkred-50 hover:text-darkred-800'}`}>{label}</a>
                 ))}
                 <a href="#contact" onClick={(e) => { e.preventDefault(); setIsMenuOpen(false); scrollToSection('contact'); }} className={`block rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${isDark ? 'text-zinc-300 hover:bg-white/[0.06] hover:text-glowred' : 'text-stone-600 hover:bg-darkred-50 hover:text-darkred-800'}`}>Contact</a>
@@ -1241,8 +1293,15 @@
 
                   <Reveal delay={280}>
                     <p className={`text-sm md:text-base max-w-md mb-5 leading-relaxed font-light select-none ${isDark ? 'text-zinc-400' : 'text-stone-500'}`}>
-                      Postdoctoral Fellow in Theoretical Particle Physics. Exploring the nature of dark matter, BSM physics, and the fundamental particle dynamics shaping our universe.
+                      Exploring the nature of dark matter, axions, and physics beyond the Standard Model.
                   </p>
+                  </Reveal>
+
+                  <Reveal delay={320}>
+                    <p className={`flex items-center gap-2.5 text-xs font-medium ${isDark ? 'text-zinc-400' : 'text-stone-500'}`}>
+                      <i className={`fa-solid fa-building-columns text-[11px] shrink-0 ${isDark ? 'text-glowred' : 'text-darkred-700'}`}></i>
+                      Department of Physics, Indian Institute of Technology Bombay
+                    </p>
                   </Reveal>
 
                   <Reveal delay={360}>
@@ -1275,21 +1334,8 @@
 
                     <div className="space-y-5">
                       <Reveal instant>
-                        <div className={`p-6 rounded-xl border backdrop-blur-sm ${isDark ? 'border-white/[0.05] bg-white/[0.02]' : 'border-stone-200 bg-cream-50'}`}>
-                          <p className={`eyebrow mb-3 ${isDark ? 'text-glowred' : 'text-darkred-700'}`}>Current Position</p>
-                          <p className={`text-sm font-semibold leading-snug ${isDark ? 'text-white' : 'text-stone-800'}`}>Postdoctoral Fellow</p>
-                          <p className={`text-xs mt-1 leading-relaxed ${isDark ? 'text-zinc-500' : 'text-stone-400'}`}>Department of Physics<br/>Indian Institute of Technology Bombay</p>
-                        </div>
-                      </Reveal>
-
-                      <Reveal instant>
-                        <div className={`p-6 rounded-xl border backdrop-blur-sm ${isDark ? 'border-white/[0.05] bg-white/[0.02]' : 'border-stone-200 bg-cream-50'}`}>
-                          <p className={`eyebrow mb-4 ${isDark ? 'text-glowred' : 'text-darkred-700'}`}>Computational Tools</p>
-                          <div className="flex flex-wrap gap-2">
-                            {['Mathematica', 'FeynRules', 'SARAH & SPheno', 'MicrOmega', 'MadGraph', 'FeynArts & FeynCalc', 'CalcHEP'].map((tool, i) => (
-                              <span key={i} className={`px-2.5 py-1 rounded-md text-xs transition-colors cursor-default border ${isDark ? 'bg-white/[0.03] text-zinc-400 border-white/[0.06] hover:border-glowred/40 hover:text-white' : 'bg-cream text-stone-500 border-stone-200 hover:border-darkred-300 hover:text-darkred-700'}`}>{tool}</span>
-                            ))}
-                          </div>
+                        <div className={`overflow-hidden rounded-xl border ${isDark ? 'border-white/[0.05]' : 'border-stone-200'}`}>
+                          <img src="./me.jpg" alt="Dr. Shivam Gola" className="block w-full aspect-[4/5] object-cover" loading="lazy" />
                         </div>
                       </Reveal>
                     </div>
@@ -1322,11 +1368,26 @@
                       <TabBtn label="Experience" icon="fa-briefcase" value="experience" state={activeTab} setState={setActiveTab} />
                       <TabBtn label="Education" icon="fa-graduation-cap" value="education" state={activeTab} setState={setActiveTab} />
                       <TabBtn label="Achievements" icon="fa-award" value="achievements" state={activeTab} setState={setActiveTab} />
+                      <TabBtn label="Tools" icon="fa-code" value="tools" state={activeTab} setState={setActiveTab} />
                     </div>
                   </Reveal>
 
                   <div className={`space-y-4 relative before:absolute before:inset-0 before:ml-[1.1rem] before:h-full before:w-px ${isDark ? 'before:bg-gradient-to-b before:from-white/[0.1] before:via-white/[0.03] before:to-transparent' : 'before:bg-gradient-to-b before:from-stone-200 before:via-stone-100 before:to-transparent'}`}>
-                    {activeTab === 'achievements' ? (
+                    {activeTab === 'tools' ? (
+                      <Reveal instant>
+                        <div className="relative flex items-start gap-5 group">
+                          <div className={`mt-1 flex items-center justify-center w-9 h-9 rounded-full border shrink-0 z-10 transition-all ${isDark ? 'border-white/[0.1] bg-cosmic-dust text-glowred group-hover:border-glowred/40' : 'border-2 border-stone-200 bg-cream text-darkred-600 group-hover:border-darkred-300 group-hover:bg-darkred-50'}`}><i className="fa-solid fa-code text-xs"></i></div>
+                          <div className={`flex-1 p-5 rounded-xl border transition-all ${isDark ? 'bg-white/[0.01] border-white/[0.05] group-hover:border-white/[0.1]' : 'bg-cream-50 border-stone-200 group-hover:border-stone-300'}`}>
+                            <p className={`eyebrow mb-4 ${isDark ? 'text-glowred' : 'text-darkred-700'}`}>Computational Tools</p>
+                            <div className="flex flex-wrap gap-2">
+                              {computationalTools.map((tool, i) => (
+                                <span key={i} className={`px-2.5 py-1 rounded-md text-xs whitespace-nowrap transition-colors cursor-default border ${isDark ? 'bg-white/[0.03] text-zinc-400 border-white/[0.06] hover:border-glowred/40 hover:text-white' : 'bg-cream text-stone-500 border-stone-200 hover:border-darkred-300 hover:text-darkred-700'}`}>{tool}</span>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      </Reveal>
+                    ) : activeTab === 'achievements' ? (
                       achievements.map((item, idx) => (
                         <Reveal key={idx} instant>
                           <div className="relative flex items-start gap-5 group">
@@ -1430,13 +1491,100 @@
                   <button onClick={() => setActiveActivityTab('visits')} className={`tab-underline flex items-center gap-2 text-sm font-medium ${activeActivityTab === 'visits' ? (isDark ? 'is-active text-glowred' : 'is-active text-darkred-800') : (isDark ? 'text-zinc-500 hover:text-zinc-300' : 'text-stone-400 hover:text-stone-700')}`}>
                     <i className="fa-solid fa-flask text-xs"></i> Research Visits
                   </button>
+                  <button onClick={() => setActiveActivityTab('talks')} className={`tab-underline flex items-center gap-2 text-sm font-medium ${activeActivityTab === 'talks' ? (isDark ? 'is-active text-glowred' : 'is-active text-darkred-800') : (isDark ? 'text-zinc-500 hover:text-zinc-300' : 'text-stone-400 hover:text-stone-700')}`}>
+                    <i className="fa-solid fa-display text-xs"></i> Presentations
+                  </button>
                 </div>
 
-                <section aria-label={activeActivityTab === 'conferences' ? 'Conferences and seminars' : 'Research visits'}>
+                <section aria-label={activeActivityTab === 'conferences' ? 'Conferences and seminars' : activeActivityTab === 'visits' ? 'Research visits' : 'Presentation slides'}>
                   <div className="grid gap-4">
-                    {(activeActivityTab === 'conferences' ? conferencesList : visitsList).map((item, idx) => <ActivityCard key={item.title} item={item} index={idx} />)}
+                    {activeActivityTab === 'talks'
+                      ? presentations.map((talk) => {
+                          const hasLink = !!talk.link;
+                          const Tag = hasLink ? 'a' : 'div';
+                          return (
+                            <Reveal key={talk.title} instant>
+                              <Tag
+                                {...(hasLink ? { href: talk.link, target: '_blank', rel: 'noopener noreferrer' } : {})}
+                                className={`group card-lift block rounded-xl border p-5 ${hasLink ? 'cursor-pointer' : 'cursor-default'} ${isDark ? 'bg-white/[0.015] border-white/[0.06] hover:bg-white/[0.03] hover:border-glowred/30' : 'bg-cream-50 border-stone-200 hover:border-darkred-300'}`}
+                              >
+                                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                                  <div className="min-w-0">
+                                    <p className={`eyebrow mb-2 ${isDark ? 'text-glowred' : 'text-darkred-600'}`}>Slides</p>
+                                    <h3 className={`text-base font-semibold leading-snug transition-colors ${isDark ? 'text-white group-hover:text-glowred' : 'text-stone-900 group-hover:text-darkred-800'}`}>{talk.title}</h3>
+                                  </div>
+                                  <span className={`shrink-0 text-xs font-medium ${isDark ? 'text-zinc-500' : 'text-stone-400'}`}>{talk.date}</span>
+                                </div>
+                                <p className={`mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 border-t pt-3 text-sm leading-relaxed ${isDark ? 'border-white/[0.06] text-zinc-400' : 'border-stone-100 text-stone-500'}`}>
+                                  {talk.venue}
+                                  {hasLink
+                                    ? <i className="fa-solid fa-arrow-up-right-from-square text-[9px] opacity-60"></i>
+                                    : <span className={`text-xs italic ${isDark ? 'text-zinc-400' : 'text-stone-500'}`}>· slides to be added</span>}
+                                </p>
+                              </Tag>
+                            </Reveal>
+                          );
+                        })
+                      : (activeActivityTab === 'conferences' ? conferencesList : visitsList).map((item, idx) => <ActivityCard key={item.title} item={item} index={idx} />)}
                   </div>
                 </section>
+              </div>
+            </div>
+          )}
+
+          {currentPage === 'resources' && (
+            <div className={`pt-28 pb-16 min-h-screen animate-fade-in ${isDark ? 'bg-cosmic-void' : 'bg-cream'}`}>
+              <div className="max-w-5xl mx-auto px-6">
+                <div className="mb-12">
+                  <SectionHeader instant eyebrow="Reading" title="Resources" />
+                  <p className={`text-sm mt-4 max-w-xl leading-relaxed ${isDark ? 'text-zinc-400' : 'text-stone-500'}`}>A collection of books, lecture notes and software tools I find useful.</p>
+                </div>
+
+                <section aria-label="Books" className="mb-14">
+                  <h2 className={`eyebrow mb-5 flex items-center gap-2 ${isDark ? 'text-glowred' : 'text-darkred-700'}`}>
+                    <i className="fa-solid fa-book text-[11px]"></i> Books
+                  </h2>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    {resourceBooks.map((book) => (
+                      <Reveal key={book.title} instant>
+                        <div className={`h-full rounded-xl border p-5 transition-all ${isDark ? 'bg-white/[0.015] border-white/[0.06] hover:border-white/[0.12]' : 'bg-cream-50 border-stone-200 hover:border-stone-300'}`}>
+                          <h3 className={`text-base font-semibold leading-snug ${isDark ? 'text-white' : 'text-stone-900'}`}>{book.title}</h3>
+                          <p className={`mt-1 text-xs font-medium ${isDark ? 'text-zinc-400' : 'text-stone-500'}`}>{book.author}</p>
+                          {book.note && <p className={`mt-3 border-t pt-3 text-sm leading-relaxed ${isDark ? 'border-white/[0.06] text-zinc-400' : 'border-stone-100 text-stone-500'}`}>{book.note}</p>}
+                        </div>
+                      </Reveal>
+                    ))}
+                  </div>
+                </section>
+
+                {resourceGroups.map((group) => (
+                  <section key={group.heading} aria-label={group.heading} className="mb-14 last:mb-0">
+                    <h2 className={`eyebrow mb-5 flex items-center gap-2 ${isDark ? 'text-glowred' : 'text-darkred-700'}`}>
+                      <i className={`fa-solid ${group.icon} text-[11px]`}></i> {group.heading}
+                    </h2>
+                    <div className="grid gap-4">
+                      {group.items.map((item) => (
+                        <Reveal key={item.url} instant>
+                          <a
+                            href={item.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={`group card-lift block rounded-xl border p-5 ${isDark ? 'bg-white/[0.015] border-white/[0.06] hover:bg-white/[0.03] hover:border-glowred/30' : 'bg-cream-50 border-stone-200 hover:border-darkred-300'}`}
+                          >
+                            <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4">
+                              <h3 className={`flex items-center gap-2 text-base font-semibold leading-snug transition-colors ${isDark ? 'text-white group-hover:text-glowred' : 'text-stone-900 group-hover:text-darkred-800'}`}>
+                                {item.title}
+                                <i className="fa-solid fa-arrow-up-right-from-square text-[9px] opacity-60"></i>
+                              </h3>
+                              <span className={`shrink-0 text-xs font-medium ${isDark ? 'text-zinc-400' : 'text-stone-500'}`}>{item.by}</span>
+                            </div>
+                            <p className={`mt-3 border-t pt-3 text-sm leading-relaxed ${isDark ? 'border-white/[0.06] text-zinc-400' : 'border-stone-100 text-stone-500'}`}>{item.note}</p>
+                          </a>
+                        </Reveal>
+                      ))}
+                    </div>
+                  </section>
+                ))}
               </div>
             </div>
           )}

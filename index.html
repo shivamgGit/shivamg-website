@@ -988,8 +988,11 @@
             }
             return y;
           };
-          const gasRGB = isDarkNow ? '255, 70, 150' : '200, 30, 110';
-          const gasA = isDarkNow ? 0.58 : 0.36;
+          const gasRGB = isDarkNow ? '255, 60, 55' : '190, 25, 25';
+          // Gas is present all along, but faint before impact: shock heating at
+          // collision makes it X-ray bright, and it stays hot afterwards.
+          const heat = 0.3 + 0.7 * Math.max(shock, S);
+          const gasA = (isDarkNow ? 0.58 : 0.36) * heat;
           const blobs = [];
           // Main cluster gas: larger, fainter. The "bullet": smaller, denser, brighter.
           [[gasPos1, z1, 1, 220, 1.0], [gasPos2, z2, -1, 360, 0.8]].forEach(([gx, gz, lead, gr, br]) => {
@@ -998,7 +1001,7 @@
               blobs.push({ x: gx - lead * k * 120 * S, z: gz, r: gr * (1 - 0.2 * k), a: gasA * br * S * (0.45 - 0.15 * k) });
             }
           });
-          blobs.forEach(b => {
+          blobs.forEach((b, bi) => {
             if (b.a <= 0.005) return;
             const proj = project(b.x, wellY(b.x, b.z) * 0.6, b.z);
             if (!proj) return;
@@ -1013,15 +1016,25 @@
             if (rx <= 0) return;
             ctx.save();
             ctx.translate(proj.sx, proj.sy);
-            ctx.scale(1, 0.55);
-            const g = ctx.createRadialGradient(0, 0, 0, 0, 0, rx);
-            g.addColorStop(0, `rgba(${gasRGB}, ${a})`);
-            g.addColorStop(0.55, `rgba(${gasRGB}, ${a * 0.45})`);
-            g.addColorStop(1, `rgba(${gasRGB}, 0)`);
-            ctx.fillStyle = g;
-            ctx.beginPath();
-            ctx.arc(0, 0, rx, 0, Math.PI * 2);
-            ctx.fill();
+            // Turbulent cloud: a core plus drifting, breathing puffs, so the
+            // outline is irregular instead of a clean ellipse.
+            const puffs = [[0, 0, rx * 0.7, a * 0.7]];
+            for (let k = 0; k < 7; k++) {
+              const ang = k * 0.8976 + bi * 1.3 + elapsed * 0.12 * (k % 2 ? 1 : -1);
+              const d = rx * 0.38 * (1 + 0.35 * Math.sin(elapsed * 0.7 + k * 1.7 + bi));
+              const pr = rx * 0.5 * (0.75 + 0.3 * Math.sin(elapsed * 0.55 + k * 2.3 + bi * 0.7));
+              puffs.push([Math.cos(ang) * d, Math.sin(ang) * d * 0.7, pr, a * 0.42]);
+            }
+            puffs.forEach(([px, py, pr, pa]) => {
+              const g = ctx.createRadialGradient(px, py, 0, px, py, pr);
+              g.addColorStop(0, `rgba(${gasRGB}, ${pa})`);
+              g.addColorStop(0.5, `rgba(${gasRGB}, ${pa * 0.5})`);
+              g.addColorStop(1, `rgba(${gasRGB}, 0)`);
+              ctx.fillStyle = g;
+              ctx.beginPath();
+              ctx.arc(px, py, pr, 0, Math.PI * 2);
+              ctx.fill();
+            });
             ctx.restore();
           });
 

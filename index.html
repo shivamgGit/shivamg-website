@@ -623,7 +623,7 @@
         scene.add(mesh);
 
         // ── Sequence timing (frames @ 60fps, advanced on a fixed timestep) ────
-        const F_RUN = 780, F_HOLD = 110, F_COLLAPSE = 380, F_VOID = 80, F_FADE = 70;
+        const F_RUN = 780, F_HOLD = 260, F_COLLAPSE = 380, F_VOID = 80, F_FADE = 70;
 
         let phase = 'run';
         let phaseFrame = 0;
@@ -728,32 +728,68 @@
           observer.observe(canvas2D);
         }
 
-        const darkTheme  = { base: [255, 255, 255], well: [255, 51, 75],  alphaBase: 0.075, alphaGlow: 0.72, particleColor: '255, 255, 255' };
-        const lightTheme = { base: [0, 0, 0],       well: [123, 31, 31],  alphaBase: 0.055, alphaGlow: 0.52, particleColor: '123, 31, 31' };
+        const darkTheme  = { base: [255, 255, 255], well: [110, 160, 255], alphaBase: 0.075, alphaGlow: 0.72, particleColor: '255, 255, 255' };
+        const lightTheme = { base: [0, 0, 0],       well: [30, 70, 190],   alphaBase: 0.055, alphaGlow: 0.52, particleColor: '123, 31, 31' };
 
         // ── Spacetime sheet ──────────────────────────────────────────────────
         const xSteps = 52, zSteps = 40, spacingX = 104, spacingZ = 108;
 
         // ── Mass budget: baryonic gas is ~15% of the cluster mass ────────────
-        const DM1_MASS = 430, DM2_MASS = 360;
-        const GAS1_MASS = 66, GAS2_MASS = 54;
-        const MASS_NORM = DM1_MASS * 0.85;
+        // The "bullet" (index 1 / primary) is ~1/3 the main cluster's mass here —
+        // the real ratio is ~1:10, but that would leave the bullet invisible.
+        const DM1_MASS = 170, DM2_MASS = 480;
+        const GAS1_MASS = 30, GAS2_MASS = 72;
+        const MASS_NORM = DM2_MASS * 0.8;
 
         const particles = [];
-        const numDMParticles = 900, numGasParticles = 750, numStreamParticles = 350;
+        // Gas is a smooth hot plasma, so it is drawn as a diffuse glowing cloud
+        // (see the gas pass in drawFrame), not as particles.
+        const numDMParticles = 0, numGasParticles = 0, numStreamParticles = 0, numGalaxies = 130;
 
+        // Random unit vector, and a random orbital plane (two orthonormal axes).
+        const randUnit = () => {
+          const z = Math.random() * 2 - 1, t = Math.random() * Math.PI * 2, s = Math.sqrt(1 - z * z);
+          return [s * Math.cos(t), s * Math.sin(t), z];
+        };
+        const randPlane = () => {
+          const a = randUnit();
+          let b = randUnit();
+          const d = a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+          b = [b[0] - d * a[0], b[1] - d * a[1], b[2] - d * a[2]];
+          const n = Math.hypot(b[0], b[1], b[2]) || 1;
+          return [a, [b[0] / n, b[1] / n, b[2] / n]];
+        };
+
+        // DM halos are pressure-supported, not rotating: each particle orbits in
+        // its own randomly oriented plane (isotropic velocity dispersion), so the
+        // halo is a roughly spherical, non-spinning cloud. Net spin is negligible.
         for (let i = 0; i < numDMParticles; i++) {
           const haloIdx = Math.floor(Math.random() * 2);
           const rFactor = Math.pow(Math.random(), 2.2);
+          const [e1, e2] = randPlane();
           particles.push({
-            type: 'halo_dm', haloIdx, rFactor,
+            type: 'halo_dm', haloIdx, rFactor, e1, e2,
             theta: Math.random() * Math.PI * 2,
-            phi: Math.acos((Math.random() * 2) - 1),
-            // Flat rotation curve: v ≈ const ⇒ ω ∝ 1/r.
-            speed: (Math.random() > 0.5 ? 1 : -1) * 0.010 / (rFactor + 0.14),
+            speed: 0.006 / (rFactor + 0.2),
             size: Math.random() * 5.0 + 1.6,
             baseAlpha: (1 - rFactor) * 0.9,
             isBlueTint: haloIdx === 0
+          });
+        }
+
+        // Member galaxies are effectively collisionless too: they ride with the DM.
+        for (let i = 0; i < numGalaxies; i++) {
+          const haloIdx = Math.random() < 0.3 ? 0 : 1;   // most galaxies belong to the main cluster
+          const rFactor = Math.pow(Math.random(), 1.5);
+          const [e1, e2] = randPlane();
+          particles.push({
+            type: 'galaxy', haloIdx, rFactor, e1, e2,
+            theta: Math.random() * Math.PI * 2,
+            speed: 0.004 / (rFactor + 0.25),
+            size: Math.random() * 4.0 + 5.0,
+            tilt: Math.random() * Math.PI,
+            aspect: Math.random() * 0.55 + 0.35,
+            baseAlpha: Math.random() * 0.25 + 0.75
           });
         }
 
@@ -793,7 +829,9 @@
             simFrame += step;
             if (simFrame >= F_RUN) { simFrame = F_RUN; setPhase('hold'); }
           } else if (phase === 'hold') {
-            if (phaseFrame >= F_HOLD) spawnBlackHole(null);
+            // No automatic black hole: the black hole is a click-only easter egg.
+            // The observed configuration holds, then fades out and the loop restarts.
+            if (phaseFrame >= F_HOLD) setPhase('void');
           } else if (phase === 'collapse') {
             if (phaseFrame >= F_COLLAPSE) { blackHole = null; setPhase('void'); }
           } else if (phase === 'void') {
@@ -806,7 +844,10 @@
           const blackHoleRadius = blackHole ? Math.max(28, Math.min(52, Math.min(w, h) * 0.075)) : 0;
 
           // Re-emerge instead of dying: the sheet fades back in every cycle.
-          const sceneAlpha = phase === 'void' ? 0 : (phase === 'run' ? Math.min(1, simFrame / F_FADE) : 1);
+          const sceneAlpha = phase === 'void' ? 0
+            : phase === 'run' ? Math.min(1, simFrame / F_FADE)
+            : phase === 'hold' && !blackHole ? Math.max(0, Math.min(1, (F_HOLD - phaseFrame) / F_FADE))
+            : 1;
 
           ctx.clearRect(0, 0, w, h);
           ctx.globalCompositeOperation = 'source-over';
@@ -820,19 +861,22 @@
           const S = 1.0 / (1.0 + Math.exp(-8.0 * u));
           const deflection = 65 * Math.tanh(1.8 * u);
 
-          // Collisionless DM keeps going; gas stalls near the impact point.
-          const primaryX = u * 2500;
-          const secondaryX = -u * 2300;
-          const gasPos1 = primaryX * (1 - S) + 70 * S;
-          const gasPos2 = secondaryX * (1 - S) - 70 * S;
+          // Collisionless DM (and galaxies) keep going; the gas is slowed, not
+          // stopped — after the pass it lags its halo but still moves with it,
+          // ending between the two DM peaks (as observed in 1E 0657-56).
+          // The light bullet moves fast; the massive main cluster barely recoils.
+          const primaryX = u * 1900;
+          const secondaryX = -u * 750;
+          const gasPos1 = primaryX * (1 - 0.55 * S);
+          const gasPos2 = secondaryX * (1 - 0.55 * S);
           const z1 = -85 + deflection;
           const z2 = 95 - deflection * 0.85;
 
           const activeHalos = [
-            { x: primaryX,   z: z1, r: 790, mass: DM1_MASS,  color: isDarkNow ? {r: 65, g: 130, b: 255, a: 0.22} : {r: 35, g: 70, b: 190, a: 0.12} },
-            { x: secondaryX, z: z2, r: 690, mass: DM2_MASS,  color: isDarkNow ? {r: 0, g: 200, b: 255, a: 0.18} : {r: 15, g: 110, b: 180, a: 0.10} },
-            { x: gasPos1,    z: z1, r: 400, mass: GAS1_MASS, color: isDarkNow ? {r: 255, g: 51, b: 90, a: 0.34} : {r: 190, g: 25, b: 55, a: 0.20} },
-            { x: gasPos2,    z: z2, r: 360, mass: GAS2_MASS, color: isDarkNow ? {r: 255, g: 120, b: 40, a: 0.30} : {r: 180, g: 75, b: 15, a: 0.16} }
+            { kind: 'dm',  x: primaryX,   z: z1, r: 470, mass: DM1_MASS,  color: isDarkNow ? {r: 80, g: 125, b: 235, a: 0.52} : {r: 45, g: 85, b: 200, a: 0.30} },
+            { kind: 'dm',  x: secondaryX, z: z2, r: 820, mass: DM2_MASS,  color: isDarkNow ? {r: 80, g: 125, b: 235, a: 0.52} : {r: 45, g: 85, b: 200, a: 0.30} },
+            { kind: 'gas', x: gasPos1,    z: z1, r: 260, mass: GAS1_MASS },
+            { kind: 'gas', x: gasPos2,    z: z2, r: 420, mass: GAS2_MASS }
           ];
 
           const project = (x, y, z) => {
@@ -878,7 +922,7 @@
           }
 
           ctx.globalCompositeOperation = isDarkNow ? 'screen' : 'multiply';
-          [...activeHalos].sort((a, b) => b.z - a.z).forEach(halo => {
+          activeHalos.filter(hl => hl.kind === 'dm').sort((a, b) => b.z - a.z).forEach(halo => {
             const proj = project(halo.x, halo.mass * 0.5, halo.z);
             if (!proj) return;
             let radius = halo.r * proj.scale * 1.8;
@@ -893,6 +937,7 @@
             }
             const gradient = ctx.createRadialGradient(proj.sx, proj.sy, 0, proj.sx, proj.sy, radius);
             gradient.addColorStop(0, `rgba(${halo.color.r}, ${halo.color.g}, ${halo.color.b}, ${opacity})`);
+            gradient.addColorStop(0.5, `rgba(${halo.color.r}, ${halo.color.g}, ${halo.color.b}, ${opacity * 0.55})`);
             gradient.addColorStop(1, `rgba(${halo.color.r}, ${halo.color.g}, ${halo.color.b}, 0)`);
             ctx.beginPath();
             ctx.arc(proj.sx, proj.sy, radius, 0, Math.PI * 2);
@@ -932,19 +977,128 @@
 
           const shock = Math.exp(-6.0 * u * u);   // peaks at closest approach
 
+          // ── X-ray gas: diffuse clouds. Core compressed at the leading edge (bow
+          // shock), ram-pressure-stripped tail streaming behind. Pink, as in the
+          // Chandra composite; DM is blue (lensing map), galaxies gold.
+          const wellY = (x, z) => {
+            let y = 0;
+            for (let k = 0; k < activeHalos.length; k++) {
+              const hl = activeHalos[k], dx = x - hl.x, dz = z - hl.z;
+              y += hl.mass * Math.exp(-(dx * dx + dz * dz) / (hl.r * hl.r));
+            }
+            return y;
+          };
+          const gasRGB = isDarkNow ? '255, 70, 150' : '200, 30, 110';
+          const gasA = isDarkNow ? 0.58 : 0.36;
+          const blobs = [];
+          // Main cluster gas: larger, fainter. The "bullet": smaller, denser, brighter.
+          [[gasPos1, z1, 1, 220, 1.0], [gasPos2, z2, -1, 360, 0.8]].forEach(([gx, gz, lead, gr, br]) => {
+            blobs.push({ x: gx + lead * 40 * shock, z: gz, r: gr * (1 - 0.15 * shock), a: gasA * br });
+            for (let k = 1; k <= 2; k++) {
+              blobs.push({ x: gx - lead * k * 120 * S, z: gz, r: gr * (1 - 0.2 * k), a: gasA * br * S * (0.45 - 0.15 * k) });
+            }
+          });
+          blobs.forEach(b => {
+            if (b.a <= 0.005) return;
+            const proj = project(b.x, wellY(b.x, b.z) * 0.6, b.z);
+            if (!proj) return;
+            let rx = b.r * proj.scale * 1.6, a = b.a;
+            if (blackHole) {
+              a *= Math.pow(1 - collapseProgress, 1.5);
+              const dx = blackHole.x - proj.sx, dy = blackHole.y - proj.sy;
+              const pull = Math.pow(collapseProgress, 1.6) * 0.96;
+              proj.sx += dx * pull; proj.sy += dy * pull;
+              rx *= Math.max(0.08, 1 - collapseProgress * 0.9);
+            }
+            if (rx <= 0) return;
+            ctx.save();
+            ctx.translate(proj.sx, proj.sy);
+            ctx.scale(1, 0.55);
+            const g = ctx.createRadialGradient(0, 0, 0, 0, 0, rx);
+            g.addColorStop(0, `rgba(${gasRGB}, ${a})`);
+            g.addColorStop(0.55, `rgba(${gasRGB}, ${a * 0.45})`);
+            g.addColorStop(1, `rgba(${gasRGB}, 0)`);
+            ctx.fillStyle = g;
+            ctx.beginPath();
+            ctx.arc(0, 0, rx, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+          });
+
+          // DM core pass, drawn over the gas: before the collision the gas sits
+          // inside its halo and would otherwise hide the blue completely.
+          activeHalos.filter(hl => hl.kind === 'dm').forEach(halo => {
+            const proj = project(halo.x, halo.mass * 0.5, halo.z);
+            if (!proj) return;
+            let radius = halo.r * proj.scale * 0.95;
+            let a = halo.color.a * 0.6;
+            if (blackHole) {
+              a *= Math.pow(1 - collapseProgress, 1.5);
+              const dx = blackHole.x - proj.sx, dy = blackHole.y - proj.sy;
+              const pull = Math.pow(collapseProgress, 1.6) * 0.96;
+              proj.sx += dx * pull; proj.sy += dy * pull;
+              radius *= Math.max(0.08, 1 - collapseProgress * 0.9);
+            }
+            if (radius <= 0) return;
+            const c = `${halo.color.r}, ${halo.color.g}, ${halo.color.b}`;
+            const g = ctx.createRadialGradient(proj.sx, proj.sy, 0, proj.sx, proj.sy, radius);
+            g.addColorStop(0, `rgba(${c}, ${a})`);
+            g.addColorStop(1, `rgba(${c}, 0)`);
+            ctx.fillStyle = g;
+            ctx.beginPath();
+            ctx.arc(proj.sx, proj.sy, radius, 0, Math.PI * 2);
+            ctx.fill();
+          });
+
+          // Bow shock: a thin bright arc running ahead of the bullet's gas once it
+          // has punched through the main cluster.
+          const shockOn = S * Math.min(1, Math.max(0, u * 3));
+          if (false && shockOn > 0.02) {
+            const sx = gasPos1 + 260;
+            const sp = project(sx, wellY(sx, z1) * 0.6, z1);
+            if (sp) {
+              let a = (isDarkNow ? 0.75 : 0.55) * shockOn;
+              let rr = 300 * sp.scale * 1.6;
+              if (blackHole) {
+                a *= Math.pow(1 - collapseProgress, 1.5);
+                const dx = blackHole.x - sp.sx, dy = blackHole.y - sp.sy;
+                const pull = Math.pow(collapseProgress, 1.6) * 0.96;
+                sp.sx += dx * pull; sp.sy += dy * pull;
+                rr *= Math.max(0.08, 1 - collapseProgress * 0.9);
+              }
+              ctx.save();
+              ctx.translate(sp.sx - rr, sp.sy);
+              ctx.scale(1, 0.55);
+              ctx.lineCap = 'round';
+              [[5, 0.25], [1.6, 1]].forEach(([lw, k]) => {
+                ctx.strokeStyle = `rgba(${isDarkNow ? '255, 190, 225' : '200, 30, 110'}, ${(a * k).toFixed(3)})`;
+                ctx.lineWidth = lw;
+                ctx.beginPath();
+                ctx.arc(0, 0, rr, -0.85, 0.85);
+                ctx.stroke();
+              });
+              ctx.restore();
+            }
+          }
+
           particles.forEach(p => {
             let worldX = 0, worldY = 0, worldZ = 0, customColor = null;
 
-            if (p.type === 'halo_dm') {
+            if (p.type === 'halo_dm' || p.type === 'galaxy') {
               p.theta += p.speed * step;
               const halo = activeHalos[p.haloIdx];
-              const r = p.rFactor * (halo.r * 0.65);
-              worldX = halo.x + r * Math.sin(p.phi) * Math.cos(p.theta);
-              worldY = (r * Math.cos(p.phi)) * 0.28;
-              worldZ = halo.z + r * Math.sin(p.phi) * Math.sin(p.theta);
-              customColor = isDarkNow
-                ? (p.isBlueTint ? '150, 190, 255' : '110, 220, 255')
-                : (p.isBlueTint ? '30, 60, 160' : '20, 95, 150');
+              const r = p.rFactor * (halo.r * (p.type === 'galaxy' ? 0.9 : 0.65));
+              const c = Math.cos(p.theta), s = Math.sin(p.theta);
+              worldX = halo.x + r * (c * p.e1[0] + s * p.e2[0]);
+              // Keep galaxies on the sheet: a large vertical offset makes them look
+              // detached from the spacetime grid.
+              worldY = r * (c * p.e1[1] + s * p.e2[1]) * (p.type === 'galaxy' ? 0.05 : 0.55);
+              worldZ = halo.z + r * (c * p.e1[2] + s * p.e2[2]);
+              if (p.type === 'galaxy') {
+                customColor = isDarkNow ? '225, 235, 255' : '40, 60, 120';
+              } else {
+                customColor = isDarkNow ? '130, 175, 255' : '30, 70, 190';
+              }
 
             } else if (p.type === 'gas_plasma') {
               p.theta += p.turbSpeed * step;
@@ -972,7 +1126,7 @@
               const isPrimary = p.side > 0;
               const lead = isPrimary ? 1 : -1;
               const gasX = isPrimary ? gasPos1 : gasPos2;
-              worldX = gasX - lead * (680 * S) * p.progress;
+              worldX = gasX - lead * (380 * S) * p.progress;
               worldZ = (isPrimary ? z1 : z2) + Math.sin(p.progress * Math.PI * 2 + elapsed * 0.6) * (p.spread * 0.4);
               worldY = Math.sin(p.progress * Math.PI) * 20 * S;
               customColor = isDarkNow ? '210, 140, 255' : '120, 55, 160';
@@ -1001,7 +1155,23 @@
               finalAlpha *= Math.max(0, Math.min(1, (d - blackHoleRadius) / 26));
             }
 
-            if (finalAlpha > 0.01) {
+            if (finalAlpha > 0.01 && p.type === 'galaxy') {
+              // Tiny tilted elliptical galaxy: bright core fading into a soft glow.
+              const gr = Math.max(0.6, p.size * proj.scale * 1.6);
+              ctx.save();
+              ctx.translate(proj.sx, proj.sy);
+              ctx.rotate(p.tilt);
+              ctx.scale(1, p.aspect);
+              const g = ctx.createRadialGradient(0, 0, 0, 0, 0, gr);
+              g.addColorStop(0, `rgba(${isDarkNow ? '255, 255, 255' : '20, 30, 70'}, ${finalAlpha.toFixed(3)})`);
+              g.addColorStop(0.25, `rgba(${customColor}, ${(finalAlpha * 0.8).toFixed(3)})`);
+              g.addColorStop(1, `rgba(${customColor}, 0)`);
+              ctx.fillStyle = g;
+              ctx.beginPath();
+              ctx.arc(0, 0, gr, 0, Math.PI * 2);
+              ctx.fill();
+              ctx.restore();
+            } else if (finalAlpha > 0.01) {
               ctx.fillStyle = `rgba(${customColor || theme.particleColor}, ${finalAlpha.toFixed(3)})`;
               ctx.beginPath();
               ctx.arc(proj.sx, proj.sy, Math.max(0.1, p.size * proj.scale), 0, Math.PI * 2);
@@ -1335,7 +1505,7 @@
                     <div className="space-y-5">
                       <Reveal instant>
                         <div className={`overflow-hidden rounded-xl border ${isDark ? 'border-white/[0.05]' : 'border-stone-200'}`}>
-                          <img src="./me.jpg" alt="Dr. Shivam Gola" className="block w-full aspect-[4/5] object-cover" loading="lazy" />
+                          <img src="./images/shivam-portrait.jpg" alt="Dr. Shivam Gola" className="block w-full aspect-[4/5] object-cover" loading="lazy" />
                         </div>
                       </Reveal>
                     </div>

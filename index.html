@@ -196,7 +196,7 @@
     const conferencesList = [
       { type: "Conference", title: "Conference on Cosmology, Astrophysics and Particle Physics (CCAPP 2025)", date: "Jan 30 – Feb 2, 2025", details: "SRM-IST, Kattankulathur, India. Talk: Dark matter from axions with connection to neutrino mass." },
       { type: "School / Workshop", title: "Summer School on Particle Physics (SMR 3848)", date: "Jun 19 – 30, 2023", details: "ICTP, Trieste, Italy. Talk: A Pseudo-scalar Dark Matter in a Generic U(1)_X Model." },
-      { type: "Seminar", title: "IMSc60", date: "Jan 5, 2023", details: "IMSc, Chennai, India. Public Talk: Dark Matter from Particle Physics Perspective." },
+      { type: "Seminar", title: "IMSc60", date: "Jan 5, 2023", details: "IMSc, Chennai, India. Public Talk: Dark Matter from Particle Physics Perspective.", link: "https://youtu.be/VbpDoWssRmM?si=TqHXE2Ft0tjdhkvo", linkLabel: "Watch the talk" },
       { type: "Conference", title: "XXV DAE-BRNS High Energy Physics (HEP) Symposium 2022", date: "Dec 12 – 16, 2022", details: "IISER, Mohali, India. Talk: Two-Component Scalar and Fermion Dark Matter in a Generic U(1)_X Model." },
       { type: "Conference", title: "Kashiwa Dark Matter Symposium 2022 (Online)", date: "Nov 29 – Dec 2, 2022", details: "University of Tokyo, Japan. Poster: Two-Component Scalar and Fermion Dark Matter in a Generic U(1)_X Model." },
       { type: "School / Workshop", title: "Program on New Directions in Particle Physics", date: "Sep 5 – 23, 2022", details: "ICTP-SAIFR, Sao Paulo, Brazil." },
@@ -225,6 +225,7 @@
         icon: "fa-book-open",
         items: [
           { title: "Lectures on Theoretical Physics", by: "David Tong, Cambridge", note: "The clearest set of notes on QFT, GR and statistical field theory available anywhere.", url: "https://davidtong.org/teaching/" },
+          { title: "Particle Physics Lectures", by: "Mark Thomson, Cambridge", note: "A complete Part III course on the Standard Model, from Dirac equation to electroweak unification.", url: "https://www.hep.phy.cam.ac.uk/~thomson/lectures/lectures.html" },
           { title: "Lecture Notes on General Relativity", by: "Sean M. Carroll", note: "A complete GR course, free online.", url: "https://ned.ipac.caltech.edu/level5/March01/Carroll3/Carroll_contents.html" },
           { title: "Yet Another Introduction to Dark Matter", by: "Bauer & Plehn, arXiv:1705.01987", note: "Dark matter in the language of QFT — the calculations, done properly.", url: "https://arxiv.org/abs/1705.01987" },
           { title: "Rotation Curves of Spiral Galaxies", by: "Yoshiaki Sofue", note: "Where the observational case for dark matter begins.", url: "https://ned.ipac.caltech.edu/level5/Sept16/Sofue/Sofue2.html" },
@@ -1400,6 +1401,12 @@
               <span className={`shrink-0 text-xs font-medium ${isDark ? 'text-zinc-500' : 'text-stone-400'}`}>{item.date}</span>
             </div>
             <p className={`mt-3 border-t pt-3 text-sm leading-relaxed ${isDark ? 'border-white/[0.06] text-zinc-400' : 'border-stone-100 text-stone-500'}`}>{item.details}</p>
+            {item.link && (
+              <a href={item.link} target="_blank" rel="noopener noreferrer" className={`mt-4 inline-flex w-fit items-center gap-2 whitespace-nowrap rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors ${isDark ? 'bg-glowred/15 text-glowred ring-1 ring-glowred/30 hover:bg-glowred hover:text-white' : 'bg-darkred-50 text-darkred-800 ring-1 ring-darkred-200 hover:bg-darkred-700 hover:text-white'}`}>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+                {item.linkLabel || 'View'}
+              </a>
+            )}
           </article>
         </Reveal>
       );
@@ -1411,6 +1418,7 @@
             <div className="max-w-5xl mx-auto px-6 flex justify-between items-center">
               
               <a href="#" onClick={(e) => navigateTo(e, 'home')} className="flex items-center gap-3 group">
+                <div aria-hidden="true" className={`flex items-center justify-center transition-colors duration-300 ${isDark ? 'text-zinc-100 group-hover:text-glowred' : 'text-stone-900 group-hover:text-darkred-700'}`}><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg></div>
                 <div className="leading-tight">
                   <div className={`font-display font-semibold text-sm ${isDark ? 'text-zinc-100' : 'text-stone-900'}`}>Dr. Shivam Gola</div>
                   <div className={`text-xs ${isDark ? 'text-zinc-400' : 'text-stone-500'}`}>Postdoctoral Fellow</div>
@@ -1475,16 +1483,16 @@
                   </Reveal>
 
                   <Reveal delay={280}>
-                    <p className={`text-sm md:text-base max-w-md mb-5 leading-relaxed font-light select-none ${isDark ? 'text-zinc-400' : 'text-stone-500'}`}>
-                      Exploring the nature of dark matter, axions, and physics beyond the Standard Model.
-                  </p>
-                  </Reveal>
-
-                  <Reveal delay={320}>
-                    <p className={`flex items-center gap-2.5 text-xs font-medium ${isDark ? 'text-zinc-400' : 'text-stone-500'}`}>
+                    <p className={`flex items-center gap-2.5 mb-5 text-xs font-medium ${isDark ? 'text-zinc-400' : 'text-stone-500'}`}>
                       <i className={`fa-solid fa-building-columns text-[11px] shrink-0 ${isDark ? 'text-glowred' : 'text-darkred-700'}`}></i>
                       Department of Physics, Indian Institute of Technology Bombay
                     </p>
+                  </Reveal>
+
+                  <Reveal delay={320}>
+                    <p className={`text-sm md:text-base max-w-md leading-relaxed font-light select-none ${isDark ? 'text-zinc-400' : 'text-stone-500'}`}>
+                      Exploring the nature of dark matter, axions, and physics beyond the Standard Model.
+                  </p>
                   </Reveal>
 
                   <Reveal delay={360}>

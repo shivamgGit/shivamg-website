@@ -236,10 +236,10 @@
         heading: "Tools & Packages",
         icon: "fa-terminal",
         items: [
-          { title: "FeynRules", by: "UCLouvain CP3", note: "Turns a Lagrangian into model files the generators can read.", url: "https://cp3.irmp.ucl.ac.be/projects/feynrules/" },
-          { title: "SARAH", by: "Mathematica package", note: "Builds model files for a new Lagrangian — the starting point of most of my model work.", url: "https://sarah.hepforge.org/" },
-          { title: "micrOMEGAs", by: "Relic density & detection rates", note: "Relic abundance and direct/indirect detection cross sections for a given model.", url: "https://micromegasdm.github.io/" },
-          { title: "MadGraph5_aMC@NLO", by: "UCLouvain CP3", note: "Matrix elements and event generation for collider signatures.", url: "https://cp3.irmp.ucl.ac.be/projects/madgraph/" }
+          { title: "FeynRules", note: "Turns a Lagrangian into model files the generators can read.", url: "https://cp3.irmp.ucl.ac.be/projects/feynrules/" },
+          { title: "SARAH", note: "Builds model files for a new Lagrangian — the starting point of most of my model work.", url: "https://sarah.hepforge.org/" },
+          { title: "micrOMEGAs", note: "Relic abundance and direct/indirect detection cross sections for a given model.", url: "https://micromegasdm.github.io/" },
+          { title: "MadGraph5_aMC@NLO", note: "Matrix elements and event generation for collider signatures.", url: "https://cp3.irmp.ucl.ac.be/projects/madgraph/" }
         ]
       },
       {
@@ -254,8 +254,10 @@
         heading: "Interactive",
         icon: "fa-globe",
         items: [
-          { title: "Universe Explorer", by: "Best on desktop", note: "An interactive explorer", url: "universe.html" },
-          { title: "Planck CMB Simulator", by: "GitHub repo", note: "An interactive CMB map simulator", url: "https://chrisnorth.github.io/planckapps/Simulator/" }
+          { title: "Universe Explorer", by: "Built using Claude", note: "An interactive explorer", url: "universe.html" },
+          { title: "Planck CMB Simulator", by: "GitHub repo", note: "An interactive CMB map simulator", url: "https://chrisnorth.github.io/planckapps/Simulator/" },
+          { title: "Seeing Theory", by: "Brown University", note: "A visual introduction to probability and statistics", url: "https://seeing-theory.brown.edu/index.html#firstPage" },
+          { title: "Legacy Surveys Sky Viewer", by: "DESI Legacy Imaging Surveys", note: "An interactive sky map, opened on NGC 5443", url: "https://www.legacysurvey.org/viewer#NGC%205443" }
         ]
       }
     ];
@@ -1783,7 +1785,7 @@
                                 {item.title}
                                 <i className="fa-solid fa-arrow-up-right-from-square text-[9px] opacity-60"></i>
                               </h3>
-                              <span className={`shrink-0 text-xs font-medium ${isDark ? 'text-zinc-400' : 'text-stone-500'}`}>{item.by}</span>
+                              {item.by && <span className={`shrink-0 text-xs font-medium ${isDark ? 'text-zinc-400' : 'text-stone-500'}`}>{item.by}</span>}
                             </div>
                             <p className={`mt-3 border-t pt-3 text-sm leading-relaxed ${isDark ? 'border-white/[0.06] text-zinc-400' : 'border-stone-100 text-stone-500'}`}>{item.note}</p>
                           </a>

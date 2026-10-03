@@ -268,7 +268,8 @@ const EL=[ // a, e, I, L, varpi, Omega  and their rates per Julian century
  ['Jupiter',[5.20288700,0.04838624,1.30439695,34.39644051,14.72847983,100.47390909],[-0.00011607,-0.00013253,-0.00183714,3034.74612775,0.21252668,0.20469106],'#f0c89a'],
  ['Saturn',[9.53667594,0.05386179,2.48599187,49.95424423,92.59887831,113.66242448],[-0.00125060,-0.00050991,0.00193609,1222.49362201,-0.41897216,-0.28867794],'#ead7a4'],
  ['Uranus',[19.18916464,0.04725744,0.77263783,313.23810451,170.95427630,74.01692503],[-0.00196176,-0.00004397,-0.00242939,428.48202785,0.40805281,0.04240589],'#aee6ea'],
- ['Neptune',[30.06992276,0.00859048,1.77004347,-55.12002969,44.96476227,131.78422574],[0.00026291,0.00005105,0.00035372,218.45945325,-0.32241464,-0.00508664],'#7fa6ff']];
+ ['Neptune',[30.06992276,0.00859048,1.77004347,-55.12002969,44.96476227,131.78422574],[0.00026291,0.00005105,0.00035372,218.45945325,-0.32241464,-0.00508664],'#7fa6ff'],
+ ['Pluto',[39.48211675,0.24882730,17.14001206,238.92903833,224.06891629,110.30393684],[-0.00031596,0.00005170,0.00004818,145.20780515,-0.04062942,-0.01183482],'#d9c7b0']];
 const D2R=Math.PI/180, EPS=23.43928*D2R;
 const RG=[[-0.0548755604,-0.8734370902,-0.4838350155],[0.4941094279,-0.4448296300,0.7469822445],[-0.8676661490,-0.1980763734,0.4559837762]];
 function ecl2three(x,y,z,out){ // ecliptic J2000 -> ICRS -> Galactic -> three (x, zg, -yg)
@@ -461,10 +462,16 @@ const bodyScene=new THREE.Scene(), bodyCam=camera.clone();
 const sph=new THREE.SphereGeometry(1,96,48);
 const BVS=`varying vec2 vUv;varying vec3 vN;varying vec3 vW;
 void main(){vUv=uv;vN=normalize(mat3(modelMatrix)*normal);vec4 w=modelMatrix*vec4(position,1.0);vW=w.xyz;gl_Position=projectionMatrix*viewMatrix*w;}`;
-const BFS=`uniform sampler2D map;uniform sampler2D nmap;uniform sampler2D cmap;uniform float isEarth,isSun,atmK,wrap,cRot;uniform vec3 sunW,atm;
+const BFS=`uniform sampler2D map;uniform sampler2D nmap;uniform sampler2D cmap;uniform float isEarth,isSun,atmK,wrap,cRot,uTime;uniform vec3 sunW,atm;
+ float sh_(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+ float sn_(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);return mix(mix(sh_(i),sh_(i+vec2(1,0)),f.x),mix(sh_(i+vec2(0,1)),sh_(i+vec2(1,1)),f.x),f.y);}
 varying vec2 vUv;varying vec3 vN;varying vec3 vW;
 void main(){vec3 n=normalize(vN);vec3 v=normalize(cameraPosition-vW);vec3 c=texture2D(map,vUv).rgb;
- if(isSun>0.5){float mu=max(dot(n,v),0.0);gl_FragColor=vec4(c*(0.38+0.62*pow(mu,0.5))*1.45,1.0);return;}
+ if(isSun>0.5){float mu=max(dot(n,v),0.0);vec2 q=vUv*vec2(1100.0,550.0);
+    vec2 w=vec2(sn_(q*0.45+uTime*0.05),sn_(q*0.45-uTime*0.04+5.0));float g=sn_(q+w*1.6+vec2(uTime*0.03,0.0));
+    float sg=sn_(vUv*vec2(70.0,35.0)+uTime*0.003);float fac=smoothstep(0.72,0.9,sn_(vUv*vec2(160.0,80.0)-uTime*0.002))*(1.0-mu);
+    vec3 limb=mix(vec3(1.0,0.62,0.4),vec3(1.0),pow(mu,0.55));
+    gl_FragColor=vec4(c*limb*(0.38+0.62*pow(mu,0.5))*1.45*(0.86+0.28*g)*(0.95+0.1*sg)+vec3(1.0,0.9,0.7)*fac*0.35,1.0);return;}
  vec3 l=normalize(sunW-vW);float mu=dot(n,l);float d=clamp((mu+wrap)/(1.0+wrap),0.0,1.0);
  vec3 col=c*d*1.08+c*0.012;
  if(isEarth>0.5){float cl=texture2D(cmap,vUv+vec2(cRot,0.0)).r;
@@ -477,7 +484,7 @@ void main(){vec3 n=normalize(vN);vec3 v=normalize(cameraPosition-vW);vec3 c=text
 const bodies=BD.map((b,i)=>{
   const k=b[0].toLowerCase(), isE=k==='earth';
   const u={map:{value:tx(b[7])},nmap:{value:isE?tx('earth_nightmap'):null},cmap:{value:isE?tx('earth_clouds'):null},
-    isEarth:{value:isE?1:0},isSun:{value:k==='sun'?1:0},atmK:{value:b[9]},wrap:{value:b[10]},cRot:{value:0},
+    isEarth:{value:isE?1:0},isSun:{value:k==='sun'?1:0},uTime:{value:0},atmK:{value:b[9]},wrap:{value:b[10]},cRot:{value:0},
     sunW:{value:new THREE.Vector3()},atm:{value:new THREE.Vector3(...b[8])}};
   const m=new THREE.Mesh(sph,new THREE.ShaderMaterial({uniforms:u,vertexShader:BVS,fragmentShader:BFS}));
   m.matrixAutoUpdate=false;m.frustumCulled=false;bodyScene.add(m);
@@ -496,12 +503,24 @@ B.saturn.br=B.saturn.R*2.4;B.sun.br=B.sun.R*5;
    vec3 l=normalize(sunW-vW);vec3 tc=cW-vW;float t=dot(tc,l);float sh=1.0;if(t>0.0)sh=smoothstep(Rw*0.97,Rw*1.02,length(tc-l*t));
    gl_FragColor=vec4(c.rgb*(0.05+1.0*sh),c.a*0.96);}`}));
  m.matrixAutoUpdate=false;m.frustumCulled=false;bodyScene.add(m);B.saturn.ring=m;}
-// corona
-{const c=document.createElement('canvas');c.width=c.height=256;const x=c.getContext('2d');const gr=x.createRadialGradient(128,128,0,128,128,128);
- gr.addColorStop(0,'rgba(255,240,215,1)');gr.addColorStop(.2,'rgba(255,220,170,.55)');gr.addColorStop(.45,'rgba(255,190,120,.14)');gr.addColorStop(1,'rgba(255,170,90,0)');
- x.fillStyle=gr;x.fillRect(0,0,256,256);
- const s=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),blending:THREE.AdditiveBlending,depthWrite:false,transparent:true}));
- s.frustumCulled=false;bodyScene.add(s);B.sun.corona=s;}
+ // corona: streamers, chromosphere, prominences and flares, animated (replaces a static glow)
+ {const m=new THREE.ShaderMaterial({transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,uniforms:{uTime:{value:0}},
+   vertexShader:`varying vec2 vP;void main(){vP=position.xy;vec4 c=viewMatrix*vec4(modelMatrix[3].xyz,1.0);float s=length(modelMatrix[0].xyz);c.xy+=position.xy*s*0.5;gl_Position=projectionMatrix*c;}`,
+   fragmentShader:`uniform float uTime;varying vec2 vP;
+    float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+    float n(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);return mix(mix(h(i),h(i+vec2(1,0)),f.x),mix(h(i+vec2(0,1)),h(i+vec2(1,1)),f.x),f.y);}
+    float fbm(vec2 p){return 0.55*n(p)+0.3*n(p*2.03+7.1)+0.15*n(p*4.11-3.7);}
+    void main(){float r=length(vP)*4.5;if(r<0.995||r>4.5)discard;float d=r-1.0,ang=atan(vP.y,vP.x);
+     float st=0.45+1.1*fbm(vec2(ang*4.0,log(r)*1.2-uTime*0.01));st*=0.7+0.6*smoothstep(0.2,0.9,abs(sin(ang)));
+     float cor=pow(r,-2.8)*st*0.75*smoothstep(4.5,3.2,r);
+     float chrom=exp(-d*d/0.00012)*0.9;
+     float pm=smoothstep(0.66,0.84,n(vec2(ang*7.0+3.0,uTime*0.012)));
+     float hgt=0.025+0.07*n(vec2(ang*25.0,uTime*0.04));float lp=pm*exp(-d/hgt)*smoothstep(0.0,0.006,d)*(0.6+0.4*sin(ang*90.0+uTime*0.6));
+     float fl=fract(uTime/23.0);float fa=smoothstep(0.0,0.015,fl)*(1.0-smoothstep(0.015,0.1,fl));float fang=6.2832*h(vec2(floor(uTime/23.0),1.0));
+     float fe=fa*exp(-pow(mod(ang-fang+3.1416,6.2832)-3.1416,2.0)/0.004)*exp(-d/0.08);
+     vec3 col=vec3(1.0,0.93,0.82)*cor+vec3(1.0,0.32,0.36)*(chrom*0.8+lp*1.5)+vec3(1.0,0.97,0.9)*fe*2.0;
+     gl_FragColor=vec4(col,clamp(cor+chrom*0.8+lp+fe,0.0,1.0));}`});
+  const s=new THREE.Mesh(new THREE.PlaneGeometry(2,2),m);s.frustumCulled=false;bodyScene.add(s);B.sun.corona=s;}
 // Moon: low-precision geocentric ephemeris (Astronomical Almanac), ~0.3 deg
 function moonGeo(T,out){const s=d=>Math.sin(d*D2R),c=d=>Math.cos(d*D2R);
   const lam=218.32+481267.881*T+6.29*s(135.0+477198.87*T)-1.27*s(259.3-413335.36*T)+0.66*s(235.7+890534.22*T)+0.21*s(269.9+954397.74*T)-0.19*s(357.5+35999.05*T)-0.11*s(186.5+966404.03*T);
@@ -781,11 +800,377 @@ const lensMat=new THREE.ShaderMaterial({depthTest:false,depthWrite:false,uniform
 lensScene.add(new THREE.Mesh(new THREE.PlaneGeometry(2,2),lensMat));
 let rt=null;
 
+
+/* =====================================================================================
+   EXOTIC OBJECTS (Cosmic Frontier edition). Every object sits at its catalogue RA, Dec and
+   distance. Stars are limb-darkened discs at their measured radius and temperature; binaries
+   follow Kepler orbits with their real eccentricity and inclination (periods compressed so they
+   move on screen); remnants, lenses and halos are particle models scaled to measured sizes.
+   High-redshift objects are placed at comoving distance and scaled by (1 + z) so that they
+   subtend their true angle on this comoving map.
+   ===================================================================================== */
+const RSUN=2.25461e-8, KMPC_=3.2407793e-14;
+function chiZ(z){const t=DATA.cosmo.ztab,c=DATA.cosmo.chitab;if(z<=t[0])return c[0]*z/t[0]*1e6;
+  for(let i=1;i<t.length;i++)if(t[i]>=z){const f=(z-t[i-1])/(t[i]-t[i-1]);return(c[i-1]+f*(c[i]-c[i-1]))*1e6;}return c[c.length-1]*1e6;}
+function bbCol(T){const t=T/100;let r,g,b;
+  if(t<=66){r=255;g=99.47*Math.log(t)-161.12;b=t<=19?0:138.52*Math.log(t-10)-305.04;}
+  else{r=329.7*Math.pow(t-60,-0.1332);g=288.12*Math.pow(t-60,-0.0755);b=255;}
+  const c=x=>Math.min(1,Math.max(0,x/255));return[c(r),c(g),c(b)];}
+/* billboard: 0 = star surface (limb darkening + granulation), 1 = glow, 2 = black-hole shadow with photon ring */
+const BBVS=`uniform float uScale,uRad,uK,uPx,uMin;uniform vec3 uC,uAx;varying vec2 vP;varying float vS;varying vec3 vAx;
+void main(){vP=position.xy;vec4 c=modelViewMatrix*vec4(uC,1.0);float pr=uRad*uScale/max(-c.z,1e-30)*uPx;float s=max(1.0,uMin/max(pr,1e-9));vS=s;
+ vAx=(modelViewMatrix*vec4(uAx,0.0)).xyz;c.xy+=position.xy*uRad*uScale*uK*s;gl_Position=projectionMatrix*c;}`;
+const BBFS=`uniform vec3 uCol;uniform float uOp,uT,uSeed,uGran,uMode,uK,uAct,uCon;varying vec2 vP;varying float vS;varying vec3 vAx;
+float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+float n(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);return mix(mix(h(i),h(i+vec2(1,0)),f.x),mix(h(i+vec2(0,1)),h(i+vec2(1,1)),f.x),f.y);}
+float fbm(vec2 p){return 0.55*n(p)+0.3*n(p*2.03+7.1)+0.15*n(p*4.11-3.7);}
+void main(){vec2 p=vP*uK;float r=length(p);vec3 col=vec3(0.0);float a=0.0;
+ if(vS>1.05){float q=length(vP);float g=exp(-q*q*9.0)*(1.0+0.07*sin(uT*3.0+uSeed));gl_FragColor=vec4(uCol*(0.6+0.6*g),g*uOp);return;}
+ float ang=atan(p.y,p.x);
+ if(uMode<0.5){
+  if(r<1.0){float mu=sqrt(1.0-r*r);vec2 q=p/(0.35+0.65*mu)*uGran+uSeed;
+   vec2 w=vec2(fbm(q+uT*0.06),fbm(q-uT*0.05+3.3));float g=fbm(q+1.7*w+vec2(uT*0.03,0.0));
+   float cells=smoothstep(0.25,0.75,g);
+   float spot=smoothstep(0.80,0.87,n(q*0.16+uSeed*0.3+uT*0.003))*uAct;
+   vec3 limb=mix(vec3(1.0,0.62,0.42),vec3(1.0),pow(mu,0.6));
+   col=uCol*limb*(1.0-0.62*(1.0-mu))*(1.0+uCon*(cells-0.5)*0.6)*(1.0-0.75*spot);
+   col+=uCol*0.25*uAct*smoothstep(0.7,0.9,g)*(1.0-mu);a=1.0;}
+  else{float d=r-1.0;float stream=0.55+0.9*fbm(vec2(ang*3.0+uSeed,d*1.5-uT*0.02));
+   float cor=exp(-d*3.2)*stream*0.5*(0.35+uAct);float chrom=exp(-d*d/0.0009)*uAct;
+   float pm=smoothstep(0.62,0.82,n(vec2(ang*6.0+uSeed,uT*0.015)));
+   float lp=pm*exp(-d/(0.04+0.1*n(vec2(ang*30.0,uT*0.05))))*smoothstep(0.0,0.01,d)*uAct;
+   col=uCol*cor+vec3(1.0,0.35,0.3)*(chrom*0.6+lp*1.6);a=clamp(cor+chrom*0.6+lp,0.0,1.0);}
+  float fl=fract(uT/17.0+uSeed*0.13);float fa=uAct*smoothstep(0.0,0.02,fl)*(1.0-smoothstep(0.02,0.14,fl));
+  vec2 fp=vec2(cos(uSeed*5.0),sin(uSeed*5.0))*0.9;float fd=length(p-fp);float fe=fa*exp(-fd*fd/0.012);
+  col+=vec3(1.0,0.95,0.9)*fe*2.0;a=max(a,fe);}
+ else if(uMode<1.5){float gl=exp(-r*r*3.0)+0.25*exp(-r*1.6);col=uCol*gl*(1.0+0.06*sin(uT*5.0+uSeed));a=min(1.0,gl);}
+ else if(uMode<2.5){float ring=exp(-pow((r-1.0)*7.0,2.0));float disc=smoothstep(1.0,1.15,r)*exp(-(r-1.15)*1.3)*0.5;
+   col=uCol*(ring*1.4+disc);a=r<0.97?1.0:min(1.0,ring+disc);if(r<0.97)col=vec3(0.0);}
+ else if(uMode<3.5){if(r<1.0){float mu=sqrt(1.0-r*r);vec3 nrm=vec3(p,mu);float c=abs(dot(nrm,normalize(vAx)));
+   float hs=exp(-(1.0-c)/0.02);col=uCol*(0.5+0.5*mu)*(0.95+0.1*n(p*12.0+uT))+vec3(1.0,0.97,0.9)*hs*1.6;a=1.0;}
+   else{float d=r-1.0;float gl=exp(-d*2.2)*0.75;col=uCol*gl;a=gl;}}
+ else{if(r<1.0){float mu=sqrt(1.0-r*r);float b=0.85+0.15*n(vec2(p.y*7.0+uSeed,uSeed));col=uCol*(0.2+0.8*pow(mu,0.7))*b;a=1.0;}else discard;}
+ if(r>uK)discard;gl_FragColor=vec4(col,a*uOp);}`;
+const QUAD=new THREE.PlaneGeometry(2,2);
+function bb(o){const m=new THREE.ShaderMaterial({vertexShader:BBVS,fragmentShader:BBFS,transparent:true,depthTest:false,depthWrite:false,
+  blending:o.add?THREE.AdditiveBlending:THREE.NormalBlending,
+  uniforms:{uScale:{value:1},uPx:{value:1},uOp:{value:1},uMax:{value:PMAX},uMin:{value:(o.min!==undefined?o.min:3.2)*DPR},uRad:{value:o.R},uK:{value:o.k||2.2},uC:{value:new THREE.Vector3()},uAx:{value:new THREE.Vector3(0,0,1)},uAct:{value:o.act!==undefined?o.act:0.6},uCon:{value:o.con!==undefined?o.con:1},
+   uCol:{value:new THREE.Vector3(...(o.col||[1,1,1]))},uT:{value:0},uSeed:{value:Math.random()*50},uGran:{value:o.gran||8},uMode:{value:o.mode||0}}});
+  const s=new THREE.Mesh(QUAD,m);s.frustumCulled=false;s.renderOrder=o.ro||6;return s;}
+/* lines with the uniforms the DSO loop expects */
+const LNVS=`void main(){gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}`;
+const LNFS=`uniform vec3 uCol;uniform float uOp,uA;void main(){gl_FragColor=vec4(uCol,uA*uOp);}`;
+function lineObj(pts,col,al,loop){const g=new THREE.BufferGeometry().setFromPoints(pts);
+  const m=new THREE.ShaderMaterial({vertexShader:LNVS,fragmentShader:LNFS,transparent:true,depthTest:false,depthWrite:false,blending:THREE.AdditiveBlending,
+   uniforms:{uScale:{value:1},uPx:{value:1},uOp:{value:1},uMax:{value:PMAX},uCol:{value:new THREE.Vector3(...col)},uA:{value:al}}});
+  const l=new (loop?THREE.LineLoop:THREE.Line)(g,m);l.frustumCulled=false;l.renderOrder=5;return l;}
+function ellipse(a,e,n,cx){const p=[];for(let i=0;i<n;i++){const E=i/n*6.2832;p.push(new THREE.Vector3(cx*(a*(Math.cos(E)-e)),cx*(a*Math.sqrt(1-e*e)*Math.sin(E)),0));}return p;}
+function circle(r,n){const p=[];for(let i=0;i<n;i++){const t=i/n*6.2832;p.push(new THREE.Vector3(r*Math.cos(t),r*Math.sin(t),0));}return p;}
+function kep(M,e){let E=M;for(let k=0;k<8;k++)E-=(E-e*Math.sin(E)-M)/(1-e*Math.cos(E));return E;}
+function beacon(col,sz){const ps=PS();put(ps,0,0,0,col,1e-12,1.5+(sz||0.25));return points(ps);}
+/* Keplerian accretion disc, rotating in the shader */
+const ADVS=`attribute vec3 acol;attribute float ar;attribute float aph;uniform float uOp,uT,uW;uniform vec3 uC;varying vec3 vC;varying float vA;
+void main(){float ang=aph+uT*uW*pow(ar,-1.5);vec3 p=uC+vec3(ar*cos(ang),ar*sin(ang),position.z);vec4 mv=modelViewMatrix*vec4(p,1.0);gl_Position=projectionMatrix*mv;
+ vec3 tv=normalize((modelViewMatrix*vec4(-sin(ang),cos(ang),0.0,0.0)).xyz);float b=min(0.6,0.55*pow(ar,-0.5));float g=1.0/sqrt(1.0-b*b);float D=1.0/(g*(1.0-b*dot(tv,normalize(-mv.xyz))));
+ float fl=0.75+0.25*sin(uT*4.0+aph*9.0);gl_PointSize=2.0;vC=acol*min(3.0,pow(D,3.0));vA=uOp*0.6*fl;}`;
+const ADFS=`varying vec3 vC;varying float vA;void main(){vec2 q=gl_PointCoord*2.0-1.0;float r2=dot(q,q);if(r2>1.0)discard;gl_FragColor=vec4(vC,exp(-2.5*r2)*vA);}`;
+function disc(rin,rout,n,thick,seed,hot,cool){const r=rng(seed),p=[],c=[],ar=[],ph=[];
+  for(let i=0;i<n;i++){const u=r(),R=rin*Math.pow(rout/rin,u);p.push(0,0,gs(r)*thick*R);const t=Math.pow(rin/R,0.75);
+    const k=mix(cool,hot,t);c.push(...k);ar.push(R/rin);ph.push(r()*6.2832);}
+  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(p,3));g.setAttribute('acol',new THREE.Float32BufferAttribute(c,3));
+  g.setAttribute('ar',new THREE.Float32BufferAttribute(ar,1));g.setAttribute('aph',new THREE.Float32BufferAttribute(ph,1));
+  const m=new THREE.ShaderMaterial({vertexShader:ADVS.replace('ar*cos(ang),ar*sin(ang)','ar*uR0*cos(ang),ar*uR0*sin(ang)').replace('uniform float uOp','uniform float uR0,uOp'),fragmentShader:ADFS,
+   transparent:true,depthTest:false,depthWrite:false,blending:THREE.AdditiveBlending,
+   uniforms:{uScale:{value:1},uPx:{value:1},uOp:{value:1},uMax:{value:PMAX},uT:{value:0},uW:{value:1.2},uC:{value:new THREE.Vector3()},uR0:{value:rin}}});STREAMS.push(m);
+  const o=new THREE.Points(g,m);o.frustumCulled=false;o.renderOrder=5;return o;}
+/* gravitational-wave pattern of a circular binary: a two-armed spiral, wavelength c P / 2 (schematic amplitude) */
+const GWFS=`uniform float uOp,uT,uL,uR;varying vec2 vP;void main(){float r=length(vP)*uR;float ph=atan(vP.y,vP.x);
+ float w=cos(2.0*ph-6.2832*r/uL+uT*6.2832*2.0);float a=0.22*(0.5+0.5*w)*smoothstep(uL*0.15,uL*0.6,r)*exp(-r/(uL*2.2));
+ if(r>uR)discard;gl_FragColor=vec4(0.55,0.75,1.0,a*uOp);}`;
+function gwSpiral(lam,Rmax){const m=new THREE.ShaderMaterial({vertexShader:`uniform float uR;varying vec2 vP;void main(){vP=position.xy;gl_Position=projectionMatrix*modelViewMatrix*vec4(position.xy*uR,0.0,1.0);}`,
+  fragmentShader:GWFS,transparent:true,depthTest:false,depthWrite:false,blending:THREE.AdditiveBlending,
+  uniforms:{uScale:{value:1},uPx:{value:1},uOp:{value:1},uMax:{value:PMAX},uT:{value:0},uL:{value:lam},uR:{value:Rmax}}});
+  const s=new THREE.Mesh(QUAD,m);s.frustumCulled=false;s.renderOrder=2;return s;}
+/* a moving dot of fixed pixel size (for objects far smaller than a pixel) */
+const MDVS=`uniform vec3 uC;uniform float uPs;void main(){gl_Position=projectionMatrix*modelViewMatrix*vec4(uC,1.0);gl_PointSize=uPs;}`;
+const MDFS=`uniform vec3 uCol;uniform float uOp;void main(){vec2 q=gl_PointCoord*2.0-1.0;float r2=dot(q,q);if(r2>1.0)discard;gl_FragColor=vec4(uCol,exp(-2.0*r2)*uOp);}`;
+function mdot(col,px){const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute([0,0,0],3));
+  const m=new THREE.ShaderMaterial({vertexShader:MDVS,fragmentShader:MDFS,transparent:true,depthTest:false,depthWrite:false,blending:THREE.AdditiveBlending,
+   uniforms:{uScale:{value:1},uPx:{value:1},uOp:{value:1},uMax:{value:PMAX},uC:{value:new THREE.Vector3()},uCol:{value:new THREE.Vector3(...col)},uPs:{value:px*DPR}}});
+  const o=new THREE.Points(g,m);o.frustumCulled=false;o.renderOrder=7;return o;}
+/* stream particles: each flows from a start to an end point and fades in and out (jets, winds, wisps) */
+const STVS=`attribute vec3 acol;attribute vec3 a1;attribute float aph;attribute float asp;attribute float asz;attribute float aal;uniform float uScale,uPx,uOp,uMax,uT;varying vec3 vC;varying float vA;
+void main(){float f=fract(aph+uT*asp);vec3 p=mix(position,a1,f);vec4 mv=modelViewMatrix*vec4(p,1.0);gl_Position=projectionMatrix*mv;float L=max(length(mv.xyz),1e-12);
+ float px=asz*uScale/L*uPx;float a=aal*uOp*sin(3.14159*f);if(px<1.2){a*=px*px/1.44;px=1.2;}gl_PointSize=min(px,uMax);vC=acol;vA=a;}`;
+const STREAMS=[];
+function SP(){return{p:[],q:[],ph:[],sp:[],c:[],s:[],a:[]};}
+function sput(o,p0,p1,ph,spd,c,s,a){o.p.push(...p0);o.q.push(...p1);o.ph.push(ph);o.sp.push(spd);o.c.push(...c);o.s.push(s);o.a.push(a);}
+function streamPts(o){const g=new THREE.BufferGeometry(),F=(k,a,n)=>g.setAttribute(k,new THREE.Float32BufferAttribute(a,n));
+  F('position',o.p,3);F('a1',o.q,3);F('aph',o.ph,1);F('asp',o.sp,1);F('acol',o.c,3);F('asz',o.s,1);F('aal',o.a,1);
+  const m=new THREE.ShaderMaterial({vertexShader:STVS,fragmentShader:CLFS,transparent:true,depthTest:false,depthWrite:false,blending:THREE.AdditiveBlending,
+    uniforms:{uScale:{value:1},uPx:{value:1},uOp:{value:1},uMax:{value:PMAX},uT:{value:0}}});
+  const pts=new THREE.Points(g,m);pts.frustumCulled=false;pts.renderOrder=4;STREAMS.push(m);return pts;}
+/* relativistic jet: knots of synchrotron-emitting plasma flowing out along +-axis, widening with a small opening angle */
+function jetPts(o){const sp=SP(),r=rng(o.seed||5),ax=o.ax||[0,0,1],u=o.u||[1,0,0],v=[ax[1]*u[2]-ax[2]*u[1],ax[2]*u[0]-ax[0]*u[2],ax[0]*u[1]-ax[1]*u[0]];
+  const sides=o.one?[1]:[1,-1];
+  for(const sd of sides)for(let k=0;k<(o.knots||28);k++){const ph=r(),n=Math.round((o.n||3000)/(o.knots||28)/sides.length*(sd>0?1:(o.cj||1)));
+    for(let i=0;i<n;i++){const t=r()*6.2832,w=Math.abs(gs(r))*Math.tan(o.open||0.03),e0=[Math.cos(t)*w,Math.sin(t)*w];
+      const P=(s)=>[0,1,2].map(j=>sd*ax[j]*s*o.L+(u[j]*e0[0]+v[j]*e0[1])*s*o.L+(u[j]*gs(r)+v[j]*gs(r))*o.L*0.004);
+      sput(sp,P(0.01),P(1.0),r()<0.45?r():ph+gs(r)*0.006,o.speed||0.08,mix(o.c0||[.6,.75,1],o.c1||[.85,.9,1],r()),o.L*(o.sz||0.012),o.a||0.5);}}
+  return streamPts(sp);}
+/* pulsar: neutron star with polar hot spots, rotating magnetosphere (dipole field lines), emission cones along the magnetic axis */
+function pulsar(o,objs){const Rns=(o.Rkm||12)*KMPC_,Rlc=2.998e5*o.P/(2*Math.PI)*KMPC_,Lb=Rlc*1.6,th=12*D2R,mag=0.45;
+  const ns=bb({R:Rns,col:[.62,.78,1],mode:3,k:3,min:3.4});objs.push(ns);
+  objs.push(lineObj(circle(Rlc,160),[.45,.6,1],.22,true));
+  const coneMat=new THREE.ShaderMaterial({transparent:true,depthTest:false,depthWrite:false,side:THREE.DoubleSide,blending:THREE.AdditiveBlending,
+    uniforms:{uScale:{value:1},uPx:{value:1},uOp:{value:1},uMax:{value:PMAX},uL:{value:Lb},uT:{value:0}},
+    vertexShader:`uniform float uL;varying float vAl;varying vec3 vN;varying vec3 vV;void main(){vAl=abs(position.z)/uL;vN=normalize(normalMatrix*normal);vec4 mv=modelViewMatrix*vec4(position,1.0);vV=normalize(-mv.xyz);gl_Position=projectionMatrix*mv;}`,
+    fragmentShader:`uniform float uOp,uT;varying float vAl;varying vec3 vN;varying vec3 vV;void main(){float f=abs(dot(normalize(vN),normalize(vV)));
+     float w=0.8+0.2*sin(vAl*40.0-uT*12.0);float a=pow(f,1.3)*pow(1.0-vAl,1.8)*0.5*w;gl_FragColor=vec4(mix(vec3(0.75,0.85,1.0),vec3(0.95,0.8,1.0),vAl),a*uOp);}`});
+  const cones=[-1,1].map(s=>{const g=new THREE.ConeGeometry(Lb*Math.tan(th),Lb,48,1,true);g.translate(0,-Lb/2,0);g.rotateX(s>0?-Math.PI/2:Math.PI/2);
+    const c=new THREE.Mesh(g,coneMat);c.frustumCulled=false;c.renderOrder=5;objs.push(c);return c;});
+  const fl=[];const add=(a,b)=>fl.push(a[0],a[1],a[2],b[0],b[1],b[2]);
+  for(const k of[0.06,0.12,0.22,0.36,0.55,0.8])for(let j=0;j<8;j++){const phi=j/8*6.2832;let prev=null;
+    for(let i=0;i<=60;i++){const t=0.03+i/60*(Math.PI-0.06),rr=k*Rlc*Math.sin(t)**2;if(rr<Rns)continue;const q=[rr*Math.sin(t)*Math.cos(phi),rr*Math.sin(t)*Math.sin(phi),rr*Math.cos(t)];if(prev)add(prev,q);prev=q;}}
+  for(const k of[1.15,1.5,2.2])for(let j=0;j<8;j++)for(const sg of[1,-1]){const phi=j/8*6.2832;let prev=null;
+    for(let i=0;i<=40;i++){const t=0.02+i/40*0.9,rr=k*Rlc*Math.sin(t)**2;if(rr>Rlc*1.5)break;const q=[rr*Math.sin(t)*Math.cos(phi),rr*Math.sin(t)*Math.sin(phi),sg*rr*Math.cos(t)];if(prev)add(prev,q);prev=q;}}
+  const fg=new THREE.BufferGeometry();fg.setAttribute('position',new THREE.Float32BufferAttribute(fl,3));
+  const fm=new THREE.ShaderMaterial({vertexShader:LNVS,fragmentShader:LNFS,transparent:true,depthTest:false,depthWrite:false,blending:THREE.AdditiveBlending,
+    uniforms:{uScale:{value:1},uPx:{value:1},uOp:{value:1},uMax:{value:PMAX},uCol:{value:new THREE.Vector3(.5,.65,1)},uA:{value:.16}}});
+  const field=new THREE.LineSegments(fg,fm);field.frustumCulled=false;field.renderOrder=3;objs.push(field);
+  if(o.pwn){const sp=SP(),r=rng(o.seed||31),Rt=o.pwn.Rt,Lj=o.pwn.Lj;
+    for(let i=0;i<6000;i++){const t=r()*6.2832,rr=Rt*(0.35+0.65*Math.sqrt(r())),z=gs(r)*0.06*Rt,p0=[rr*0.6*Math.cos(t),rr*0.6*Math.sin(t),z],p1=[rr*1.15*Math.cos(t+0.15),rr*1.15*Math.sin(t+0.15),z];
+      sput(sp,p0,p1,r(),0.05+0.05*r(),mix([.75,.85,1],[1,1,1],r()),Rt*0.03,0.35);}
+    const tp=streamPts(sp),jp=jetPts({L:Lj,open:0.05,n:2200,seed:o.seed||31,speed:0.07,sz:0.02,a:0.45,cj:0.6});objs.push(tp,jp);
+    TK.push(()=>{const w=smooth(-4.4,-3.4,state.logD);tp.material.uniforms.uOp.value*=w;jp.material.uniforms.uOp.value*=w;});}
+  const qT=new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1,0,0),mag),qS=new THREE.Quaternion(),Z=new THREE.Vector3(0,0,1);
+  return now=>{const ph=now/1000*2*Math.PI/o.Pvis;qS.setFromAxisAngle(Z,ph).multiply(qT);
+    cones.forEach(c=>c.quaternion.copy(qS));field.quaternion.copy(qS);coneMat.uniforms.uT.value=now/1000;
+    ns.material.uniforms.uAx.value.copy(Z).applyQuaternion(qS);ns.material.uniforms.uT.value=now/1000;
+    {const w=1-smooth(-6.6,-5.8,state.logD);coneMat.uniforms.uOp.value*=w;fm.uniforms.uOp.value*=w;}
+    if(o.flare){const u=(now/1000)%26,b=u<0.4?u/0.4:Math.exp(-(u-0.4)*1.3);ns.material.uniforms.uCol.value.set(.62+b*2,.78+b*1.8,1+b*1.5);fm.uniforms.uA.value=.16+.5*b;}};}
+/* remnant particles that shimmer and churn slowly (turbulent filaments) */
+const SNVS=`attribute vec3 acol;attribute float asz;attribute float aal;attribute float aph;uniform float uScale,uPx,uOp,uMax,uT;varying vec3 vC;varying float vA;
+void main(){vec3 p=position*(1.0+0.006*sin(uT*0.35+aph*6.2832))+vec3(sin(uT*0.2+aph*40.0),cos(uT*0.17+aph*31.0),sin(uT*0.23+aph*17.0))*asz*0.4;
+ vec4 mv=modelViewMatrix*vec4(p,1.0);gl_Position=projectionMatrix*mv;float L=max(length(mv.xyz),1e-12);float px=asz*uScale/L*uPx;
+ float a=aal*uOp*(0.65+0.35*sin(uT*1.1+aph*57.0));if(aal>1.5){px=max(px,1.6+(aal-1.5)*3.0);a=uOp;}else if(px<1.2){a*=px*px/1.44;px=1.2;}gl_PointSize=min(px,uMax);vC=acol;vA=a;}`;
+function snPoints(ps){const g=new THREE.BufferGeometry(),n=ps.s.length,ph=new Float32Array(n);for(let i=0;i<n;i++)ph[i]=Math.random();
+  g.setAttribute('position',new THREE.Float32BufferAttribute(ps.p,3));g.setAttribute('acol',new THREE.Float32BufferAttribute(ps.c,3));
+  g.setAttribute('asz',new THREE.Float32BufferAttribute(ps.s,1));g.setAttribute('aal',new THREE.Float32BufferAttribute(ps.a,1));g.setAttribute('aph',new THREE.BufferAttribute(ph,1));
+  const m=new THREE.ShaderMaterial({vertexShader:SNVS,fragmentShader:CLFS,transparent:true,depthTest:false,depthWrite:false,blending:THREE.AdditiveBlending,
+    uniforms:{uScale:{value:1},uPx:{value:1},uOp:{value:1},uMax:{value:PMAX},uT:{value:0}}});
+  const o=new THREE.Points(g,m);o.frustumCulled=false;o.renderOrder=3;STREAMS.push(m);return o;}
+/* expanding shell of filaments (supernova remnants) */
+function snShell(ps,r,R,n,cols,thick,bil){for(let i=0;i<n;i++){const ct=2*r()-1,st=Math.sqrt(1-ct*ct),ph=r()*6.2832;
+  let x=st*Math.cos(ph),y=st*Math.sin(ph),z=ct;const k=1+thick*gs(r)+0.08*Math.sin(7*ph+3*ct)*Math.cos(5*ct);
+  const w=bil?Math.pow(Math.abs(x),bil):1;if(bil&&r()>0.25+0.75*w)continue;
+  const c=cols[Math.floor(r()*cols.length)];put(ps,x*R*k,y*R*k,z*R*k,c,R*0.02,0.35+0.4*r());}}
+/* NFW halo sampled by rejection: rho ~ 1/(x (1+x)^2), x = r/rs, out to c rs */
+function nfw(ps,r,rs,c,n,col,size,al){const mx=(x)=>Math.log(1+x)-x/(1+x),Mc=mx(c);let k=0;
+  while(k<n){const u=r()*Mc;let lo=0,hi=c;for(let it=0;it<40;it++){const m=(lo+hi)/2;if(mx(m)<u)lo=m;else hi=m;}
+    const R=lo*rs,ct=2*r()-1,st=Math.sqrt(1-ct*ct),ph=r()*6.2832;put(ps,R*st*Math.cos(ph),R*st*Math.sin(ph),R*ct,col,size*(0.6+R/(c*rs)),al);k++;}}
+function exo(o){o.dg=o.dg||1;o.g=o.g||1;const d=dso(o);d.lmin=o.lmin;return d;}
+function sidev(o){o.side=1;return o;}
+const TK=[];   /* per-object animation callbacks */
+const COLX={sn:[1,.6,.3],ns:[.55,.85,1],bh:[.75,.55,1],st:[1,.95,.8],gw:[1,.55,.8],dm:[.75,.5,1],ln:[.45,1,.85]};
+const MW_MK=[2.4,5.3,3.9],XG_MK=[5.6,9.6,8.6];
+/* ---------------- stars ---------------- */
+function star(o){const R=o.Rs*RSUN,col=bbCol(o.T),objs=[bb({R,col,gran:o.gran||8,k:3,act:o.act,con:o.con}),beacon(COLX.st)];if(o.extra)o.extra(objs,R);
+  if(o.planets)o.planets.forEach((p,i)=>{objs.push(lineObj(circle(p.a*AU,160),[.55,.65,.8],.35,true));const s=bb({R:Math.max(p.r*6371*KMPC_,R*0.04),col:p.c||[.75,.62,.5],mode:4,min:2.4});objs.push(s);
+    TK.push(now=>{const t=now/1000*2*Math.PI/(o.Pvis*p.P/o.planets[o.planets.length-1].P)+i*1.7;s.material.uniforms.uC.value.set(p.a*AU*Math.cos(t),p.a*AU*Math.sin(t),0);});});
+  const sys=o.planets?Math.max(...o.planets.map(p=>p.a))*AU:0;
+  const e=exo({side:!!o.planets,g:1,id:o.id,name:o.name,cat:'Stars',ra:o.ra,dec:o.dec,d:o.d,pa:0,inc:o.inc||60,R:Math.max(R*2.2,sys*1.2),view:o.view||Math.max(R*7,sys*3),lmin:R*1.15,objs,mk:MW_MK,note:o.note});
+  TK.push(now=>{objs[0].material.uniforms.uT.value=now/1000;});return e;}
+star({act:0.35,id:'betelgeuse',name:'Betelgeuse',ra:88.7929,dec:7.4071,d:168,Rs:764,T:3600,gran:2.2,
+ extra:(objs,R)=>{const sp=SP(),r=rng(1920);for(let i=0;i<2600;i++){const ct=-0.2-0.8*Math.pow(r(),0.6)*(r()<.7?1:-0.6),st=Math.sqrt(Math.max(0,1-ct*ct)),ph=r()*6.2832,d=[st*Math.cos(ph),ct,st*Math.sin(ph)];const a0=1.05+0.15*r(),a1=2.6+0.8*r();sput(sp,d.map(x=>x*a0*R),d.map(x=>x*a1*R),r(),0.012+0.01*r(),mix([.75,.42,.25],[.55,.35,.3],r()),R*0.09,0.22);}objs.push(streamPts(sp));},
+ note:'A red supergiant in Orion, 168 pc away (Joyce et al. 2020), about 764 times the Sun\u2019s radius: placed at the Sun it would reach past Mars. Its surface has only a few giant convection cells, which boil visibly here, and it sheds dusty gas (the slow brown outflow). In 2019\u201320 it faded by more than a magnitude (the Great Dimming), caused by a dust cloud it ejected (Montarg\u00e8s et al. 2021). It will explode as a core-collapse supernova, probably within ~100,000 years.'});
+star({act:0.4,id:'rigel',name:'Rigel',ra:78.6345,dec:-8.2016,d:264,Rs:79,T:12100,gran:5,
+ note:'A blue supergiant about 264 pc away, roughly 79 solar radii and 12,100 K, some 100,000 times the Sun\u2019s luminosity. Hot massive stars like this live only ~10 million years.'});
+star({act:0.45,id:'aldebaran',name:'Aldebaran',ra:68.9802,dec:16.5093,d:20.0,Rs:44,T:3900,gran:3,
+ note:'An orange (K5) giant 20 pc away, about 44 solar radii: what the Sun will look like in roughly 5 billion years, after its core hydrogen runs out.'});
+star({act:1.3,id:'proxima',name:'Proxima Centauri',ra:217.4289,dec:-62.6795,d:1.3020,Rs:0.154,T:3042,gran:14,inc:40,Pvis:8,planets:[{a:0.0485,P:11.19,r:1.07,c:[.7,.55,.45]}],
+ note:'The nearest star to the Sun, 1.302 pc (4.25 light-years): a red dwarf 15 % of the Sun\u2019s size and 3,042 K. Its planet Proxima b (Anglada-Escud\u00e9 et al. 2016) orbits every 11.2 days at 0.049 AU, inside the habitable zone, though frequent flares strip it. Red dwarfs are three quarters of all stars and live for trillions of years.'});
+star({act:0.6,id:'barnard',name:'Barnard\u2019s Star',ra:269.4521,dec:4.6934,d:1.8282,Rs:0.187,T:3195,gran:14,
+ note:'A red dwarf 1.83 pc away with the largest proper motion of any star, 10.4 arcseconds per year: it crosses the width of the full Moon in 180 years.'});
+star({act:0.9,id:'trappist',name:'TRAPPIST-1 and its seven planets',ra:346.6224,dec:-5.0414,d:12.47,Rs:0.1192,T:2566,gran:14,inc:89.7,Pvis:30,view:0.12*AU*1.6,
+ planets:[[0.01154,1.511,1.116],[0.01580,2.422,1.097],[0.02227,4.050,0.788],[0.02925,6.100,0.920],[0.03849,9.207,1.045],[0.04683,12.353,1.129],[0.06189,18.773,0.755]].map(q=>({a:q[0],P:q[1],r:q[2]})),
+ note:'An ultracool red dwarf 12.5 pc away, barely larger than Jupiter, with seven Earth-sized planets all closer to it than Mercury is to the Sun (Gillon et al. 2017; radii from Agol et al. 2021). Their periods, 1.5 to 18.8 days, form a resonant chain; here they are compressed to 30 s for the outermost, keeping the true ratios. The orbits are seen almost edge-on from Earth, which is why all seven transit.'});
+/* Sirius A + B: white dwarf binary on its measured orbit */
+{const RA_=101.2872,DE_=-16.7161,a=19.8*AU,e=0.592,mA=2.063,mB=1.018,objs=[],A=bb({R:1.711*RSUN,col:bbCol(9940),gran:9,k:3,act:0.15,con:0.3}),Bw=bb({R:0.0084*RSUN*1,col:bbCol(25000),mode:0,gran:20,act:0,con:0.04});
+ objs.push(lineObj(ellipse(a*mA/(mA+mB),e,256,-1),[.6,.7,.9],.35,true),lineObj(ellipse(a*mB/(mA+mB),e,256,1),[.6,.7,.9],.35,true),A,Bw,beacon(COLX.st));
+ const Bg=mdot([.8,.9,1],7);objs.push(Bg);
+ exo({side:1,id:'sirius',name:'Sirius A and the white dwarf Sirius B',cat:'Stars',ra:RA_,dec:DE_,d:2.637,pa:0,inc:136,R:a*1.2,view:a*3,lmin:0.0084*RSUN*1.2,objs,mk:MW_MK,
+  note:'The brightest star in the night sky, 2.64 pc away, and its companion Sirius B, the first white dwarf identified (Adams 1915). Sirius B holds 1.02 solar masses in a sphere about the size of Earth (0.0084 R\u2609), so a teaspoon of it weighs tonnes; it is held up by electron degeneracy pressure, which fails above the Chandrasekhar mass, 1.4 M\u2609. They orbit every 50.1 years on an eccentric ellipse (e = 0.59, a = 19.8 AU), shown here in 20 s. Sirius B is drawn at true size; the bright dot marks it, since at this scale it is far smaller than a pixel.'});
+ TK.push(now=>{const M=now/1000*2*Math.PI/20,E=kep(M,e),x=a*(Math.cos(E)-e),y=a*Math.sqrt(1-e*e)*Math.sin(E),f=1/(mA+mB);
+   A.material.uniforms.uC.value.set(-x*mB*f,-y*mB*f,0);Bw.material.uniforms.uC.value.set(x*mA*f,y*mA*f,0);Bg.material.uniforms.uC.value.copy(Bw.material.uniforms.uC.value);A.material.uniforms.uT.value=now/1000;});}
+/* ---------------- pulsars and magnetars ---------------- */
+function psr(o){const objs=[beacon(COLX.ns)];const tk=pulsar(o,objs);TK.push(tk);const Rlc=2.998e5*o.P/(2*Math.PI)*KMPC_;if(o.pwn)o.Rsys=o.pwn.Lj*1.3;
+  if(o.extra)o.extra(objs);
+  return exo({side:1,id:o.id,name:o.name,cat:'Neutron stars & pulsars',ra:o.ra,dec:o.dec,d:o.d,pa:o.pa||0,inc:o.inc||70,R:o.Rsys||Rlc*2.5,view:o.view||Rlc*6,lmin:12*KMPC_*1.2,objs,mk:MW_MK,note:o.note});}
+psr({id:'velapsr',name:'Vela pulsar',ra:128.8358,dec:-45.1764,d:287,P:0.0893,Pvis:2.0,pa:130.6,inc:63.6,pwn:{Rt:0.07,Lj:0.12},seed:41,
+ note:'A neutron star 287 pc away (VLBI parallax, Dodson et al. 2003), left by a supernova about 11,000 years ago: 1.4 solar masses in a ball ~12 km across, spinning 11.2 times a second. Its radio beams (drawn as cones along the tilted magnetic axis) sweep past Earth once per turn. Bright polar caps, heated by returning particles, sit where the magnetic axis meets the surface; the faint loops are the dipole field, closed inside the light cylinder and open beyond it. Zoom out to about 0.3 pc to see its X-ray wind nebula: a torus in the spin equator and a jet along the spin axis, as Chandra images it. The circle is the light cylinder, c P / 2\u03c0 = 4,260 km, where co-rotation would reach the speed of light. Spin slowed about 22\u00d7 here.'});
+psr({id:'crabpsr',name:'Crab pulsar',ra:83.6332,dec:22.0145,d:2000,P:0.0337,Pvis:2.0,pa:124,inc:61.3,pwn:{Rt:0.35,Lj:0.45},seed:42,
+ note:'The neutron star at the heart of the Crab Nebula, born in the supernova seen in 1054. It spins 29.9 times a second and powers the whole nebula through its wind. Zoom out to about 1 pc to see the wind nebula Chandra photographed: inner ring, torus and polar jets, with wisps flowing outward. Spin slowed about 60\u00d7.'});
+psr({id:'j0437',name:'PSR J0437\u22124715 (millisecond pulsar)',ra:69.3162,dec:-47.2525,d:156.8,P:0.005757,Pvis:1.6,
+ note:'The nearest and brightest millisecond pulsar, 157 pc away, spinning 174 times a second after being spun up by accreting from its white-dwarf companion. NICER X-ray pulse modelling measured its radius, 11.4 km for 1.42 M\u2609 (Choudhury et al. 2024), which constrains the equation of state of matter above nuclear density. It is one of the most precise clocks in the pulsar timing arrays. Spin slowed about 280\u00d7.'});
+psr({id:'sgr1806',name:'SGR 1806\u221220 (magnetar)',ra:272.1638,dec:-20.4110,d:8700,P:7.56,Pvis:7.56,flare:1,
+ note:'A magnetar about 8.7 kpc away, with a magnetic field near 2 \u00d7 10\u00b9\u2075 gauss, a thousand times a normal pulsar\u2019s. On 27 December 2004 it released a giant flare that briefly outshone the full Moon in gamma rays and measurably disturbed Earth\u2019s ionosphere from across the Galaxy. It rotates once every 7.56 s, shown here in real time, and the drawing replays a small burst every 26 s, as magnetars emit when their crust cracks under magnetic stress.'});
+/* ---------------- binaries with compact objects ---------------- */
+function binary(o){const objs=[beacon(o.bcol||COLX.bh)],m1=o.m1,m2=o.m2,a=o.a,e=o.e,f=1/(m1+m2);
+  objs.push(lineObj(ellipse(a*m2*f,e,256,-1),[.6,.7,.95],.32,true),lineObj(ellipse(a*m1*f,e,256,1),[.6,.7,.95],.32,true));
+  const c1=o.c1(),c2=o.c2();[...c1,...c2].forEach(x=>objs.push(x));
+  let wnd=null;if(o.wind){const r=rng(66),n=3000,P=[],A=[],PH=[];for(let i=0;i<n;i++){P.push(gs(r),gs(r),gs(r));A.push(r()*0.9+0.1);PH.push(r());}
+    const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(P,3));g.setAttribute('aal',new THREE.Float32BufferAttribute(A,1));g.setAttribute('aph',new THREE.Float32BufferAttribute(PH,1));
+    const m=new THREE.ShaderMaterial({transparent:true,depthTest:false,depthWrite:false,blending:THREE.AdditiveBlending,uniforms:{uScale:{value:1},uPx:{value:1},uOp:{value:1},uMax:{value:PMAX},uT:{value:0},uS:{value:new THREE.Vector3()},uB:{value:new THREE.Vector3()},uR:{value:o.wind.R}},
+      vertexShader:`attribute float aal;attribute float aph;uniform float uOp,uT,uR;uniform vec3 uS,uB;varying float vA;void main(){float f=fract(aph+uT*0.12);vec3 d=uB-uS;vec3 s=uS+normalize(d)*uR+position*uR*0.35;
+       vec3 side=normalize(cross(d,vec3(0.0,0.0,1.0)));vec3 p=mix(s,uB+position*uR*0.05,f)+side*sin(f*3.14159)*length(d)*0.18;vec4 mv=modelViewMatrix*vec4(p,1.0);gl_Position=projectionMatrix*mv;gl_PointSize=2.0;vA=uOp*aal*0.35*sin(3.14159*f);}`,
+      fragmentShader:`varying float vA;void main(){vec2 q=gl_PointCoord*2.0-1.0;float r2=dot(q,q);if(r2>1.0)discard;gl_FragColor=vec4(0.6,0.75,1.0,exp(-2.5*r2)*vA);}`});
+    wnd=new THREE.Points(g,m);wnd.frustumCulled=false;objs.push(wnd);}
+  let jt=null;if(o.jet){jt=jetPts({L:o.jet.L,open:0.035,n:3000,seed:73,speed:0.1,sz:0.008,a:0.55});objs.push(jt);}
+  if(o.gw){const lam=o.gw;objs.push(gwSpiral(lam,lam*3));}
+  TK.push(now=>{const M=now/1000*2*Math.PI/o.Pvis,E=kep(M,e),x=a*(Math.cos(E)-e),y=a*Math.sqrt(1-e*e)*Math.sin(E);
+    c1.forEach(m=>{const u=m.material.uniforms;if(u.uC)u.uC.value.set(-x*m2*f,-y*m2*f,0);if(u.uT)u.uT.value=now/1000;});
+    c2.forEach(m=>{const u=m.material.uniforms;if(u.uC)u.uC.value.set(x*m1*f,y*m1*f,0);if(u.uT)u.uT.value=now/1000;});
+    if(wnd){const u=wnd.material.uniforms;u.uT.value=now/1000;u.uS.value.set(x*m1*f,y*m1*f,0);u.uB.value.set(-x*m2*f,-y*m2*f,0);}
+    if(jt)jt.position.set(-x*m2*f,-y*m2*f,0);
+    objs.forEach(m=>{const u=m.material&&m.material.uniforms;if(u&&u.uL)u.uT.value=now/1000/o.Pvis;});});
+  return exo({side:1,id:o.id,name:o.name,cat:'Binaries & gravitational waves',ra:o.ra,dec:o.dec,d:o.d,pa:o.pa||0,inc:o.inc,R:o.gw?o.gw*3:(o.jet?o.jet.L*1.2:a*1.6),view:o.view||a*4,lmin:o.lmin,objs,mk:MW_MK,note:o.note});}
+const BH=(Ms,col)=>bb({R:2.6*2.953*Ms*KMPC_,col:col||[1,.75,.45],mode:2,k:2.2,min:0});
+binary({id:'cygx1',name:'Cygnus X-1 (black hole + blue supergiant)',ra:299.5903,dec:35.2016,d:2220,m1:21.2,m2:40.6,a:0.244*AU,e:0.02,inc:27,Pvis:10,lmin:2.953*21.2*KMPC_*3,
+ c1:()=>{const h=BH(21.2),d=disc(2.953*21.2*KMPC_*3,0.03*AU,6000,0.02,71,[.75,.85,1],[1,.55,.25]);return[h,d];},wind:{R:22*RSUN},jet:{L:30*AU},
+ c2:()=>[bb({R:22*RSUN,col:bbCol(31000),gran:6})],
+ note:'The first black hole ever identified (1971\u201372), 2.22 kpc away: 21.2 solar masses (Miller-Jones et al. 2021) in a 5.6-day orbit with a 41 M\u2609 blue supergiant whose wind feeds an X-ray-hot accretion disc (drawn, rotating faster inside, as Kepler requires, and brighter on the side moving towards you by relativistic beaming). Gas streams from the supergiant towards the black hole, and a radio jet some 30 AU long leaves along the disc axis (Stirling et al. 2001): zoom out to see it. The event horizon is 125 km across. Orbit compressed to 10 s.'});
+binary({id:'gaiabh1',name:'Gaia BH1 (nearest known black hole)',ra:262.1712,dec:-0.5809,d:480,m1:9.62,m2:0.93,a:1.4*AU,e:0.45,inc:126,Pvis:14,lmin:2.953*9.62*KMPC_*3,
+ c1:()=>[BH(9.62,[.8,.7,1]),mdot([.8,.6,1],6)],c2:()=>[bb({R:0.99*RSUN,col:bbCol(5850),gran:12})],
+ note:'A dormant black hole of 9.6 solar masses only 480 pc away, found in 2022 from the wobble of a Sun-like star in Gaia astrometry (El-Badry et al. 2023). The star orbits every 186 days at 1.4 AU with e = 0.45. Nothing falls in, so it emits nothing: black holes like this are detectable only by their gravity. Orbit compressed to 14 s.'});
+binary({id:'gaiabh3',name:'Gaia BH3 (most massive stellar black hole in the Galaxy)',ra:294.8276,dec:14.9305,d:590,m1:32.7,m2:0.76,a:16.2*AU,e:0.73,inc:110,Pvis:16,lmin:2.953*32.7*KMPC_*3,
+ c1:()=>[BH(32.7,[.8,.7,1]),mdot([.8,.6,1],6)],c2:()=>[bb({R:4.9*RSUN,col:bbCol(5200),gran:7})],
+ note:'A 33 solar-mass black hole 590 pc away, announced by the Gaia collaboration in 2024 from an old, metal-poor giant star on an 11.6-year, highly eccentric orbit (e = 0.73). Black holes this heavy were previously known only from gravitational waves of distant mergers. Orbit compressed to 16 s.'});
+binary({id:'hulse',name:'Hulse\u2013Taylor binary pulsar (PSR B1913+16)',ra:288.8671,dec:16.1076,d:6400,m1:1.438,m2:1.390,a:1.95e6*KMPC_,e:0.617,inc:47,Pvis:6,gw:7.75*3600*2.998e5/2*KMPC_,
+ lmin:12*KMPC_*2,bcol:COLX.gw,view:1.95e6*KMPC_*9,
+ c1:()=>[mdot([.7,.85,1],7)],c2:()=>[mdot([.7,.85,1],7)],
+ note:'Two neutron stars, 1.44 and 1.39 M\u2609, in a 7.75-hour eccentric orbit about 6 kpc away (distance uncertain). Hulse and Taylor found it in 1974; its orbit shrinks exactly as general relativity predicts for gravitational-wave emission, to 0.2 % (Weisberg & Huang 2016) \u2014 the first evidence for gravitational waves, Nobel Prize 1993. The blue spiral is the quadrupole wave pattern, wavelength c P / 2 = 4.2 million km (schematic amplitude). The stars are drawn as dots; each is about 24 km across. Zoom out a few steps from the pair to see the wave pattern. They will merge in about 300 million years.'});
+binary({id:'dpsr',name:'Double pulsar (PSR J0737\u22123039A/B)',ra:114.4635,dec:-30.6613,d:735,m1:1.338,m2:1.249,a:8.8e5*KMPC_,e:0.088,inc:89,Pvis:4,gw:2.454*3600*2.998e5/2*KMPC_,
+ lmin:12*KMPC_*2,bcol:COLX.gw,view:8.8e5*KMPC_*9,
+ c1:()=>[mdot([.7,.85,1],7)],c2:()=>[mdot([.7,.85,1],7)],
+ note:'The only system where both neutron stars are seen as pulsars, 735 pc away, orbiting every 2.45 hours. Sixteen years of timing confirmed general relativity\u2019s prediction for the orbital decay to 0.013 % (Kramer et al. 2021), the most precise strong-field test of GR from radio pulsars. They will merge in 85 million years.'});
+/* ---------------- supernovae ---------------- */
+function snr(o){const r=rng(o.seed||7),ps=PS();snShell(ps,r,o.Rpc,o.n||9000,o.cols,o.th||0.06,o.bil);if(o.inner)o.inner(ps,r);
+  const objs=[snPoints(ps),beacon(COLX.sn)];if(o.extra)o.extra(objs);
+  return exo({win:o.win,id:o.id,name:o.name,cat:'Supernovae',ra:o.ra,dec:o.dec,d:o.d,pa:o.pa||0,inc:o.inc||0,R:o.Rpc*1.3,view:o.view||o.Rpc*5,lmin:o.lmin||o.Rpc*0.05,objs,mk:o.mk||MW_MK,note:o.note});}
+snr({id:'casa',name:'Cassiopeia A (supernova ~1680)',ra:350.85,dec:58.815,d:3400,Rpc:2.5,seed:11,pa:65,cols:[[.4,1,.55],[.75,.45,1],[1,.4,.35],[.45,.7,1]],
+ inner:(ps,r)=>{for(let i=0;i<1500;i++){const R=2.0*Math.cbrt(r());const ct=2*r()-1,st=Math.sqrt(1-ct*ct),ph=r()*6.2832;put(ps,R*st*Math.cos(ph),R*st*Math.sin(ph),R*ct,[1,.5,.35],0.05,0.25);}},
+ extra:objs=>{objs.push(bb({R:0.02,col:[.6,.85,1],mode:1,add:1,k:1}));const sp=SP(),r=rng(1680);for(const sd of[1,-0.75])for(let i=0;i<1800;i++){const w=gs(r)*0.12,t=r()*6.2832,d=[sd,w*Math.cos(t),w*Math.sin(t)];const a0=2.0+0.3*r(),a1=(sd>0?4.2:3.4)*(0.85+0.3*r());sput(sp,d.map(x=>x*a0),d.map(x=>x*a1),r(),0.004+0.004*r(),mix([.45,1,.6],[.9,1,.7],r()),0.06,0.35);}objs.push(streamPts(sp));},
+ note:'The youngest known core-collapse remnant in the Galaxy, 3.4 kpc away; its light reached Earth around 1680, apparently unnoticed. The shell, about 5 pc across, glows in silicon (green), iron (violet), oxygen and argon from the star\u2019s interior; the bright point is its central neutron star, found by Chandra in 1999. The green plumes poking through the shell to the north-east and south-west are its silicon-rich ejecta jets, seen in Chandra maps. Filaments churn slowly here; the real shell expands at about 5,000 km/s.'});
+snr({id:'tycho',name:'Tycho\u2019s supernova (SN 1572)',ra:6.3342,dec:64.138,d:2700,Rpc:3.1,seed:12,cols:[[.55,.75,1],[1,.75,.45],[.9,.4,.3]],th:0.035,
+ note:'The type Ia supernova Tycho Brahe observed in 1572, which overturned the belief that the heavens never change. A white dwarf exploded about 2.7 kpc away (distance uncertain, 2.5\u20134 kpc). Light echoes off interstellar dust let astronomers take its spectrum 436 years later (Krause et al. 2008).'});
+snr({id:'kepler',name:'Kepler\u2019s supernova (SN 1604)',ra:262.675,dec:-21.4914,d:5100,Rpc:2.7,seed:13,cols:[[1,.55,.35],[.5,.8,1],[1,.85,.5]],
+ note:'The last supernova seen with the naked eye in the Milky Way, observed by Kepler in 1604, about 5.1 kpc away. A type Ia explosion running into material shed by its progenitor system.'});
+snr({id:'sn1006',name:'SN 1006',ra:225.70,dec:-41.93,d:2200,Rpc:9.6,seed:14,cols:[[.5,.7,1],[.8,.9,1]],bil:2.0,th:0.03,pa:45,
+ note:'The brightest stellar event in recorded history, magnitude about \u22127.5, recorded in China, Egypt, Iraq, Japan and Europe in 1006. 2.2 kpc away. Its two bright rims (drawn) are synchrotron X-rays from electrons accelerated to ~100 TeV in the shock, a site of cosmic-ray acceleration.'});
+snr({id:'velasnr',name:'Vela supernova remnant',ra:128.5,dec:-45.5,d:287,Rpc:19,seed:15,n:16000,cols:[[1,.45,.4],[.45,.85,.8],[.6,.6,1]],th:0.09,view:60,win:[0.4,1.0,6.0,6.6],
+ note:'The remnant of the explosion that made the Vela pulsar, about 11,000 years ago and only 287 pc away; it spans 8\u00b0 of sky, sixteen full Moons. A separate entry flies to the pulsar itself.'});
+{const ps=PS(),r=rng(1987),R=0.207,c=[1,.8,.6];
+ for(let i=0;i<3000;i++){const t=r()*6.2832,k=1+gs(r)*0.03;put(ps,R*k*Math.cos(t),R*k*Math.sin(t),gs(r)*0.005,c,0.004,0.35);}
+ for(let i=0;i<30;i++){const t=i/30*6.2832+gs(r)*0.05;put(ps,R*Math.cos(t),R*Math.sin(t),0,[1,.95,.85],0.012,1.0);}
+ for(let i=0;i<2500;i++){const ct=2*r()-1,st=Math.sqrt(1-ct*ct),ph=r()*6.2832,RR=0.13*Math.cbrt(r());put(ps,RR*st*Math.cos(ph)*1.0,RR*st*Math.sin(ph),RR*ct*1.6,[1,.5,.35],0.004,0.25);}
+ for(const s of[1,-1])for(let i=0;i<2500;i++){const t=r()*6.2832,RR=0.48*(1+gs(r)*0.03);put(ps,RR*Math.cos(t)+0.05*s,RR*Math.sin(t),0.28*s,[1,.45,.5],0.004,0.22);}
+ for(let i=0;i<1500;i++){const g=()=>gs(r)*0.035;put(ps,g(),g(),g()*1.6,[1,.55,.35],0.004,0.3);}
+ exo({id:'sn1987a',name:'SN 1987A',cat:'Supernovae',ra:83.8667,dec:-69.2697,d:51400,pa:81,inc:43,R:0.6,view:2.2,lmin:0.005,objs:[snPoints(ps),beacon(COLX.sn)],mk:[2.4,5.5],
+  note:'The nearest supernova seen since 1604, in the Large Magellanic Cloud, 51.4 kpc away. About two hours before the light, 24 neutrinos arrived in three underground detectors (Kamiokande-II, IMB, Baksan) on 23 February 1987: the first neutrinos from beyond the Sun, carrying the energy of a forming neutron star. The equatorial ring (0.2 pc radius) was blown by the progenitor 20,000 years before; the ejecta shock now lights it in beads. The outer rings make an hourglass. In 2024 JWST found argon emission that points to a neutron star at the centre (Fransson et al. 2024).'});}
+{const C=skyPos(210.8023,54.349,6.7e6);const mk=(id,name,ra,dec,col,note)=>{const ps=PS();const o={id,name,cat:'Supernovae',ra,dec,d:6.7e6,pa:0,inc:0,R:3000,view:40000,lmin:50,
+   objs:[bb({R:400,col,mode:1,add:1,k:1}),beacon(COLX.sn)],mk:XG_MK,note};const e=exo(o);TK.push(now=>{e.objs[0].material.uniforms.uOp.value*=0.75+0.25*Math.sin(now/400);});return e;};
+ mk('sn2011fe','SN 2011fe (in M101)',210.7740,54.2737,[.95,.95,1],'A type Ia supernova in the Pinwheel Galaxy, 6.4\u20136.7 Mpc away, caught within hours of explosion: the nearest Ia in decades and a calibrator for the cosmic distance ladder whose standard candles revealed dark energy (Ch 12). Glow size is schematic.');
+ mk('sn2023ixf','SN 2023ixf (in M101)',210.9107,54.3117,[1,.75,.55],'A core-collapse (type II) supernova in M101 discovered on 19 May 2023, the closest of its kind in a decade; its red-supergiant progenitor was found in archival Hubble and Spitzer images. Glow size is schematic.');}
+/* ---------------- GW170817 in NGC 4993 ---------------- */
+{const d=40e6,gal=elliptical({seed:4993,N:30000,re:2.9,rmax:16,gc:200}),objs=[points(gal),beacon(COLX.gw)];
+ const kn=bb({R:220,col:[1,.62,.35],mode:1,add:1,k:1});objs.push(kn);
+ const rip=new THREE.ShaderMaterial({vertexShader:`varying vec2 vP;void main(){vP=position.xy;gl_Position=projectionMatrix*modelViewMatrix*vec4(position.xy*6000.0+vec2(1500.0,1300.0),0.0,1.0);}`,
+   fragmentShader:`uniform float uOp,uT;varying vec2 vP;void main(){float r=length(vP);float w=fract(r*4.0-uT*0.5);float a=0.3*smoothstep(0.0,0.08,w)*(1.0-w)*(1.0-r)*step(r,1.0);gl_FragColor=vec4(0.6,0.8,1.0,a*uOp);}`,
+   transparent:true,depthTest:false,depthWrite:false,blending:THREE.AdditiveBlending,uniforms:{uScale:{value:1},uPx:{value:1},uOp:{value:1},uMax:{value:PMAX},uT:{value:0}}});
+ const rm=new THREE.Mesh(QUAD,rip);rm.frustumCulled=false;objs.push(rm);kn.material.uniforms.uC.value.set(1500,1300,0);
+ TK.push(now=>{rip.uniforms.uT.value=now/1000;const u=(now/1000)%10;kn.material.uniforms.uOp.value*=Math.exp(-u/3);});
+ exo({id:'gw170817',name:'GW170817: neutron-star merger in NGC 4993',cat:'Binaries & gravitational waves',ra:197.4487,dec:-23.3839,d,pa:0,inc:30,R:16000,view:60000,lmin:100,objs,mk:XG_MK,
+  note:'On 17 August 2017 LIGO and Virgo recorded two neutron stars (1.17\u20131.60 M\u2609) spiralling together 40 Mpc away. A gamma-ray burst arrived 1.7 s later, and telescopes found the kilonova AT2017gfo (orange, flashing every 10 s here) 2 kpc from the galaxy\u2019s centre: heavy elements such as gold and platinum forged by rapid neutron capture. The 1.7 s delay over 130 million years of travel shows gravity moves at the speed of light to about one part in 10\u00b9\u2075, ruling out many alternatives to GR. Rings are schematic.'});}
+/* ---------------- supermassive black holes ---------------- */
+{const z=0.3056,chi=chiZ(z),s=1+z,objs=[beacon(COLX.bh)],a=0.05*s,e=0.65;
+ const h1=BH(1.8e10,[1,.8,.5]);const h2=BH(1.5e8,[1,.8,.5]);
+ const dsc=disc(2.953*1.8e10*KMPC_*4*s,0.08*s,9000,0.01,287,[.8,.9,1],[1,.5,.25]);dsc.rotation.x=0.5;
+ objs.push(dsc,h1,h2,lineObj(ellipse(a,e,256,1),[.7,.7,1],.3,true));
+ objs.push(jetPts({L:0.6*s,open:0.02,n:6000,seed:288,speed:0.06,sz:0.003,a:0.45,one:1,knots:22}));
+ TK.push(now=>{const M=now/1000*2*Math.PI/12,E=kep(M,e);h2.material.uniforms.uC.value.set(a*(Math.cos(E)-e),a*Math.sqrt(1-e*e)*Math.sin(E),0);dsc.material.uniforms.uT.value=now/1000;});
+ exo({side:1,id:'oj287',name:'OJ 287 (binary supermassive black hole candidate)',cat:'Black holes',ra:133.7036,dec:20.1085,d:chi,pa:0,inc:20,R:0.12*s,view:0.5*s,lmin:1e-4,objs,mk:XG_MK,
+  note:'A blazar at z = 0.306 whose optical outbursts recur about every 12 years since 1888 plates. The leading model is a smaller black hole on an eccentric orbit punching through the disc of a much larger one (Valtonen et al.), though the masses are debated (Komossa et al. 2023 argue the primary is far lighter than the 1.8 \u00d7 10\u00b9\u2070 M\u2609 drawn). No merger of two supermassive black holes has yet been detected directly. In 2023 the pulsar timing arrays (NANOGrav, EPTA, PPTA, CPTA) reported evidence for a nanohertz gravitational-wave background with the Hellings\u2013Downs correlation, most likely the summed hum of many such binaries across the universe. Orbit shown in 12 s; sizes scaled by 1 + z.'});}
+{const z=2.219,chi=chiZ(z),s=1+z,objs=[beacon(COLX.bh)];
+ const core=bb({R:0.02*s,col:[.75,.85,1],mode:1,add:1,k:1});const neb=PS(),r=rng(618);
+ for(let i=0;i<9000;i++){const R=60e3*s*Math.pow(r(),0.7),ct=2*r()-1,st=Math.sqrt(1-ct*ct),ph=r()*6.2832;put(neb,R*st*Math.cos(ph),R*st*Math.sin(ph),R*ct*0.8,[.35,.75,1],R*0.08+300,0.06);}
+ objs.push(points(neb),core,BH(4e10,[1,.8,.5]),disc(2.953*4e10*KMPC_*3*s,0.15*s,6000,0.02,619,[.8,.9,1],[1,.55,.3]));
+ TK.push(now=>{objs.forEach(o=>{const u=o.material&&o.material.uniforms;if(u&&u.uW)u.uT.value=now/1000;});});
+ exo({id:'ton618',name:'TON 618 (ultramassive black hole)',cat:'Black holes',ra:186.9658,dec:31.4775,d:chi,pa:0,inc:60,R:60e3*s,view:2.4e5*s,lmin:1e-4,objs,mk:XG_MK,
+  note:'A hyperluminous quasar at z = 2.219, seen as it was 10.8 billion years ago. Line widths give a black hole of roughly 4\u20136 \u00d7 10\u00b9\u2070 solar masses (Shemmer et al. 2004), among the heaviest known: its event horizon would swallow the Solar System many times over. It sits inside a giant glowing hydrogen nebula (blue, schematic extent). Sizes scaled by 1 + z.'});}
+{const z=0.158,chi=chiZ(z),s=1+z,objs=[beacon(COLX.bh)],r=rng(273),jet=PS(),host=elliptical({seed:273,N:20000,re:6,rmax:40,gc:0});
+ objs.push(jetPts({L:63e3*s,ax:[1,0,0],u:[0,1,0],open:0.012,n:6000,seed:273,speed:0.025,sz:0.006,a:0.45,one:1,knots:14,c0:[.55,.7,1],c1:[1,.85,.7]}));
+ objs.push(points(host),bb({R:900*s,col:[.8,.9,1],mode:1,add:1,k:1}));
+ exo({id:'3c273',name:'3C 273 (the first quasar)',cat:'Black holes',ra:187.2779,dec:2.0524,d:chi,pa:222,inc:0,R:70e3*s,view:2.6e5*s,lmin:10,objs,mk:XG_MK,
+  note:'The first quasar identified: in 1963 Maarten Schmidt read its redshift, z = 0.158, and realised this \u201cstar\u201d was 2 billion light-years away and brighter than a hundred galaxies. It is a black hole of a few hundred million to a billion solar masses feeding at a furious rate, with a jet some 60 kpc long (drawn along its measured direction). Sizes scaled by 1 + z.'});}
+/* ---------------- dark matter and lensing ---------------- */
+{const ps=PS(),r=rng(2000);nfw(ps,r,20000,10,16000,[.62,.42,1],6000,0.16);
+ exo({side:1,id:'mwhalo',name:'Milky Way dark-matter halo',cat:'Dark matter & lensing',ra:266.41684,dec:-29.00781,d:8178,pa:0,inc:0,R:2e5,view:7.5e5,lmin:2000,objs:[points(ps)],g:1,win:[5.2,5.7,6.6,7.1],
+  note:'The Galaxy\u2019s stars and gas are a small part of its mass. The flat rotation curve (about 230 km/s far beyond the stellar disc, Ch 18) needs a roughly spherical halo of dark matter some 200 kpc in radius and about 10\u00b9\u00b2 solar masses, five to ten times the visible mass. Drawn here as points sampled from an NFW profile (scale radius 20 kpc), the shape found in cold-dark-matter simulations. It is invisible in reality.'});}
+{const ps=PS(),r=rng(1933),d=99e6;nfw(ps,r,0.45e6,4.5,16000,[.62,.42,1],1.2e4,0.06);
+ const gal=PS(),TM=DATA.tmrs,TP=f32(TM.pos),C=skyPos(194.9531,27.9807,d),u=C.clone().normalize();let n=0;
+ for(let i=0;i<TM.n;i++){const x=TP[3*i],y=TP[3*i+1],z=TP[3*i+2],dd=Math.hypot(x,y,z);if(dd<70||dd>135)continue;if((x*u.x+y*u.y+z*u.z)/dd<Math.cos(2.4*D2R))continue;
+   const D2=(99+(dd-101)*0.1)*1e6;put(gal,x/dd*D2-C.x,y/dd*D2-C.y,z/dd*D2-C.z,[1,.85,.6],4e4,1.0);n++;}
+ const hot=PS();for(let i=0;i<5000;i++){const R=0.3e6*Math.pow(r(),0.6)*2,ct=2*r()-1,st=Math.sqrt(1-ct*ct),ph=r()*6.2832;put(hot,R*st*Math.cos(ph),R*st*Math.sin(ph),R*ct,[1,.45,.7],2.5e4,0.05);}
+ const o=exo({id:'coma',name:'Coma Cluster',cat:'Large-scale structure',ra:194.9531,dec:27.9807,d,pa:0,inc:0,R:2.5e6,view:9e6,lmin:1e4,objs:[points(ps),points(hot),points(gal)],mk:[6.2,9.4],
+  note:`A rich cluster about 99 Mpc away with more than a thousand galaxies and roughly 10\u00b9\u2075 solar masses. In 1933 Fritz Zwicky measured its galaxies moving at about 1,000 km/s, far too fast to be held by the visible mass, and inferred \u201cdunkle Materie\u201d: the first evidence for dark matter. Gold: ${n} member galaxies from 2MRS (placed at the cluster distance); pink: the 10\u2078 K X-ray gas, which outweighs the stars; violet: the dark-matter halo (NFW, schematic sampling), which outweighs both.`});}
+{const z=0.296,chi=chiZ(z),s=1+z,r=rng(657),p=[],c=[],cp=[],al=[];
+ const add=(comp,x,y,zz,col,a)=>{p.push(x,y,zz);c.push(...col);cp.push(comp);al.push(a);};
+ const blob=(comp,n,sx,sy,col,a)=>{for(let i=0;i<n;i++)add(comp,gs(r)*sx*s,gs(r)*sy*s,gs(r)*sx*0.7*s,col,a);};
+ blob(0,7000,0.32e6,0.26e6,[.35,.55,1],0.05);blob(1,4000,0.16e6,0.14e6,[.35,.55,1],0.06);
+ blob(2,260,0.22e6,0.2e6,[1,.85,.55],0.9);blob(3,120,0.11e6,0.1e6,[1,.85,.55],0.9);
+ blob(4,6000,0.26e6,0.22e6,[1,.4,.75],0.07);blob(5,3500,0.09e6,0.12e6,[1,.4,.75],0.09);
+ for(let i=0;i<2500;i++){const t=(r()-.5)*2.2,R=0.32e6*s;add(6,R*Math.cos(t)*0.35,R*Math.sin(t),gs(r)*0.05e6,[1,.55,.85],0.08);}
+ const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(p,3));g.setAttribute('acol',new THREE.Float32BufferAttribute(c,3));
+ g.setAttribute('acp',new THREE.Float32BufferAttribute(cp,1));g.setAttribute('aal',new THREE.Float32BufferAttribute(al,1));
+ const m=new THREE.ShaderMaterial({transparent:true,depthTest:false,depthWrite:false,blending:THREE.AdditiveBlending,
+  uniforms:{uScale:{value:1},uPx:{value:1},uOp:{value:1},uMax:{value:PMAX},uS:{value:1},uK:{value:s*1e6}},
+  vertexShader:`attribute vec3 acol;attribute float acp;attribute float aal;uniform float uOp,uS,uK;varying vec3 vC;varying float vA;
+   void main(){float xb=mix(-1.6,0.5,uS),xm=mix(0.4,-0.22,uS),dr=smoothstep(0.45,0.8,uS);float x=0.0;float vis=1.0;
+    if(acp<0.5||(acp>1.5&&acp<2.5))x=xm;else if(acp<1.5||acp<3.5)x=xb;
+    if(acp>3.5&&acp<4.5)x=xm+0.17*dr;if(acp>4.5&&acp<5.5)x=xb-0.25*dr;if(acp>5.5){x=xb-0.25*dr+0.36;vis=smoothstep(0.55,0.7,uS);}
+    vec3 p=position+vec3(x*uK,0.0,0.0);vec4 mv=modelViewMatrix*vec4(p,1.0);gl_Position=projectionMatrix*mv;gl_PointSize=acp>1.5&&acp<3.5?2.6:3.5;vC=acol;vA=aal*uOp*vis;}`,
+  fragmentShader:`varying vec3 vC;varying float vA;void main(){vec2 q=gl_PointCoord*2.0-1.0;float r2=dot(q,q);if(r2>1.0)discard;gl_FragColor=vec4(vC,exp(-2.5*r2)*vA);}`});
+ const pts=new THREE.Points(g,m);pts.frustumCulled=false;pts.renderOrder=3;
+ TK.push(now=>{const u=(now/1000)%22;m.uniforms.uS.value=Math.min(1,u/14);});
+ exo({id:'bullet',name:'Bullet Cluster (1E 0657\u221256)',cat:'Dark matter & lensing',ra:104.623,dec:-55.94,d:chi,pa:90,inc:0,R:1.6e6*s,view:3.0e6*s,lmin:1e4,objs:[pts,beacon(COLX.dm)],mk:XG_MK,
+  note:'Two galaxy clusters that passed through each other about 150 million years before the light we see left them (z = 0.296). Galaxies (gold) and dark matter (blue, mapped by weak lensing) sail through almost without collision; the hot X-ray gas (pink), which holds most of the ordinary mass, is slowed by ram pressure and lags behind, with a bow shock ahead of the smaller \u201cbullet\u201d moving at about 4,700 km/s (Markevitch 2006). The mass peaks sit on the galaxies, not the gas, at 8\u03c3 (Clowe et al. 2006): direct evidence that most of the mass is not ordinary matter. The animation replays the collision in 14 s and holds the observed configuration; sizes scaled by 1 + z.'});}
+function lens(o){const chi=chiZ(o.z),s=1+o.z,r=rng(o.seed),objs=[beacon(COLX.ln)],th=x=>x/206264.8*chi;
+  objs.push(points(elliptical({seed:o.seed,N:o.N||15000,re:o.re*s,rmax:o.re*6*s,gc:0})));
+  if(o.build)o.build(objs,th,r,s);
+  return exo({id:o.id,name:o.name,cat:'Dark matter & lensing',ra:o.ra,dec:o.dec,d:chi,pa:o.pa||0,inc:0,R:o.R(th),view:o.R(th)*(o.vk||2.6),lmin:10,objs,mk:XG_MK,note:o.note});}
+lens({id:'einsteincross',name:'Einstein Cross (Q2237+0305)',ra:340.1258,dec:3.3584,z:0.0394,seed:2237,re:1.5,R:th=>th(3),
+ build:(objs,th)=>{[[0.9,0.05],[-0.85,-0.1],[0.05,0.9],[-0.1,-0.8]].forEach(q=>{const b=bb({R:th(0.12),col:[.75,.9,1],mode:1,add:1,k:1});b.material.uniforms.uC.value.set(th(q[0]),th(q[1]),0);objs.push(b);});},
+ note:'A quasar 8 billion light-years away (z = 1.695) seen four times around the core of a nearby galaxy (z = 0.039) whose gravity bends its light: four images 1.8\u2033 apart in a cross (Huchra et al. 1985). The pattern exists only along our line of sight: rotate away and it would not be seen this way.'});
+lens({id:'twinqso',name:'Twin Quasar (Q0957+561)',ra:150.3363,dec:55.8971,z:0.355,seed:957,re:5,R:th=>th(10),
+ build:(objs,th)=>{[[1.0,0],[-5.1,0.2]].forEach(q=>{const b=bb({R:th(0.3),col:[.75,.9,1],mode:1,add:1,k:1});b.material.uniforms.uC.value.set(th(q[0]),th(q[1]),0);objs.push(b);});},
+ note:'The first gravitational lens found (Walsh, Carswell & Weymann 1979): one quasar at z = 1.41 seen twice, 6.1\u2033 apart, by a galaxy and its cluster at z = 0.36. Light along the two paths takes different times: the images flicker in step 417 days apart, which measures the Hubble constant independently of the distance ladder.'});
+lens({id:'horseshoe',name:'Cosmic Horseshoe (Einstein ring)',ra:177.1375,dec:19.5006,z:0.444,seed:444,re:8,R:th=>th(9),
+ build:(objs,th,r)=>{const ps=PS();for(let i=0;i<5000;i++){const t=(r()*300-150+180)*D2R,R=th(5.0)*(1+gs(r)*0.04);put(ps,R*Math.cos(t),R*Math.sin(t),0,mix([.45,.7,1],[.8,.9,1],r()),th(0.08),1.55);}objs.push(points(ps));},
+ note:'A massive red galaxy at z = 0.444 bends the light of a star-forming galaxy at z = 2.38 into a 300\u00b0 arc of radius 5\u2033, nearly a complete Einstein ring (Belokurov et al. 2007). The ring radius measures the lens mass inside it directly.'});
+lens({id:'a1689',name:'Abell 1689 (giant arcs)',ra:197.873,dec:-1.341,z:0.183,seed:1689,re:12,N:20000,R:th=>th(110),
+ build:(objs,th,r,s)=>{const g=PS();for(let i=0;i<400;i++){const R=th(70)*Math.pow(r(),0.8),t=r()*6.2832;put(g,R*Math.cos(t),R*Math.sin(t),gs(r)*th(20),[1,.85,.6],th(0.6),1.62);}objs.push(points(g));
+   const dm=PS();nfw(dm,r,th(25),6,9000,[.62,.42,1],th(4),0.05);objs.push(points(dm));
+   const arcs=PS();for(let k=0;k<26;k++){const t0=r()*6.2832,R=th(35+25*r()),len=(4+10*r())*D2R;for(let i=0;i<220;i++){const t=t0+(r()-.5)*len;put(arcs,R*Math.cos(t),R*Math.sin(t),0,[.5,.75,1],th(0.25),1.55);}}objs.push(points(arcs));},
+ note:'One of the most massive known clusters (z = 0.183), and one of the strongest lenses: its Einstein radius is about 47\u2033 (Broadhurst et al. 2005), and Hubble found more than 100 lensed images of some 30 background galaxies. The lensing mass (violet) is dominated by dark matter. Arcs here are drawn at the measured Einstein radius with schematic lengths.'});
+/* ---------------- animation hook ---------------- */
+const EX_TICK=now=>{const t=now/1000;for(const m of STREAMS)m.uniforms.uT.value=t;for(const f of TK)f(now);if(B.sun.u.uTime){B.sun.u.uTime.value=t;if(B.sun.corona.material.uniforms)B.sun.corona.material.uniforms.uTime.value=t;}};
+
 /* ------------------------------------------------------------------ targets */
 const T=[];
 const tgt=o=>{T.push(o);return o;};
 const TSUN=tgt({id:'sun',name:'Sun',cat:'Solar System',pos:()=>ZERO,lmin:B.sun.R*1.3,view:B.sun.R*6,body:B.sun,
- note:'A G2 dwarf 1.39 million km across, 4.6 billion years old. The texture is a real solar image; the corona glow is drawn.'});
+ note:'A G2 dwarf 1.39 million km across, 4.6 billion years old. The surface is a real solar image with animated granulation (convection cells ~1,000 km across, lasting minutes) and faculae near the limb. Around it: the corona with its streamers, the thin red chromosphere, prominences looping above the limb, and an occasional flare. The corona and its activity are drawn, not imaged; time on the surface is sped up.'});
 [['mercury','The smallest planet, 0.39 AU from the Sun; its surface is scarred by craters and scarps.'],
  ['venus','Hidden under sulphuric-acid clouds at 460 \u00b0C; it rotates backwards, once every 243 days.'],
  ['earth','Day and night, city lights and cloud cover follow the real rotation and the Sun\'s direction at the displayed date.'],
@@ -800,14 +1185,99 @@ tgt({id:'sgra',name:'Sgr A*: S-star orbits',cat:'Galactic Centre',pos:()=>GC.C,l
  note:'The black hole at the centre of the Milky Way, 4.3 million solar masses. The star S2 follows its measured 16-year orbit (GRAVITY 2020), coming within 120 AU of the hole. The surrounding cluster is a statistical model.'});
 tgt({id:'sgrah',name:'Sgr A*: the event horizon',cat:'Galactic Centre',pos:()=>GC.C,lmin:GC.rs*6,view:GC.rs*60,
  note:'The shadow is 2.6 Schwarzschild radii across (r_s = 12.7 million km). Background stars are gravitationally lensed in real time, forming an Einstein ring. The orange ring is drawn in the style of the EHT image.'});
-DSO.forEach(o=>tgt({id:o.id,name:o.name,cat:o.cat,pos:()=>o.C,lmin:o.R*.08,view:o.view,dso:o,note:o.note}));
+DSO.forEach(o=>tgt({id:o.id,name:o.name,cat:o.cat,pos:()=>o.C,lmin:o.lmin||o.R*.08,view:o.view,dso:o,note:o.note}));
+
+/* =====================================================================================
+   SOLAR SYSTEM AND MILKY WAY, richer views (Cosmic Frontier edition)
+   Small bodies move on Kepler orbits solved in the vertex shader at the displayed date:
+   main belt with the Kirkwood gaps, Jupiter Trojans led and trailed by 60 deg, Kuiper belt
+   (cold and hot classicals), plutinos locked in 3:2 resonance with Neptune, the scattered disc,
+   and a schematic Oort cloud. Statistical populations, not catalogue objects.
+   ===================================================================================== */
+const tv0=new THREE.Vector3();
+{const K=0.01720209895, d2r=D2R;
+ const c0=ecl2three(1,0,0,new THREE.Vector3()),c1=ecl2three(0,1,0,new THREE.Vector3()),c2=ecl2three(0,0,1,new THREE.Vector3());
+ const ME=new THREE.Matrix3().set(c0.x,c1.x,c2.x,c0.y,c1.y,c2.y,c0.z,c1.z,c2.z);
+ const SBVS=`attribute vec4 ael;attribute vec3 aw;attribute vec3 acol;uniform float uDays,uOp,uPs;uniform mat3 uM;varying vec3 vC;varying float vA;
+ void main(){float a=ael.x,e=ael.y,I=ael.z,O=ael.w,vp=aw.x;float M=aw.y+aw.z*uDays-vp;M=mod(M+3.14159265,6.2831853)-3.14159265;
+  float E=M+e*sin(M);for(int k=0;k<6;k++){E=E-(E-e*sin(E)-M)/(1.0-e*cos(E));}
+  float xp=a*(cos(E)-e),yp=a*sqrt(1.0-e*e)*sin(E);float w=vp-O;float cw=cos(w),sw=sin(w),cO=cos(O),sO=sin(O),cI=cos(I),sI=sin(I);
+  vec3 ec=vec3((cw*cO-sw*sO*cI)*xp+(-sw*cO-cw*sO*cI)*yp,(cw*sO+sw*cO*cI)*xp+(-sw*sO+cw*cO*cI)*yp,(sw*sI)*xp+(cw*sI)*yp);
+  vec4 mv=modelViewMatrix*vec4(uM*ec,1.0);gl_Position=projectionMatrix*mv;gl_PointSize=uPs;vC=acol;vA=uOp;}`;
+ const SBFS=`varying vec3 vC;varying float vA;void main(){vec2 q=gl_PointCoord*2.0-1.0;float r2=dot(q,q);if(r2>1.0)discard;gl_FragColor=vec4(vC,exp(-2.0*r2)*vA);}`;
+ const r=rng(4242),A=[],W=[],Cc=[];
+ const add=(a,e,i,O,vp,L0,n,col)=>{A.push(a,e,i,O);W.push(vp,L0,n);Cc.push(...col);};
+ const gaps=[[2.502,.03],[2.825,.018],[2.958,.014],[3.279,.035]];
+ for(let k=0;k<14000;k++){const a=2.06+r()*1.25;if(gaps.some(g=>Math.abs(a-g[0])<g[1])&&r()<0.93)continue;
+   add(a,Math.min(.33,Math.abs(.13+gs(r)*.07)),Math.abs(gs(r))*7*d2r,r()*6.2832,r()*6.2832,r()*6.2832,K/Math.pow(a,1.5),mix([.75,.68,.6],[.92,.86,.78],r()));}
+ const LJ=34.39644051*d2r,nJ=3034.74612775/36525*d2r;
+ for(let k=0;k<2600;k++){const s=r()<.5?1:-1;add(5.2026+gs(r)*.05,Math.abs(gs(r))*.06,Math.abs(gs(r))*12*d2r,r()*6.2832,r()*6.2832,LJ+s*60*d2r+gs(r)*11*d2r,nJ,[.55,.85,.6]);}
+ const LN=-55.12002969*d2r,nN=218.45945325/36525*d2r;
+ for(let k=0;k<9000;k++){const a=42+r()*5.5,cold=r()<.6;add(a,Math.abs(gs(r))*.05,Math.abs(gs(r))*(cold?2.2:14)*d2r,r()*6.2832,r()*6.2832,r()*6.2832,K/Math.pow(a,1.5),cold?[.62,.8,1]:[.75,.85,1]);}
+ for(let k=0;k<2400;k++){const vp=r()*6.2832,kk=Math.floor(r()*3);add(39.45+gs(r)*.12,.1+r()*.2,Math.abs(gs(r))*10*d2r,r()*6.2832,vp,(2*LN+vp+Math.PI)/3+kk*2*Math.PI/3+gs(r)*.35,nN*2/3,[.9,.75,1]);}
+ for(let k=0;k<1800;k++){const a=50*Math.pow(3,r()),q=30+r()*10;add(a,1-q/a,Math.abs(gs(r))*20*d2r,r()*6.2832,r()*6.2832,r()*6.2832,K/Math.pow(a,1.5),[.7,.75,.95]);}
+ const nIn=A.length/4;
+ for(let k=0;k<7000;k++){const a=2000*Math.pow(50,r());add(a,r()*.3,Math.acos(2*r()-1),r()*6.2832,r()*6.2832,r()*6.2832,K/Math.pow(a,1.5),[.6,.7,.9]);}
+ function mk(i0,i1,ps,w){const g=new THREE.BufferGeometry(),n=i1-i0;g.setAttribute('position',new THREE.Float32BufferAttribute(new Float32Array(3*n),3));
+   g.setAttribute('ael',new THREE.Float32BufferAttribute(A.slice(4*i0,4*i1),4));g.setAttribute('aw',new THREE.Float32BufferAttribute(W.slice(3*i0,3*i1),3));
+   g.setAttribute('acol',new THREE.Float32BufferAttribute(Cc.slice(3*i0,3*i1),3));
+   const m=new THREE.ShaderMaterial({vertexShader:SBVS,fragmentShader:SBFS,transparent:true,depthTest:false,depthWrite:false,blending:THREE.AdditiveBlending,
+     uniforms:{uDays:{value:0},uOp:{value:0},uPs:{value:ps*DPR},uM:{value:ME}}});
+   const o=new THREE.Points(g,m);o.frustumCulled=false;o.renderOrder=2;
+   o.onBeforeRender=()=>{m.uniforms.uDays.value=state.jd-2451545;m.uniforms.uOp.value=(L.planets.a>0?1:0)*win(w[0],w[1],w[2],w[3],state.logD)*w[4];};
+   L.planets.g.add(o);return o;}
+ mk(0,nIn,1.3,[-7.2,-6.5,-2.7,-2.0,.38]);mk(nIn,A.length/4,1.3,[-5.0,-4.2,-0.4,0.3,.5]);
+ const P=v=>ecl2three(v[0],v[1],v[2],new THREE.Vector3()).multiplyScalar(AU);
+ const ab=P([2.75,0,0]),kb=P([0,44,0]),oc=P([-1.2e4,1.2e4,0]);
+ addLabel('Main asteroid belt',()=>ab,-5.6,-3.4);addLabel('Kuiper belt',()=>kb,-4.6,-2.6);addLabel('Oort cloud (schematic)',()=>oc,-3.2,0.0);
+ const pl=planetObjs.find(o=>o.name==='Pluto');if(pl)addLabel('Pluto',()=>tv0.copy(pl.v).multiplyScalar(AU),-5.2,-2.9);
+}
+/* Milky Way: a painted face-on disc from the same analytic model (4 log-spiral arms, 12.5 deg pitch,
+   27 deg bar), with dust lanes on the inner edge of each arm and star-forming knots */
+{const N=768,Rm=16000,cv=document.createElement('canvas');cv.width=cv.height=N;const cx=cv.getContext('2d'),img=cx.createImageData(N,N),d=img.data;
+ const bar=27*D2R,k=1/Math.tan(12.5*D2R),r=rng(9);
+ for(let j=0;j<N;j++)for(let i=0;i<N;i++){const X=(i/N*2-1)*Rm,Y=(j/N*2-1)*Rm,R=Math.hypot(X,Y);let o=4*(j*N+i);if(R>Rm){d[o+3]=255;continue;}
+   const ph=Math.atan2(Y,X),base=k*Math.log(Math.max(R,900)/3000);let arm=0,dust=0;
+   for(let a=0;a<4;a++){let dp=ph-(a*Math.PI/2+base);dp=((dp+Math.PI)%(2*Math.PI)+2*Math.PI)%(2*Math.PI)-Math.PI;
+     arm=Math.max(arm,Math.exp(-dp*dp/(2*0.24*0.24)));dust=Math.max(dust,Math.exp(-Math.pow(dp+0.16,2)/(2*0.05*0.05)));}
+   const disc=Math.exp(-R/2600),edge=1-Math.pow(R/Rm,6);
+   const xb=X*Math.cos(bar)+Y*Math.sin(bar),yb=-X*Math.sin(bar)+Y*Math.cos(bar);
+   const bul=Math.exp(-(xb*xb/(2*1700*1700)+yb*yb/(2*620*620)))+0.8*Math.exp(-R*R/(2*500*500));
+   const armI=arm*Math.exp(-R/6000)*(R>2000?1:R/2000),dk=1-0.65*dust*(R>2500?1:0);
+   let rr=(0.55*disc+0.9*bul)*1.0+armI*0.55,gg=(0.5*disc+0.75*bul)+armI*0.68,bb_=(0.42*disc+0.45*bul)+armI*0.95;
+   rr*=dk*edge;gg*=dk*edge;bb_*=dk*edge;
+   d[o]=Math.min(255,rr*255);d[o+1]=Math.min(255,gg*255);d[o+2]=Math.min(255,bb_*255);d[o+3]=255;}
+ cx.putImageData(img,0,0);
+ cx.globalCompositeOperation='lighter';
+ for(let n=0;n<900;n++){const a=Math.floor(r()*4),R=2500+r()*10500,ph=a*Math.PI/2+k*Math.log(R/3000)+gs(r)*0.12,X=R*Math.cos(ph),Y=R*Math.sin(ph);
+   const px=(X/Rm+1)/2*N,py=(Y/Rm+1)/2*N,s=0.6+r()*1.6,g=cx.createRadialGradient(px,py,0,px,py,s*2);g.addColorStop(0,'rgba(255,120,170,.55)');g.addColorStop(1,'rgba(255,120,170,0)');cx.fillStyle=g;cx.fillRect(px-s*2,py-s*2,s*4,s*4);}
+ const tex=new THREE.CanvasTexture(cv);tex.minFilter=THREE.LinearMipmapLinearFilter;tex.anisotropy=Math.min(8,renderer.capabilities.getMaxAnisotropy());
+ const R0=8178,pos=[],uv=[];for(const[x,y]of[[-Rm,-Rm],[Rm,-Rm],[Rm,Rm],[-Rm,Rm]]){pos.push(R0-x,0,-y);uv.push((x/Rm+1)/2,1-(y/Rm+1)/2);}
+ const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));g.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));g.setIndex([0,1,2,0,2,3]);
+ const m=new THREE.ShaderMaterial({transparent:true,depthTest:false,depthWrite:false,side:THREE.DoubleSide,blending:THREE.AdditiveBlending,uniforms:{tex:{value:tex},uOp:{value:0}},
+   vertexShader:`varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}`,
+   fragmentShader:`uniform sampler2D tex;uniform float uOp;varying vec2 vUv;void main(){vec3 c=texture2D(tex,vUv).rgb;gl_FragColor=vec4(c,uOp);}`});
+ const mesh=new THREE.Mesh(g,m);mesh.frustumCulled=false;mesh.renderOrder=-0.5;
+ mesh.onBeforeRender=()=>{m.uniforms.uOp.value=L.mw.a*0.85*smooth(3.5,4.2,state.logD);};
+ L.mw.g.add(mesh);}
+/* ---------------- overview targets ---------------- */
+{const N_=ecl2three(0,0,1,new THREE.Vector3()).normalize(),X_=ecl2three(1,0,0,new THREE.Vector3()).normalize();
+ const tilt=(a)=>N_.clone().multiplyScalar(Math.cos(a)).addScaledVector(X_,Math.sin(a));
+ const ov=(o)=>tgt(Object.assign({cat:'Overviews',nolab:1,lmin:TSUN.lmin},o));
+ ov({id:'ov-ss',name:'Solar System',pos:()=>ZERO,view:75*AU,dir:tilt(0.75),note:'All eight planets on their orbits at the displayed date, with Pluto, the main asteroid belt, the Jupiter Trojans (green, 60\u00b0 ahead of and behind Jupiter), the Kuiper belt and the plutinos (violet, locked in 3:2 resonance with Neptune). Small bodies follow real Kepler orbits drawn from statistical populations. Speed up the clock to watch them move.'});
+ ov({id:'ov-inner',name:'Inner planets and the asteroid belt',pos:()=>ZERO,view:6.5*AU,dir:tilt(0.6),note:'Mercury to Mars, with the main belt between Mars and Jupiter. Its gaps sit where an asteroid\u2019s period would be a simple fraction of Jupiter\u2019s (3:1, 5:2, 7:3, 2:1): the Kirkwood gaps, cleared by resonance.'});
+ ov({id:'ov-outer',name:'Outer planets and the Kuiper belt',pos:()=>ZERO,view:140*AU,dir:tilt(0.85),note:'Jupiter to Neptune, the Kuiper belt beyond 42 AU (cold classicals on nearly flat orbits, hot classicals tilted), the plutinos sharing Pluto\u2019s 3:2 resonance with Neptune, and the start of the scattered disc.'});
+ ov({id:'ov-oort',name:'Oort cloud',pos:()=>ZERO,view:2.2e5*AU,dir:tilt(0.9),note:'A spherical swarm of perhaps 10\u00b9\u00b2 icy bodies from about 2,000 to 100,000 AU, inferred from the orbits of long-period comets (Oort 1950) and never seen directly. Drawn schematically. Its outer edge is a third of the way to Proxima Centauri.'});
+ ov({id:'ov-mw',name:'Milky Way from above',pos:()=>new THREE.Vector3(8178,0,0),view:6.5e4,lmin:100,dir:new THREE.Vector3(0.12,1,0.05),note:'Our Galaxy face-on, drawn from an analytic model: a 27\u00b0 bar, four log-spiral arms with dust lanes on their inner edges and pink star-forming regions. The Sun sits 8.2 kpc from the centre, about 20 pc above the plane. No one has seen this view; it is reconstructed from star counts, gas velocities and Gaia distances.'});
+ ov({id:'ov-lg',name:'Local Group',pos:()=>{const m=DSO.find(o=>o.id==='m31');return m?m.C.clone().multiplyScalar(0.4):ZERO;},view:3.2e6,lmin:1e4,dir:new THREE.Vector3(0.3,0.8,0.5),note:'The Milky Way, Andromeda (M31) and Triangulum (M33) with their satellites, all within about 1.5 Mpc. Andromeda is approaching at about 110 km/s and will merge with us in roughly 4\u20135 billion years.'});}
+
 
 /* ------------------------------------------------------------------ labels and menu */
 const labRoot=document.getElementById('labels');
 T.forEach(t=>{const el=document.createElement('div');el.className='lab go'+(t.id==='sun'?' big':'');el.textContent=t.name.replace(/: .*/,'');
   el.addEventListener('click',()=>flyTo(t));labRoot.appendChild(el);t.el=el;});
 const list=document.getElementById('exList');
-['Solar System','Galactic Centre','Nebulae','Galaxies','Large-scale structure'].forEach(c=>{const h=document.createElement('h3');h.textContent=c;list.appendChild(h);
+['Overviews','Solar System','Galactic Centre','Stars','Neutron stars & pulsars','Binaries & gravitational waves','Supernovae','Black holes','Nebulae','Galaxies','Dark matter & lensing','Large-scale structure'].forEach(c=>{const h=document.createElement('h3');h.textContent=c;list.appendChild(h);
   const w=document.createElement('div');w.className='exrow';list.appendChild(w);
   T.filter(t=>t.cat===c).forEach(t=>{const b=document.createElement('button');b.textContent=t.name;b.addEventListener('click',()=>{flyTo(t);if(innerWidth<720)closeMenu();});w.appendChild(b);t.btn=b;});});
 const exBtn=document.getElementById('exploreBtn'),exP=document.getElementById('explore');
@@ -818,10 +1288,10 @@ document.getElementById('layersBtn').addEventListener('click',closeMenu);
 
 /* ------------------------------------------------------------------ focus and flight */
 state.focus=TSUN;state.F=new THREE.Vector3();state.fly=null;state.lmin=TSUN.lmin>0?Math.log10(TSUN.lmin):-11;
-function camDirFor(t){const p=t.pos(),to=p.clone().negate();const L=to.length();
+function camDirFor(t){if(t.dir)return t.dir.clone().normalize();const p=t.pos(),to=p.clone().negate();const L=to.length();
   if(t.body&&t.id!=='sun'&&L>0){to.normalize();const side=new THREE.Vector3(0,1,0).cross(to).normalize();
     const v=to.multiplyScalar(Math.cos(.9)).addScaledVector(side,Math.sin(.9)).addScaledVector(new THREE.Vector3(0,1,0),.25);if(t.id==='saturn'){const P=t.body.P;v.addScaledVector(P,Math.sign(v.dot(P)||1)*.75);}return v.normalize();}
-  if(t.dso||t.id.startsWith('sgra')){to.normalize();const side=new THREE.Vector3(0,1,0).cross(to).normalize();if(t.cat==='Large-scale structure')return to.multiplyScalar(.45).addScaledVector(side,.85).add(new THREE.Vector3(0,.3,0)).normalize();return to.addScaledVector(side,t.cat==='Galaxies'?.07:.18).normalize();}
+  if(t.dso||t.id.startsWith('sgra')){to.normalize();const side=new THREE.Vector3(0,1,0).cross(to).normalize();if(t.cat==='Large-scale structure'||(t.dso&&t.dso.side))return to.multiplyScalar(.45).addScaledVector(side,.85).add(new THREE.Vector3(0,.3,0)).normalize();return to.addScaledVector(side,t.cat==='Galaxies'?.07:.18).normalize();}
   return null;}
 function flyTo(t){if(state.tour)stopTour();
   const A=state.F.clone(),la=state.logD,lb=Math.log10(t.view),sep=t.pos().distanceTo(A);
@@ -865,9 +1335,9 @@ function update(D,T_,now){const F=state.F,px=pxScale();camPc.copy(camera.positio
   EX.bodiesOn=any;
   if(any){bodyCam.copy(camera);bodyCam.near=Math.max(near*.9,far*2e-6,1e-12);bodyCam.far=far*1.1;bodyCam.updateProjectionMatrix();}
   /* deep-sky models */
-  DSO.forEach(o=>{const dist=o.C.distanceTo(camPc),ang=o.R/dist*px;const lw=o.win?win(o.win[0],o.win[1],o.win[2],o.win[3],Math.log10(D)):1;const vis=enabled.dso&&ang>1.2&&lw>0.002;o.grp.visible=vis;if(!vis)return;
+  DSO.forEach(o=>{const dist=o.C.distanceTo(camPc),ang=o.R/dist*px;const lw=o.win?win(o.win[0],o.win[1],o.win[2],o.win[3],Math.log10(D)):1;const lD_=Math.log10(D),mkOn=!!(o.mk&&lD_>=o.mk[0]&&lD_<=o.mk[1]);const vis=enabled.dso&&(ang>1.2||mkOn)&&lw>0.002;o.grp.visible=vis;if(!vis)return;
     rel.copy(o.C).sub(F).multiplyScalar(1/D);o.grp.matrix.copy(o.Bm).multiply(SC.makeScale(1/D,1/D,1/D)).setPosition(rel);o.grp.matrixWorldNeedsUpdate=true;
-    const op=clamp01((ang-1.2)/6)*lw;o.grp.children.forEach(c=>{const u=c.material.uniforms;u.uScale.value=1/D;u.uPx.value=px;u.uOp.value=op*(c.material.blending===THREE.NormalBlending?(o.dg||.5):(o.g||1));});if(o.tick)o.tick(now,op);});
+    const op=Math.max(clamp01((ang-1.2)/6),mkOn?1:0)*lw;o.grp.children.forEach(c=>{const u=c.material.uniforms;u.uScale.value=1/D;u.uPx.value=px;u.uOp.value=op*(c.material.blending===THREE.NormalBlending?(o.dg||.5):(o.g||1));});if(o.tick)o.tick(now,op);});EX_TICK(now);
   /* Galactic Centre */
   {const dist=GC.C.distanceTo(camPc);const vis=enabled.dso&&dist<60;GC.grp.visible=vis;
    if(vis){rel.copy(GC.C).sub(F).multiplyScalar(1/D);GC.grp.position.copy(rel);GC.grp.scale.setScalar(1/D);
@@ -889,7 +1359,9 @@ function labels(D,w,h){const F=state.F,px=pxScale()/DPR;
   T.forEach(t=>{const el=t.el,p=t.pos(),dist=p.distanceTo(camPc);let show=false;
     const R=t.body?t.body.R:t.dso?t.dso.R:GC.rs*40,ang=R/dist*px;
     if(t.body)show=(t.id==='sun'||dist<.03)&&ang<h*.3;
+    else if(t.dso&&t.dso.mk&&Math.log10(D)>=t.dso.mk[0]&&Math.log10(D)<=(t.dso.mk[2]||t.dso.mk[1]))show=enabled.dso&&ang<h*.45;
     else if(t.dso)show=enabled.dso&&ang>3&&ang<h*.45&&(!t.dso.win||win(t.dso.win[0],t.dso.win[1],t.dso.win[2],t.dso.win[3],Math.log10(D))>0.3);
+    else if(t.nolab)show=false;
     else show=t.id==='sgra'?dist<40&&dist>0.004:dist<0.004&&ang<h*.3;
     if(state.fly)show=show&&t!==state.fly.t;
     if(show){tv.copy(p).sub(F).multiplyScalar(1/D).project(camera);const sx=(tv.x*.5+.5)*w;

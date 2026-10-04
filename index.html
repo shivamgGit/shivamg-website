@@ -495,8 +495,12 @@
             void main() { vUv = uv; gl_Position = vec4(position, 1.0); }
         `;
 
-        // Schwarzschild units used below: M = 0.5, so
-        //   horizon r = 2M = 1.0 · photon sphere r = 3M = 1.5 · ISCO r = 6M = 3.0
+        // Ported from the Universe Explorer's M87* ray tracer (units G = c = M = 1).
+        // Each pixel integrates the photon orbit equation d²u/dφ² = 3Mu² − u (RK4 in φ) in the ray's
+        // own orbital plane. Rays reaching r = 2M are captured (the shadow); every crossing of the
+        // disc plane adds emission from an optically thin hot flow (j ∝ r^-2.5, reaching inside the
+        // ISCO), weighted by g³ with g = √(1−3M/r)/(1−Ω l_z): gravitational redshift + Doppler beaming.
+        // Multiple crossings give the secondary image and the photon ring.
         const fragmentShader = `
             uniform float uTime;
             uniform vec2 uResolution;
@@ -505,142 +509,87 @@
             uniform float uOpacity;
             uniform float uScale;
             varying vec2 vUv;
+            const float RIN = 2.8;
+            const float ROUT = 26.0;
+            vec3 m289_(vec3 x){return x-floor(x*(1.0/289.0))*289.0;}
+vec4 m289_(vec4 x){return x-floor(x*(1.0/289.0))*289.0;}
+vec4 prm_(vec4 x){return m289_(((x*34.0)+1.0)*x);}
+float sn3(vec3 v){const vec2 C=vec2(1.0/6.0,1.0/3.0);const vec4 D=vec4(0.0,0.5,1.0,2.0);
+ vec3 i=floor(v+dot(v,C.yyy));vec3 x0=v-i+dot(i,C.xxx);vec3 g=step(x0.yzx,x0.xyz);vec3 l=1.0-g;vec3 i1=min(g.xyz,l.zxy);vec3 i2=max(g.xyz,l.zxy);
+ vec3 x1=x0-i1+C.xxx;vec3 x2=x0-i2+C.yyy;vec3 x3=x0-D.yyy;i=m289_(i);
+ vec4 p=prm_(prm_(prm_(i.z+vec4(0.0,i1.z,i2.z,1.0))+i.y+vec4(0.0,i1.y,i2.y,1.0))+i.x+vec4(0.0,i1.x,i2.x,1.0));
+ vec3 ns=0.142857142857*D.wyz-D.xzx;vec4 j=p-49.0*floor(p*ns.z*ns.z);vec4 x_=floor(j*ns.z);vec4 y_=floor(j-7.0*x_);
+ vec4 x=x_*ns.x+ns.yyyy;vec4 y=y_*ns.x+ns.yyyy;vec4 h=1.0-abs(x)-abs(y);vec4 b0=vec4(x.xy,y.xy);vec4 b1=vec4(x.zw,y.zw);
+ vec4 s0=floor(b0)*2.0+1.0;vec4 s1=floor(b1)*2.0+1.0;vec4 sh=-step(h,vec4(0.0));vec4 a0=b0.xzyw+s0.xzyw*sh.xxyy;vec4 a1=b1.xzyw+s1.xzyw*sh.zzww;
+ vec3 p0=vec3(a0.xy,h.x);vec3 p1=vec3(a0.zw,h.y);vec3 p2=vec3(a1.xy,h.z);vec3 p3=vec3(a1.zw,h.w);
+ vec4 nr=1.79284291400159-0.85373472095314*vec4(dot(p0,p0),dot(p1,p1),dot(p2,p2),dot(p3,p3));p0*=nr.x;p1*=nr.y;p2*=nr.z;p3*=nr.w;
+ vec4 m=max(0.6-vec4(dot(x0,x0),dot(x1,x1),dot(x2,x2),dot(x3,x3)),0.0);m=m*m;
+ return 42.0*dot(m*m,vec4(dot(p0,x0),dot(p1,x1),dot(p2,x2),dot(p3,x3)));}
 
-            const float R_PHOTON = 1.5;
-            const float R_ISCO   = 3.0;
-            const float R_OUTER  = 15.0;
-
-            mat2 rot(float a) { float s = sin(a), c = cos(a); return mat2(c, -s, s, c); }
-
-            float hash(vec2 p) {
-                p = fract(p * vec2(123.34, 456.21));
-                p += dot(p, p + 45.32);
-                return fract(p.x * p.y);
+            vec2 acc(vec2 s){return vec2(s.y,3.0*s.x*s.x-s.x);}
+            vec3 emit(float rc,float lz,float az){
+              float rr=max(rc,3.02);
+              float a2=az-uTime*2.4*pow(rr,-1.5);
+              float tb=0.62+0.55*(0.6*sn3(vec3(cos(a2)*2.2,sin(a2)*2.2,log(rc)*7.0))+0.4*sn3(vec3(cos(a2)*5.0,sin(a2)*5.0,log(rc)*17.0+3.0)));
+              float g=sqrt(1.0-3.0/rr)/max(1.0-pow(rr,-1.5)*lz,0.05);
+              float j=pow(rc/RIN,-2.5)*smoothstep(RIN*0.85,RIN*1.25,rc)*tb;
+              float x=clamp(j*g*g*g*4.0,0.0,3.0);
+              // Disc temperature falls as M^(-1/4): a growing hole reddens.
+              float cool=clamp(pow(max(uScale,1.0),-0.25),0.45,1.0);
+              return vec3(min(1.0,1.6*x),clamp(1.6*x-0.45,0.0,1.0)*mix(0.7,1.0,cool),clamp(1.6*x-1.1,0.0,1.0)*cool)*1.15;
             }
+            void main(){
+              vec2 uv=(vUv-uCenter)*2.0;
+              if(uResolution.x<uResolution.y) uv.y*=uResolution.y/uResolution.x;
+              else uv.x*=uResolution.x/uResolution.y;
+              uv/=max(0.001,uScale);
 
-            float noise(vec2 p) {
-                vec2 i = floor(p);
-                vec2 f = fract(p);
-                f = f * f * (3.0 - 2.0 * f);
-                float a = hash(i);
-                float b = hash(i + vec2(1.0, 0.0));
-                float c = hash(i + vec2(0.0, 1.0));
-                float d = hash(i + vec2(1.0, 1.0));
-                return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
-            }
+              // Camera orbiting the hole; disc normal is +y. Default ~70° inclination, mouse tilts/turns.
+              float elev=0.35+(uMouse.y-0.5)*0.9;
+              float azi=(uMouse.x-0.5)*6.28+uTime*0.05;
+              float r0=70.0;
+              vec3 c=r0*vec3(cos(elev)*sin(azi),sin(elev),cos(elev)*cos(azi));
+              vec3 cw=normalize(-c);
+              vec3 cu=normalize(cross(cw,vec3(0.0,1.0,0.0)));
+              vec3 cv=normalize(cross(cu,cw));
+              vec3 d=normalize(uv.x*cu+uv.y*cv+2.0*cw);
+              vec3 uN=vec3(0.0,1.0,0.0);
 
-            float fbm(vec2 p) {
-                float v = 0.0;
-                float a = 0.5;
-                vec2 shift = vec2(100.0);
-                mat2 rotFBM = mat2(cos(0.5), sin(0.5), -sin(0.5), cos(0.50));
-                for (int i = 0; i < 5; ++i) {
-                    v += a * noise(p);
-                    p = rotFBM * p * 2.0 + shift;
-                    a *= 0.5;
+              vec3 ch=c/r0;float sn=length(cross(ch,d));
+              vec3 e2=d-dot(d,ch)*ch;float el=length(e2);
+              if(el<1e-6) e2=normalize(cross(ch,vec3(1.0,0.0,0.0))); else e2/=el;
+              float b=r0*sn/sqrt(max(1.0-2.0/r0,1e-6));float u=1.0/r0;
+              float up=sqrt(max(1.0/(b*b)-u*u*(1.0-2.0*u),0.0))*(dot(d,ch)<0.0?1.0:-1.0);
+              vec3 nT=normalize(cross(ch,e2));float lz=-b*dot(nT,uN);
+              vec3 ax=vec3(1.0,0.0,0.0);vec3 ay=cross(uN,ax);
+              float phi=0.0;vec3 col=vec3(0.0);float tr=1.0;float hP=dot(ch,uN)*r0;float captured=0.0;
+              for(int i=0;i<420;i++){
+                float hh=mix(0.07,0.01,clamp(u*3.2,0.0,1.0));
+                vec2 s=vec2(u,up);vec2 k1=acc(s),k2=acc(s+0.5*hh*k1),k3=acc(s+0.5*hh*k2),k4=acc(s+hh*k3);
+                vec2 sN=s+hh/6.0*(k1+2.0*k2+2.0*k3+k4);float phN=phi+hh;
+                if(sN.x<=0.0) break;
+                vec3 dN=cos(phN)*ch+sin(phN)*e2;
+                float hN=dot(dN,uN)/sN.x;
+                if(hP*hN<0.0){
+                  float f=hP/(hP-hN);float rc=1.0/mix(s.x,sN.x,f);
+                  if(rc>RIN*0.4&&rc<ROUT){
+                    float fade=1.0-smoothstep(ROUT*0.7,ROUT,rc);
+                    vec3 pc=cos(phi+hh*f)*ch+sin(phi+hh*f)*e2;
+                    float az=atan(dot(pc,ay),dot(pc,ax));
+                    vec3 em=emit(rc,lz,az)*fade;
+                    col+=tr*(vec3(1.0)-exp(-em*1.1));
+                    tr*=0.6;
+                    if(tr<0.01) break;
+                  }
                 }
-                return v;
-            }
-
-            void main() {
-                vec2 uv = (vUv - uCenter) * 2.0;
-                if (uResolution.x < uResolution.y) uv.y *= uResolution.y / uResolution.x;
-                else                               uv.x *= uResolution.x / uResolution.y;
-                uv /= max(0.001, uScale);
-
-                vec3 ro = vec3(0.0, 10.5, 66.0);
-                float rotX = (uMouse.y - 0.5) * 2.5;
-                float rotY = (uMouse.x - 0.5) * 6.28 + (uTime * 0.05);
-                ro.yz *= rot(rotX);
-                ro.xz *= rot(rotY);
-
-                vec3 ta = vec3(0.0);
-                vec3 cw = normalize(ta - ro);
-                vec3 cu = normalize(cross(cw, vec3(0.0, 1.0, 0.0)));
-                vec3 cv = normalize(cross(cu, cw));
-                vec3 rd = normalize(uv.x * cu + uv.y * cv + 2.0 * cw);
-
-                vec3 p = ro;
-                vec3 v = rd;
-                vec3 col = vec3(0.0);
-
-                // Conserved angular momentum of the null geodesic.
-                float h2 = dot(cross(ro, rd), cross(ro, rd));
-                float prevY = p.y;
-                float hitDisk = 0.0;
-                float minR = 1000.0;
-
-                for(int i = 0; i < 300; i++) {
-                    float r = length(p);
-                    minR = min(minR, r);
-                    // Anything that falls inside the photon sphere is captured —
-                    // that, not the horizon, is what sets the shadow's edge.
-                    if(r < R_PHOTON) { minR = 0.0; break; }
-                    if(r > 120.0) break;
-
-                    float dt = 0.02 + 0.015 * r;
-                    vec3 a = -1.5 * h2 * p / pow(r, 5.0);
-                    v += a * dt;
-                    v = normalize(v);
-                    p += v * dt;
-
-                    if(prevY * p.y < 0.0) {
-                        float rDisk = length(p.xz);
-                        if(rDisk > R_ISCO && rDisk < R_OUTER) {
-                            float spinSpeed = 3.0 / pow(rDisk, 1.5);          // Keplerian
-                            float angleOffset = (uTime * spinSpeed) + (rDisk * 0.35);
-                            float s = sin(-angleOffset), c = cos(-angleOffset);
-                            vec2 rotatedP = mat2(c, -s, s, c) * p.xz;
-                            vec2 uvNoise = rotatedP * 2.0;
-
-                            float fire  = fbm(uvNoise - vec2(uTime * 1.0, uTime * 0.5));
-                            float fire2 = fbm(uvNoise * 1.5 + vec2(uTime * 1.5, uTime * 0.8));
-                            fire = smoothstep(0.1, 0.9, fire * 0.6 + fire2 * 0.4);
-
-                            float density = smoothstep(R_ISCO, R_ISCO + 1.8, rDisk)
-                                          * (1.0 - smoothstep(7.0, R_OUTER, rDisk));
-
-                            vec3 fireCol = mix(vec3(0.2, 0.0, 0.0), vec3(1.0, 0.35, 0.0), fire);
-                            fireCol = mix(fireCol, vec3(1.0, 0.8, 0.3), pow(fire, 1.5));
-                            fireCol *= 2.5;
-
-                            // Disk temperature falls as T ∝ M^(-1/4), so a hole that
-                            // grows must also redden: shift the blue-white end of the
-                            // ramp toward orange and drop the bolometric brightness.
-                            float cool = clamp(pow(max(uScale, 1.0), -0.25), 0.45, 1.0);
-                            fireCol.g *= mix(0.72, 1.0, cool);
-                            fireCol.b *= mix(0.30, 1.0, cool);
-                            fireCol *= mix(0.62, 1.0, cool);
-
-                            // Relativistic beaming. The ray marches camera→source,
-                            // so the emitter→observer direction is -v and the Doppler
-                            // factor is D = 1/(1 + beta·dot(v, diskVel)); flux ~ D^4.
-                            vec3 diskVel = normalize(vec3(-p.z, 0.0, p.x));
-                            float beta = sqrt(0.5 / rDisk);                    // v/c, circular orbit
-                            float doppler = dot(v, diskVel) * beta;
-                            float shift = pow(1.0 / clamp(1.0 + doppler, 0.35, 2.2), 4.0);
-
-                            float alpha = fire * density * 0.85;
-                            col += fireCol * shift * alpha * (1.0 - hitDisk);
-                            hitDisk += alpha;
-                            if(hitDisk >= 1.0) break;
-                        }
-                    }
-                    prevY = p.y;
-                }
-
-                col *= 1.4;
-                col = col / (1.0 + col);
-                col = pow(col, vec3(1.0 / 2.2));
-
-                float isBlackHole = 1.0 - smoothstep(R_PHOTON - 0.05, R_PHOTON + 0.12, minR);
-                float fireAlpha = smoothstep(0.0, 0.1, dot(col, vec3(0.333)));
-                float finalAlpha = max(fireAlpha, isBlackHole);
-
-                float edgeDist = length((vUv - uCenter) * 2.0);
-                finalAlpha *= 1.0 - smoothstep(0.7, 1.2, edgeDist * uScale);
-
-                gl_FragColor = vec4(col, finalAlpha * uOpacity);
+                hP=hN;u=sN.x;up=sN.y;phi=phN;
+                if(u>=0.5){captured=1.0;break;}
+              }
+              float fireAlpha=smoothstep(0.0,0.08,dot(col,vec3(0.333)));
+              float finalAlpha=max(fireAlpha,captured);
+              float edgeDist=length((vUv-uCenter)*2.0);
+              finalAlpha*=1.0-smoothstep(0.7,1.2,edgeDist*uScale);
+              gl_FragColor=vec4(col,finalAlpha*uOpacity);
             }
         `;
 

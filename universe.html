@@ -118,6 +118,72 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 #explore p{font:400 12px/1.5 var(--sans);color:var(--muted);margin:12px 0 0}
 .lab.go{pointer-events:auto;cursor:pointer;padding:3px 2px}
 .lab.go:hover{color:#fff;text-decoration:underline}
+/* add-ons: events panel, info card, locator map, overlay canvas */
+#eventsBtn,#mapBtn{font:500 13px/1 var(--sans);border:1px solid var(--line);border-radius:999px;padding:9px 14px}
+#eventsBtn[aria-expanded="true"],#mapBtn[aria-pressed="true"]{background:var(--paper);color:#000}
+#events{position:fixed;right:22px;bottom:calc(env(safe-area-inset-bottom,0px) + 64px);width:min(380px,calc(100vw - 44px));max-height:calc(100% - 140px);overflow:auto;background:rgba(10,10,12,.9);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:14px;padding:16px 18px 10px;z-index:5}
+#events[hidden]{display:none}
+#events h2{margin:0 0 2px;font:400 19px/1.2 var(--serif)}
+#events>p{margin:0 0 6px;font:400 12.5px/1.45 var(--sans);color:var(--muted)}
+.evt{display:block;width:100%;text-align:left;padding:9px 0;border-top:1px solid var(--line)}
+.evt:first-child{border-top:0}
+.evt b{display:block;font:400 15px/1.25 var(--serif);color:var(--paper)}
+.evt span{display:block;margin-top:2px;font:400 12.5px/1.4 var(--sans);color:var(--muted)}
+.evt:hover b{font-style:italic}
+#panel .lb{margin-top:16px;padding-top:12px;border-top:1px solid var(--line)}
+#panel .lb h3{margin:0;font:400 15px/1.2 var(--serif);color:var(--paper)}
+#panel .lb .row input{flex:1;accent-color:#ece6da}
+#panel .lb p{margin-top:6px}
+#panel .lb button{margin-top:8px;font:400 12.5px/1.2 var(--sans);padding:7px 11px;border:1px solid var(--line);border-radius:999px;color:#ddd6c8}
+#info{position:fixed;left:112px;width:min(330px,calc(100vw - 134px));overflow:auto;overscroll-behavior:contain;background:rgba(10,10,12,.8);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:14px;padding:13px 16px 12px;z-index:3}
+#info[hidden],#infoTab[hidden]{display:none}
+#info h2{margin:0 26px 2px 0;font:400 19px/1.2 var(--serif)}
+#info .kind{margin:0 0 10px;font:italic 400 14px/1.3 var(--serif);color:var(--muted)}
+#info dl{display:grid;grid-template-columns:minmax(6.5em,auto) 1fr;gap:0 14px;margin:0}
+#info dt,#info dd{padding:6px 0;border-top:1px solid var(--line)}
+#info dt{font:400 12px/1.35 var(--sans);color:var(--muted)}
+#info dd{margin:0;font:400 14px/1.35 var(--serif);color:var(--paper)}
+#infoX{position:absolute;top:8px;right:8px;width:28px;height:28px;border-radius:999px;font:400 18px/1 var(--sans);color:var(--muted)}
+#infoX:hover{color:var(--paper);background:rgba(236,230,218,.08)}
+#readout #camLine,#readout #scaleNote,#readout #noteMore{display:none!important}
+#info .cam{margin:-4px 0 8px;font:400 12px/1.35 var(--sans);color:var(--muted)}
+#info .note{margin:0 0 10px;font:400 14.5px/1.45 var(--serif);color:#cfc8ba}
+#info .note .z{color:var(--hot)}
+#infoRC{margin-top:12px}
+#infoRC h3{margin:0 0 6px;font:italic 400 16px/1.2 var(--serif)}
+#rcplot{display:block;width:100%;height:160px}
+#infoRC .lg{display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:6px;font:400 11.5px/1.3 var(--sans);color:var(--muted)}
+#infoRC .lg i{display:inline-block;width:14px;height:2px;vertical-align:middle;margin-right:5px}
+#infoRC p{margin:6px 0 0;font:400 12px/1.4 var(--sans);color:var(--muted)}
+#pills{position:fixed;left:112px;display:flex;gap:8px;align-items:flex-start;z-index:4}
+#infoTab,#bandBtn{font:500 12.5px/1 var(--sans);padding:8px 13px;border:1px solid var(--line);border-radius:999px;background:rgba(10,10,12,.7);color:#ddd6c8}
+#bandBtn[aria-pressed="true"],#infoTab[aria-expanded="true"]{background:var(--paper);color:#000}
+.bwrap{position:relative}
+#bands{position:absolute;left:0;top:calc(100% + 6px);width:min(330px,calc(100vw - 100px));background:rgba(10,10,12,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:14px;padding:6px 14px 10px}
+#bands[hidden]{display:none}
+.band{display:block;width:100%;text-align:left;padding:8px 0;border-top:1px solid var(--line)}
+.band:first-child{border-top:0}
+.band b{display:block;font:400 15px/1.2 var(--serif);color:var(--paper)}
+.band span{display:block;margin-top:2px;font:400 12px/1.4 var(--sans);color:var(--muted)}
+.band[aria-checked="true"] b{font-style:italic}
+.band[aria-checked="true"] b::after{content:" \2713";font-style:normal;color:var(--hot)}
+#bands .foot{margin:8px 0 0;font:400 11.5px/1.4 var(--sans);color:var(--muted)}
+#locmap{position:fixed;right:22px;bottom:calc(env(safe-area-inset-bottom,0px) + 64px);width:190px;height:190px;background:rgba(10,10,12,.72);border:1px solid var(--line);border-radius:12px;z-index:2;pointer-events:none}
+#locmap[hidden]{display:none}
+#ovl{position:fixed;inset:0;width:100%;height:100%;pointer-events:none}
+#toast{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 18px);transform:translateX(-50%);background:var(--paper);color:#000;font:500 13px/1 var(--sans);padding:9px 14px;border-radius:999px;opacity:0;transition:opacity .25s;pointer-events:none;z-index:9}
+#toast.on{opacity:1}
+@media (max-width:720px){
+  #regions{bottom:calc(env(safe-area-inset-bottom,0px) + 150px)}
+  body.hasctl #regions,body.hascard #regions{display:none}
+  #bottom{flex-direction:column-reverse;align-items:stretch;gap:8px}
+  #bottom .bb{flex-wrap:nowrap;justify-content:flex-end;gap:6px}
+  #objctl{bottom:calc(env(safe-area-inset-bottom,0px) + 152px)}
+  #info{left:70px;right:14px;width:auto;padding:11px 13px 10px}
+  #info dd{font-size:13.5px}
+  #pills{left:70px}
+  #locmap{width:130px;height:130px;right:14px;bottom:auto;top:42%}
+}
 </style>
 </head>
 <body>
@@ -148,16 +214,45 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
     <button data-speed="30">1 month/s</button>
     <button data-speed="365.25">1 year/s</button>
   </div>
-  <div class="bb"><button id="exploreBtn" aria-expanded="false" aria-controls="explore">Explore</button><button id="layersBtn" aria-expanded="false" aria-controls="panel">Layers and sources</button></div>
+  <div class="bb"><button id="eventsBtn" aria-expanded="false" aria-controls="events">Events</button><button id="mapBtn" aria-pressed="false" title="Show or hide the locator map">Map</button><button id="exploreBtn" aria-expanded="false" aria-controls="explore">Explore</button><button id="layersBtn" aria-expanded="false" aria-controls="panel">Layers and sources</button></div>
 </div>
 
 <section id="panel" hidden aria-label="Layers and sources">
   <h2>What you are looking at</h2>
   <div id="layerList"></div>
   <div class="row"><span>Faint limit</span><input id="mlim" type="range" min="3" max="10" step="0.1" value="6.5" aria-label="Limiting magnitude"><span id="mlimV">6.5</span></div>
+  <div class="lb">
+    <h3>Look-back horizon</h3>
+    <div class="row"><span>Light up to</span><input id="lbR" type="range" min="0" max="13.8" step="0.01" aria-label="Look-back time in billions of years"><span id="lbV"></span></div>
+    <p id="lbInfo"></p>
+    <button id="lbGo">Zoom out to the cosmic web</button>
+  </div>
   <p>Frame: Galactic coordinates centred on the Sun; up is the north Galactic pole. Brightness uses each object's absolute magnitude and its true distance to the camera, with automatic exposure as you zoom out. Redshifts become comoving distances with Planck 2018 ΛCDM (H₀ = 67.66, Ωₘ = 0.310).</p>
   <p>Planet, Moon and Sun maps: Solar System Scope (solarsystemscope.com/textures), CC BY 4.0, based on NASA data; downsized. S2 orbit: GRAVITY Collaboration (2020). Nebulae, remnants, cluster gas and elliptical galaxies are ray-marched volumes (emission and dust absorption through a 3D turbulence field); spiral discs are particle models. Gravitational lenses and black holes are ray-traced (lens equation; Schwarzschild geodesics). Shapes are models at measured positions, distances, sizes and orientations, not photographs.</p>
 </section>
+<section id="events" hidden aria-label="Sky events">
+  <h2>Sky events</h2>
+  <p>Choose one to set the clock to that moment and fly there.</p>
+  <div id="evList"></div>
+</section>
+<section id="info" hidden aria-label="About this object">
+  <button id="infoX" aria-label="Close the details">×</button>
+  <h2 id="infoT"></h2>
+  <p class="kind" id="infoK"></p>
+  <p class="cam" id="infoC"></p>
+  <p class="note" id="infoN"></p>
+  <dl id="infoB"></dl>
+  <div id="infoRC" hidden>
+    <h3>Why the Galaxy needs dark matter</h3>
+    <canvas id="rcplot" aria-label="Rotation speed against distance from the Galactic Centre"></canvas>
+    <div class="lg"><span><i style="background:rgba(236,230,218,.45)"></i>Measured (Eilers et al. 2019)</span><span><i style="background:#ffc58a"></i>Stars and gas only</span><span><i style="background:#a9c8ff"></i>With dark-matter halo</span><span><i style="background:rgba(168,115,255,.8)"></i>Halo alone</span></div>
+    <p>Stars and gas alone would let orbits slow to ~125 km/s at 20 kpc; measured speeds stay above 200. Model: Hernquist bulge, Miyamoto–Nagai disc, NFW halo (rₛ = 20 kpc).</p>
+  </div>
+</section>
+<div id="pills"><button id="infoTab" hidden aria-expanded="false" aria-controls="info">About this</button><div class="bwrap"><button id="bandBtn" aria-expanded="false" aria-controls="bands" aria-haspopup="true">Light: Visible</button>
+  <div id="bands" role="menu" hidden aria-label="See the universe in"><p class="foot">Brightness is re-weighted by how strongly each kind of object shines in the band, drawn in false colour. The CMB map shows in microwave and visible light; planets and labels are always drawn.</p></div></div></div>
+<canvas id="locmap" hidden aria-hidden="true"></canvas>
+<div id="toast" role="status"></div>
 <section id="explore" hidden aria-label="Explore">
   <h2>Go to</h2>
   <div id="exList"></div>
@@ -192,8 +287,9 @@ const DPR=renderer.getPixelRatio();
 
 /* ---------- point shader shared by every catalogue ---------- */
 const VS=`
-attribute float amag; attribute vec3 acol;
-uniform float uD, uExpo, uMlim, uOpacity, uPix, uMax, uMinA, uMaxA;
+attribute float amag; attribute vec3 acol; attribute float atl;
+uniform float uD, uExpo, uMlim, uOpacity, uPix, uMax, uMinA, uMaxA, uTl;
+uniform vec4 uBand;   // light band: x = gain, y = exponent of a colour weight (red stars brighter in the infrared)
 varying vec3 vCol; varying float vA;
 void main(){
   vec4 mv=modelViewMatrix*vec4(position,1.0);
@@ -201,10 +297,11 @@ void main(){
   float dpc=max(L*uD,1e-9);
   float m=amag+5.0*(log(dpc/10.0)*0.4342944819)-uExpo;
   float s=uMlim-m;
+  float bw=uBand.x*pow(clamp(acol.r-acol.b+0.5,0.05,1.5),uBand.y);s+=1.0857*log(max(bw,1e-5));
   if(L>3000.0) mv.xyz*=3000.0/L;
   gl_Position=projectionMatrix*mv;
   vCol=acol;
-  if(s<=0.0||uOpacity<=0.0){gl_PointSize=0.0;vA=0.0;return;}
+  if(s<=0.0||uOpacity<=0.0||atl>uTl){gl_PointSize=0.0;vA=0.0;return;}
   gl_PointSize=min(uPix*(1.0+0.55*s),uMax);
   vA=uOpacity*clamp(uMinA+0.12*s,0.0,uMaxA);
 }`;
@@ -221,8 +318,9 @@ function catalogue(pos,mag,col,opts){
   g.setAttribute('position',new THREE.BufferAttribute(pos,3));
   g.setAttribute('amag',new THREE.BufferAttribute(mag,1));
   g.setAttribute('acol',new THREE.BufferAttribute(col,3,true));
+  g.setAttribute('atl',new THREE.BufferAttribute(new Float32Array(mag.length),1));   // look-back time of each point (Gyr), set by the add-ons
   const m=new THREE.ShaderMaterial({vertexShader:VS,fragmentShader:FS,transparent:true,depthTest:false,depthWrite:false,blending:THREE.AdditiveBlending,
-    uniforms:{uD:{value:1},uExpo:{value:0},uMlim:{value:6.5},uOpacity:{value:1},uPix:{value:(opts.pix||1.4)*DPR},uMax:{value:(opts.max||9)*DPR},uMinA:{value:opts.minA||0.12},uMaxA:{value:opts.maxA||1.0}}});
+    uniforms:{uD:{value:1},uExpo:{value:0},uMlim:{value:6.5},uOpacity:{value:1},uPix:{value:(opts.pix||1.4)*DPR},uMax:{value:(opts.max||9)*DPR},uMinA:{value:opts.minA||0.12},uMaxA:{value:opts.maxA||1.0},uTl:{value:1e9},uBand:{value:new THREE.Vector4(1,0,0,0)}}});
   const p=new THREE.Points(g,m); p.frustumCulled=false; return p;
 }
 function group(unitPc){const g=new THREE.Group();g.userData.unit=unitPc;scene.add(g);return g;}
@@ -237,12 +335,34 @@ const L={};
 // SDSS DR17: comoving Mpc
 {const Q=DATA.sdss;L.sdss={g:group(MPC),dref:4e5};L.sdss.pts=catalogue(f32(Q.pos),f32(Q.mag),bin(Q.col),{pix:1.3,max:4,minA:0.12,maxA:0.5});L.sdss.g.add(L.sdss.pts);}
 
-// Milky Way: analytic model in pc (exponential disc, 4 log-spiral arms, bar). Seeded, so it is the same every visit.
+/* Milky Way spiral-arm centrelines from trigonometric parallaxes of masers (Reid et al. 2019, ApJ 885, 131, Table 2):
+   ln(R/R_kink) = -(beta - beta_kink) tan(psi), psi = psi_< below the kink and psi_> above it. beta is the Galactocentric
+   azimuth, 0 towards the Sun and increasing in the sense of Galactic rotation (towards l = 90 deg), so the arms trail.
+   With x = R cos(beta) pointing from the centre to the Sun and y = R sin(beta) = y_Gal, a point sits at
+   Galactic (x_G, y_G) = (R0 - x, y). Columns: beta_min, beta_max (measured), beta_kink, R_kink [kpc], psi_<, psi_> [deg],
+   width [kpc], how far the arm is drawn beyond the measured range at its low/high-beta end [deg], brightness factor,
+   and the pitch of that continuation at the low/high-beta end [deg]. Beyond the measured range the kinked fit is not
+   extrapolated (Norma's psi_< = -1 deg would wrap it into a ring): each arm continues from its measured end as a log
+   spiral of typical pitch, 12 deg (Reid et al. 2019 mean ~ 12 deg). Norma continues outward at 10 deg, which carries it
+   onto the far end of the Outer arm (10.6 vs 10.5 kpc at the junction), the Norma-Outer connection; Scutum-Centaurus
+   continues into the outer Scutum-Centaurus arm. */
+const MW_ARMS=[
+ [ -5, 54,18, 4.46,-1.0,19.5,0.14,284, 20,1.0,10,12],  // Norma, continued to the Outer arm
+ [  0,104,23, 4.91,14.1,12.1,0.23,230, 20,1.0,12,12],  // Scutum-Centaurus, continued to the outer Scutum-Centaurus arm
+ [  2, 97,24, 6.04,17.1, 1.0,0.27, 90, 30,1.0,12,12],  // Sagittarius-Carina
+ [ -8, 34, 9, 8.26,11.4,11.4,0.31, 12, 12,0.5,11.4,11.4], // Local (Orion) arm, a short spur
+ [-23,115,40, 8.87,10.3, 8.7,0.35,100, 90,1.0,12,12],  // Perseus
+ [-16, 71,18,12.24, 3.0, 9.4,0.65, 40,  0,1.0,12,12]]; // Outer (its far end is Norma's continuation)
+const armFit=(A,b)=>A[3]*1000*Math.exp(-(b-A[2])*Math.PI/180*Math.tan((b<A[2]?A[4]:A[5])*Math.PI/180));   // pc, measured range
+const armRc=(A,b)=>b<A[0]?armFit(A,A[0])*Math.exp((A[0]-b)*Math.PI/180*Math.tan(A[10]*Math.PI/180))
+  :b>A[1]?armFit(A,A[1])*Math.exp(-(b-A[1])*Math.PI/180*Math.tan(A[11]*Math.PI/180)):armFit(A,b);
+// Milky Way: analytic model in pc (exponential disc, bar, the measured spiral arms). Seeded, so it is the same every visit.
 {let seed=12345;const rnd=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296;};
  const gauss=()=>{let u=0,v=0;while(!u)u=rnd();v=rnd();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);};
  const R0=8178, N=70000, pos=new Float32Array(N*3), mag=new Float32Array(N), col=new Uint8Array(N*3);
  const put=(i,xg,yg,zg,M,r,g,b)=>{pos[3*i]=xg;pos[3*i+1]=zg;pos[3*i+2]=-yg;mag[i]=M;col[3*i]=r;col[3*i+1]=g;col[3*i+2]=b;};
- const bar=27*Math.PI/180, pitch=12.5*Math.PI/180, k=1/Math.tan(pitch);
+ const bar=27*Math.PI/180, DR=Math.PI/180, ARMS=MW_ARMS, AWt=a=>(a[1]-a[0]+a[7]+a[8])*a[9], AW=ARMS.reduce((s,a)=>s+AWt(a),0);
+ const pickArm=()=>{let u=rnd()*AW;for(const a of ARMS){u-=AWt(a);if(u<=0)return a;}return ARMS[0];};
  for(let i=0;i<N;i++){
    const t=rnd();
    if(t<0.16){ // bar/bulge, galactocentric then shifted
@@ -250,11 +370,17 @@ const L={};
      const x=a*Math.cos(bar)-b*Math.sin(bar), y=a*Math.sin(bar)+b*Math.cos(bar);
      put(i,R0-x,y,c,4.5+rnd()*2,255,205,150);
    }else{
-     let R; do{R=-2600*Math.log(rnd()*rnd());}while(R>16000||R<900);
-     let phi;
+     let R,phi;
      const onArm=t<0.62;
-     if(onArm){const arm=Math.floor(rnd()*4);phi=arm*Math.PI/2+k*Math.log(R/3000)+gauss()*0.26;}
-     else phi=rnd()*2*Math.PI;
+     if(onArm){
+       for(;;){const A=pickArm(),lo=A[0]-A[7],hi=A[1]+A[8],b=lo+(hi-lo)*rnd();
+         if((b<A[0]||b>A[1])&&rnd()>0.85)continue;                       // continuations beyond the measured range slightly fainter
+         const Rc=armRc(A,b);
+         if(Rc<3000||Rc>16500)continue;
+         if(rnd()>(Rc/4000)*Math.exp(-(Rc-4000)/4000))continue;           // uniform per unit arm length x exponential fall-off
+         const w=1.5*A[6]*1000*Rc/(A[3]*1000);                            // stars spread 1.5x the maser-arm width
+         R=Rc+gauss()*w;phi=b*DR+gauss()*0.5*w/Rc;break;}
+     }else{do{R=-2600*Math.log(rnd()*rnd());}while(R>16000||R<900);phi=rnd()*2*Math.PI;}
      const z=gauss()*(onArm?120:300)*(1+R/16000);
      const x=R*Math.cos(phi), y=R*Math.sin(phi);
      if(onArm) put(i,R0-x,y,z,5.0+rnd()*2.2,175,200,255);
@@ -273,6 +399,9 @@ const L={};
  const sph=new THREE.Mesh(new THREE.SphereGeometry(DATA.cosmo.chistar,160,80),m);sph.renderOrder=-1;sph.frustumCulled=false;
  L.cmb={g:group(MPC)};L.cmb.g.add(sph);L.cmb.mesh=sph;}
 
+// add-on layers (filled further down): relic neutrinos, dark-matter targets, dark-matter wind; LB = look-back horizon (Gyr)
+L.cnub={g:group(MPC)};L.dmj={g:group(1)};L.dmwind={g:group(1)};const LB={t:1e9};
+
 // Planets: JPL approximate Keplerian elements (Standish, valid 1800-2050), AU
 const EL=[ // a, e, I, L, varpi, Omega  and their rates per Julian century
  ['Mercury',[0.38709927,0.20563593,7.00497902,252.25032350,77.45779628,48.33076593],[0.00000037,0.00001906,-0.00594749,149472.67411175,0.16047689,-0.12534081],'#b9b2a6'],
@@ -290,6 +419,19 @@ function ecl2three(x,y,z,out){ // ecliptic J2000 -> ICRS -> Galactic -> three (x
   const xe=x, ye=y*Math.cos(EPS)-z*Math.sin(EPS), ze=y*Math.sin(EPS)+z*Math.cos(EPS);
   const xg=RG[0][0]*xe+RG[0][1]*ye+RG[0][2]*ze, yg=RG[1][0]*xe+RG[1][1]*ye+RG[1][2]*ze, zg=RG[2][0]*xe+RG[2][1]*ye+RG[2][2]*ze;
   out.set(xg,zg,-yg);return out;}
+function skyDir(ra,dec){ra*=D2R;dec*=D2R;const v=[Math.cos(dec)*Math.cos(ra),Math.cos(dec)*Math.sin(ra),Math.sin(dec)];
+  return new THREE.Vector3(RG[0][0]*v[0]+RG[0][1]*v[1]+RG[0][2]*v[2],RG[2][0]*v[0]+RG[2][1]*v[1]+RG[2][2]*v[2],-(RG[1][0]*v[0]+RG[1][1]*v[1]+RG[1][2]*v[2]));}
+/* 2MRS distances inside rich clusters are smeared along the line of sight by the members' orbital speeds (the
+   "fingers of god"). The Virgo and Coma models pull their members back to the cluster distance; do the same to the
+   catalogue layer itself, so each galaxy is drawn in one place only. Absolute magnitudes are adjusted so the
+   brightness seen from the Sun does not change. */
+const FOG={};
+{const P=L.tmrs.pts.geometry.attributes.position.array,Mg=L.tmrs.pts.geometry.attributes.amag.array;
+ [['virgo',187.7059,12.3911,6,3,35,d=>16.5+(d-18.2)*0.15],['coma',194.9531,27.9807,2.4,70,135,d=>99+(d-101)*0.1]].forEach(([k,ra,dec,cone,d0,d1,f])=>{
+  const u=skyDir(ra,dec),cm=Math.cos(cone*D2R),idx=[];
+  for(let i=0;i<DATA.tmrs.n;i++){const x=P[3*i],y=P[3*i+1],z=P[3*i+2],d=Math.hypot(x,y,z);if(d<d0||d>d1||(x*u.x+y*u.y+z*u.z)/d<cm)continue;
+    const dn=f(d),s=dn/d;P[3*i]*=s;P[3*i+1]*=s;P[3*i+2]*=s;Mg[i]-=5*Math.log10(s);idx.push(i);}
+  FOG[k]=idx;});}
 function elements(p,T){const e=p[1].map((v,i)=>v+p[2][i]*T);return{a:e[0],e:e[1],I:e[2]*D2R,L:e[3],w:(e[4]-e[5])*D2R,O:e[5]*D2R,vp:e[4]};}
 function orbitPoint(el,E,out){
   const xp=el.a*(Math.cos(E)-el.e), yp=el.a*Math.sqrt(1-el.e*el.e)*Math.sin(E);
@@ -323,24 +465,30 @@ ring.computeLineDistances();ring.frustumCulled=false;scene.add(ring);
 const META=[
  {key:'planets',name:'Planets',color:'#8fc1ff',src:'JPL Keplerian elements (Standish), solved live with Kepler\u2019s equation',w:[-9,-9,-2.6,-1.6]},
  {key:'stars',name:'Stars',color:'#ffd9a8',src:`HYG v4.0 (Hipparcos, Yale BSC, Gliese): ${DATA.stars.n.toLocaleString()} stars, colour from B\u2212V via blackbody`,w:[-9,-9,3.1,3.9]},
- {key:'mw',name:'Milky Way disc',color:'#afc8ff',src:'Analytic model, not catalogue data: exponential disc (R\u2091 = 2.6 kpc), four 12.5\u00b0 log spirals, 27\u00b0 bar',w:[2.6,3.4,6.2,7.2]},
+ {key:'mw',name:'Milky Way disc',color:'#afc8ff',src:'Analytic model, not catalogue data: exponential disc (R\u2091 = 2.6 kpc), 27\u00b0 bar, and trailing spiral arms on the maser-parallax arm centrelines of Reid et al. (2019) (Norma, Scutum\u2013Centaurus, Sagittarius\u2013Carina, Local, Perseus, Outer), extrapolated beyond the measured azimuths',w:[2.6,3.4,6.2,7.2]},
  {key:'tmrs',name:'Nearby galaxies',color:'#ffe2c4',src:`2MASS Redshift Survey via the NANOGrav 2MRS compilation: ${DATA.tmrs.n.toLocaleString()} galaxies plus the Magellanic Clouds`,w:[4.3,5.2,8.7,9.6]},
  {key:'sdss',name:'Galaxies and quasars',color:'#78ffeb',src:`SDSS DR17 spectroscopic sample (100k-object public subset): ${DATA.sdss.n.toLocaleString()} galaxies and quasars to z = 7. Blue to amber is g\u2212r; cyan are quasars`,w:[6.6,7.6,20,21]},
  {key:'cmb',name:'Cosmic microwave background',color:'#f5a046',src:`WMAP 7-year V and W bands combined by internal linear combination, monopole and dipole removed, \u00b1300 \u00b5K; rms ${DATA.cmb_rms.toFixed(0)} \u00b5K off the Galactic mask. Residual Galactic emission is dimmed.`,w:[9.2,9.8,20,21]},
  {key:'oort',name:'Oort cloud',color:'#9fb4d8',src:'Statistical model: number density \u221d r\u207b\u00b3\u1427\u2075 from 2,000 to 100,000 AU (Duncan, Quinn & Tremaine 1987); Hills cloud flattened towards the ecliptic; never observed directly',w:[-3.4,-2.6,1.0,1.6]},
- {key:'dso',name:'Nebulae, galaxies, black holes and lenses',color:'#ff9db0',src:'Ray-marched gas and starlight volumes and particle discs for well-known nebulae, remnants and galaxies at measured positions, distances, sizes and orientations; ray-traced gravitational lenses and Schwarzschild black holes (Sgr A*, M87*, Cygnus X-1, TON 618); the Galactic Centre with S2 on its measured orbit.',w:[-9,-9,20,21]}];
+ {key:'dso',name:'Nebulae, galaxies, black holes and lenses',color:'#ff9db0',src:'Ray-marched gas and starlight volumes and particle discs for well-known nebulae, remnants and galaxies at measured positions, distances, sizes and orientations; ray-traced gravitational lenses and Schwarzschild black holes (Sgr A*, M87*, Cygnus X-1, TON 618); the Galactic Centre with S2 on its measured orbit.',w:[-9,-9,20,21]},
+ {key:'cnub',name:'Cosmic neutrino background',color:'#73e6d9',src:'Relic neutrinos that decoupled about one second after the Big Bang (T \u2248 1 MeV). Today they are at 1.95 K, (4/11)^1/3 of the photon temperature, with about 336 neutrinos and antineutrinos per cm\u00b3 over the three flavours. Drawn as a shell at the comoving distance a light-speed neutrino could have covered since decoupling (massless approximation); massive neutrinos are slower and arrive from closer. Never detected directly.',w:[9.2,9.8,20,21]},
+ {key:'dmj',name:'Dark-matter glow at the Galactic Centre',color:'#b58cff',src:'The annihilation emissivity \u221d \u03c1\u00b2 of the Milky Way\u2019s NFW halo, the brightest place to look for gamma rays from dark-matter annihilation. The ten dwarf spheroidal galaxies, the cleanest targets, are always shown, each with its J-factor (Fermi-LAT, Ackermann et al. 2015) and a schematic \u03c1\u00b2 glow.',w:[2.6,3.2,6.6,7.2]},
+ {key:'dmwind',name:'Dark-matter wind',color:'#b58cff',src:'The Sun moves through the Galaxy\u2019s non-rotating halo at about 245 km/s towards Cygnus, so detectors on Earth face a dark-matter wind from that direction. Local density 0.3\u20130.4 GeV/cm\u00b3; velocity spread ~160 km/s (Standard Halo Model). Earth\u2019s orbit adds or subtracts up to ~15 km/s along the wind, so the expected event rate peaks around 2 June (annual modulation). Particles drawn around the Sun at any zoom; directions spread by the dispersion.',w:[-1,-0.4,2.2,2.8]}];
 const enabled={};META.forEach(m=>enabled[m.key]=true);
 const ll=document.getElementById('layerList');
 META.forEach(m=>{const d=document.createElement('div');d.className='layer';
   d.innerHTML=`<input type="checkbox" id="cb_${m.key}" checked><label for="cb_${m.key}"><span class="sw" style="background:${m.color}"></span>${m.name}</label><small>${m.src}</small>`;
   ll.appendChild(d);d.querySelector('input').addEventListener('change',e=>{enabled[m.key]=e.target.checked;});});
+/* the Galactic Centre dark-matter glow would wash out the Galaxy: off until switched on here (flying to it shows it) */
+enabled.dmj=false;{const cb=document.getElementById('cb_dmj');if(cb)cb.checked=false;}
 
 /* ---------- labels ---------- */
 const labelsEl=document.getElementById('labels');const LBL=[];
-function addLabel(text,getPos,lo,hi,cls){const el=document.createElement('div');el.className='lab'+(cls?' '+cls:'');el.textContent=text;labelsEl.appendChild(el);LBL.push({el,getPos,lo,hi});}
-DATA.starlabels.forEach(s=>{const v=new THREE.Vector3(s[1],s[2],s[3]);const r=s[4];addLabel(s[0],()=>v,-9,Math.min(3.0,Math.log10(r)+1.3));});
-addLabel('Galactic Centre',()=>new THREE.Vector3(8178,0,0),2.9,6.3,'big');
-DATA.labels.forEach(s=>{const v=new THREE.Vector3(s[1],s[2],s[3]);addLabel(s[0],()=>v,s[4],s[5]);});
+function addLabel(text,getPos,lo,hi,cls){const el=document.createElement('div');el.className='lab'+(cls?' '+cls:'');el.textContent=text;labelsEl.appendChild(el);const e={el,getPos,lo,hi};LBL.push(e);return e;}
+const LBLV=[];   // catalogue labels with their position vectors, re-anchored onto the 3D models further down
+DATA.starlabels.forEach(s=>{const v=new THREE.Vector3(s[1],s[2],s[3]);const r=s[4];LBLV.push({v,lab:addLabel(s[0],()=>v,-9,Math.min(3.0,Math.log10(r)+1.3))});});
+addLabel('Galactic Centre',(()=>{const v=skyDir(266.41684,-29.00781).multiplyScalar(8178);return()=>v;})(),2.9,6.3,'big');   // on Sgr A*, like the 3D model
+DATA.labels.forEach(s=>{const v=new THREE.Vector3(s[1],s[2],s[3]);LBLV.push({v,lab:addLabel(s[0],()=>v,s[4],s[5])});});
 const ringLab=document.createElement('div');ringLab.className='lab ring';labelsEl.appendChild(ringLab);
 
 /* ---------- camera state ---------- */
@@ -354,7 +502,7 @@ function place(){
 
 /* ---------- rail + regions ---------- */
 const LMIN=-11,LMAX=11;
-const REG=[['Cosmic microwave background',10.35,[9.6,11]],['Cosmic web',9.4,[8.3,9.6]],['Local Universe',7.3,[6.2,8.3]],['Local Group',6.05,[5.3,6.2]],
+const REG=[['Cosmic neutrino background',10.65,[10.5,11.01]],['Cosmic microwave background',10.3,[9.6,10.5]],['Cosmic web',9.4,[8.3,9.6]],['Local Universe',7.3,[6.2,8.3]],['Local Group',6.05,[5.3,6.2]],
  ['Milky Way',4.55,[3.3,5.3]],['Stellar neighbourhood',1.2,[-1.5,3.3]],['Solar System',-4.2,[-6,-1.5]]];
 const rail=document.getElementById('rail'),marker=document.getElementById('marker');
 const yOf=l=>(1-(l-LMIN)/(LMAX-LMIN))*100;
@@ -630,41 +778,101 @@ B.saturn.br=B.saturn.R*2.4;B.sun.br=B.sun.R*5;
    vec3 l=normalize(sunW-vW);vec3 tc=cW-vW;float t=dot(tc,l);float sh=1.0;if(t>0.0)sh=smoothstep(Rw*0.97,Rw*1.02,length(tc-l*t));
    gl_FragColor=vec4(c.rgb*(0.05+1.0*sh),c.a*0.96);}`}));
  m.matrixAutoUpdate=false;m.frustumCulled=false;bodyScene.add(m);B.saturn.ring=m;}
- // corona: streamers, chromosphere, prominences and flares, animated (replaces a static glow)
- {const m=new THREE.ShaderMaterial({transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,uniforms:{uTime:{value:0},uFilt:{value:0}},
-   vertexShader:`varying vec2 vP;void main(){vP=position.xy;vec4 c=viewMatrix*vec4(modelMatrix[3].xyz,1.0);float s=length(modelMatrix[0].xyz);c.xy+=position.xy*s*0.5;gl_Position=projectionMatrix*c;}`,
-   fragmentShader:`uniform float uTime,uFilt;varying vec2 vP;
-    float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
-    float n(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);return mix(mix(h(i),h(i+vec2(1,0)),f.x),mix(h(i+vec2(0,1)),h(i+vec2(1,1)),f.x),f.y);}
-    float fbm(vec2 p){return 0.55*n(p)+0.3*n(p*2.03+7.1)+0.15*n(p*4.11-3.7);}
-    void main(){float r=length(vP)*4.5;if(r<0.992||r>4.5)discard;float d=r-1.0,ang=atan(vP.y,vP.x);
-     /* K corona: streamers drift outward along the field, brightest over the activity belts */
-     float st=0.45+1.1*fbm(vec2(ang*4.0,log(r)*1.3-uTime*0.025));st*=0.7+0.6*smoothstep(0.2,0.9,abs(sin(ang)));
-     float cor=pow(r,-2.8)*st*0.75*smoothstep(4.5,3.2,r);
-     /* chromosphere ~2,000 km = 0.003 R plus spicules: jets 5-10 Mm tall (0.007-0.014 R) living ~5-10 min */
-     float top=0.004+0.009*n(vec2(ang*320.0,uTime*0.35))*n(vec2(ang*95.0+7.0,uTime*0.2));
+ /* Corona, chromosphere, prominences, loops, flares and CMEs: drawn in 3D in the Sun's own rotating frame (pole = +y, the
+    frame of the surface and its sunspots), so they turn with the Sun and look right from every side. Each pixel off the
+    limb integrates along its line of sight:
+    - K corona (white light): Thomson scattering by electrons, density from Baumbach-Allen,
+      n(r) ~ 0.036 r^-1.5 + 1.55 r^-6 + 2.99 r^-16 (x 1e8 cm^-3), times a streamer belt that is tilted and warped by the
+      cycle (helmet streamers broad at the base, narrowing to stalks with height), polar coronal holes with plumes, and
+      streamers above active regions. Brightness falls ~1000x from 1.02 to 3 R; it is shown compressed, as the eye sees
+      an eclipse.
+    - EUV 171 A: emission ~ n^2 of 0.7 MK plasma (scale height ~0.04 R), so holes are dark and loops dominate.
+    - Active-region loops: arcs over each sunspot pair, in vertical planes, found analytically (they are thinner than any
+      sampling step), with plasma knots flowing along them. A flaring region's loops brighten.
+    - Prominences: vertical sheets of cool plasma with fine vertical threads: a polar crown and filaments beside active
+      regions. Bright red in H-alpha, pink in white light (as at an eclipse).
+    - CMEs: from time to time a prominence erupts: bright front, dark cavity, bright core, expanding outward.
+    Events run on compressed time (a flare every ~37 s, a CME every ~53 s, lasting ~18 s) so they can be seen. */
+ {const NS=24;
+  const m=new THREE.ShaderMaterial({transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,
+   uniforms:{uTime:{value:0},uFilt:{value:0},uInv:{value:new THREE.Matrix4()},uSp:{value:B.sun.u.uSp.value},uTilt:{value:0.5},uAct:{value:0.5},
+     uPr:{value:Array.from({length:6},()=>new THREE.Vector4())},uPe:{value:Array.from({length:6},()=>new THREE.Vector4())},
+     uCme:{value:new THREE.Vector4(0,1,0,-1)},uFl:{value:new THREE.Vector4(-1,0,-1,0)}},
+   vertexShader:`varying vec3 vQ;void main(){vec4 c=viewMatrix*vec4(modelMatrix[3].xyz,1.0);float s=length(modelMatrix[0].xyz);vQ=c.xyz+vec3(position.xy*s*0.5,0.0);gl_Position=projectionMatrix*vec4(vQ,1.0);}`,
+   fragmentShader:`uniform float uTime,uFilt,uTilt,uAct;uniform mat4 uInv;uniform vec4 uSp[12];uniform vec4 uPr[6];uniform vec4 uPe[6];uniform vec4 uCme;uniform vec4 uFl;varying vec3 vQ;
+    float h3(vec3 p){return fract(sin(dot(p,vec3(127.1,311.7,74.7)))*43758.5453);}
+    float vn(vec3 p){vec3 i=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);
+      return mix(mix(mix(h3(i),h3(i+vec3(1,0,0)),f.x),mix(h3(i+vec3(0,1,0)),h3(i+vec3(1,1,0)),f.x),f.y),
+                 mix(mix(h3(i+vec3(0,0,1)),h3(i+vec3(1,0,1)),f.x),mix(h3(i+vec3(0,1,1)),h3(i+vec3(1,1,1)),f.x),f.y),f.z);}
+    float baum(float r){float i=1.0/r,i2=i*i,i6=i2*i2*i2,i8=i6*i2;return 0.036*i*sqrt(i)+1.55*i6+2.99*i8*i8;}
+    void main(){
+     vec3 O=(uInv*vec4(0.0,0.0,0.0,1.0)).xyz,Qb=(uInv*vec4(vQ,1.0)).xyz,D=normalize(Qb-O);   // ray in the Sun's frame, units of R
+     float t0=-dot(O,D);vec3 P=O+t0*D;float p=length(P);const float RM=6.0;
+     if(p<1.0||p>RM)discard;
+     float half_=sqrt(RM*RM-p*p),jit=h3(vec3(gl_FragCoord.xy,fract(uTime)));
+     float Iw=0.0,Ie=0.0,Ic=0.0,Ih=0.0;
+     /* corona and CME: sampled, denser near the point of closest approach */
+     for(int i=0;i<${NS};i++){float u=(float(i)+jit)/${NS}.0*2.0-1.0;float t=t0+half_*(0.25*u+0.75*u*abs(u));float dt=half_*(0.25+1.5*abs(u))*2.0/${NS}.0;
+       vec3 x=O+t*D;float r=length(x);vec3 un=x/r;float lat=asin(clamp(un.y,-1.0,1.0)),lon=atan(un.z,un.x);
+       float lns=uTilt*sin(lon-1.1)+0.1*sin(2.0*lon+0.4);float s=lat-lns,w=0.06+0.32*exp(-(r-1.0)/0.5);float helm=exp(-s*s/(w*w));
+       float rays=0.35+1.1*vn(un*14.0);
+       float hole=smoothstep(0.6,0.92,abs(un.y))*(1.0-0.8*uAct);float plume=0.0;if(hole>0.01){float pv=vn(un*46.0);plume=hole*pv*pv*pv*2.2;}
+       float ars=0.0;for(int g=0;g<6;g++){vec4 A=uSp[2*g],Bq=uSp[2*g+1];if(A.w<=0.0)continue;vec3 mg=normalize(A.xyz+Bq.xyz);float cg=dot(un,mg);if(cg<0.86)continue;
+         ars+=exp(-(1.0-cg)/(0.012+0.05*exp(-(r-1.0)/0.5)))*min(A.w/0.02,1.5);}
+       float fac=(0.1+4.0*helm*rays+2.5*ars*rays)*(1.0-0.75*hole)+plume;
+       Iw+=baum(r)*fac/(r*r)*dt;
+       Ie+=exp(-2.0*(r-1.0)/0.08)*(0.12+1.4*helm+2.0*ars)*(1.0-0.85*hole)*dt;
+       if(uCme.w>=0.0){float ph=uCme.w,Rf=1.15+3.6*pow(ph,1.3);float ca=acos(clamp(dot(un,uCme.xyz),-1.0,1.0));float cone=smoothstep(0.62,0.38,ca);
+         float front=exp(-pow((r-Rf)/(0.1+0.18*ph),2.0))*(0.7+0.6*vn(un*18.0+vec3(ph*3.0)));
+         float Rc=1.05+0.5*(Rf-1.0);float core=exp(-pow((r-Rc)/(0.07+0.05*ph),2.0))*smoothstep(0.3,0.08,ca)*(0.5+vn(un*40.0));
+         float fade=pow(1.0-ph,1.4);Iw+=(front*1.6+core*0.9)*cone*fade*0.8/(Rf*Rf)*dt;Ic+=core*cone*fade*smoothstep(0.75,0.0,ph)*dt;}}
+     /* chromosphere and spicules at the limb, in the Sun's frame */
+     vec3 uL=normalize(P);float d=p-1.0;
+     float top=0.004+0.01*vn(uL*260.0+vec3(0.0,uTime*0.35,0.0))*vn(uL*90.0+vec3(uTime*0.2));
      float chrom=smoothstep(top,top*0.4,d)*0.95+exp(-d*d/0.00004)*0.4;
-     /* quiescent hedgerow prominences */
-     float pm=smoothstep(0.66,0.84,n(vec2(ang*7.0+3.0,uTime*0.012)));
-     float hgt=0.02+0.05*n(vec2(ang*25.0,uTime*0.04));float lp=pm*exp(-d/hgt)*smoothstep(0.0,0.006,d)*(0.55+0.45*n(vec2(ang*160.0,d*90.0-uTime*0.4)));
-     /* active-region loops: plasma condenses at the apex and drains down both legs (coronal rain) */
+     /* active-region loops: circles in vertical planes over each spot pair, intersected analytically */
      float loops=0.0;
-     for(int i=0;i<7;i++){float fi=float(i),per=31.0+7.0*fi,ph=(uTime+fi*11.0)/per,sl=floor(ph),lt=fract(ph);
-       float a0=6.2832*h(vec2(sl,fi*3.1)),w=0.035+0.07*h(vec2(fi,sl+2.0)),hh=0.035+0.11*h(vec2(sl+5.0,fi));
-       float env=smoothstep(0.0,0.12,lt)*(1.0-smoothstep(0.7,1.0,lt));
-       float da=mod(ang-a0+3.14159,6.28318)-3.14159;float s=(da+w)/(2.0*w);if(s<0.0||s>1.0)continue;
-       for(int k=0;k<3;k++){float fk=float(k)-1.0;float ra=1.0+hh*(1.0+0.12*fk)*sin(3.14159*s);float dd=d-(ra-1.0);float tw=0.0035+0.012*hh;
-         float sp=abs(2.0*s-1.0);float kn=0.35+0.65*pow(0.5+0.5*sin(sp*16.0-uTime*0.9+fi*3.0+fk*1.7),4.0);
-         loops+=exp(-dd*dd/(tw*tw))*kn*env*(0.7+0.3*fk*fk);}}
-     loops*=smoothstep(-0.001,0.006,d);
-     float fl=fract(uTime/23.0);float fa=smoothstep(0.0,0.015,fl)*(1.0-smoothstep(0.015,0.1,fl));float fang=6.2832*h(vec2(floor(uTime/23.0),1.0));
-     float fe=fa*exp(-pow(mod(ang-fang+3.1416,6.2832)-3.1416,2.0)/0.004)*exp(-d/0.08);
-     vec3 col;float al;
-     if(uFilt<0.5){col=vec3(1.0,0.93,0.82)*cor+vec3(1.0,0.3,0.34)*(chrom*0.85+lp*1.4)+vec3(1.0,0.42,0.38)*loops*1.3+vec3(1.0,0.97,0.9)*fe*2.0;al=cor+chrom*0.85+lp+loops+fe;}
-     else if(uFilt<1.5){col=vec3(1.0,0.28,0.18)*(chrom*1.1+lp*1.8+loops*1.6)+vec3(1.0,0.6,0.5)*fe*2.0+vec3(1.0,0.3,0.2)*cor*0.08;al=chrom+lp+loops+fe+cor*0.08;}
-     else{float c2=pow(r,-6.0)*st*1.6*smoothstep(2.5,1.4,r);col=vec3(1.0,0.74,0.26)*(c2+cor*0.25+loops*2.2+fe*2.5)-vec3(0.0)*lp;al=c2+cor*0.25+loops*2.2+fe;}
-     gl_FragColor=vec4(col,clamp(al,0.0,1.0));}`});
-  const s=new THREE.Mesh(new THREE.PlaneGeometry(2,2),m);s.frustumCulled=false;bodyScene.add(s);B.sun.corona=s;}
+     for(int g=0;g<6;g++){vec4 A=uSp[2*g],Bq=uSp[2*g+1];if(A.w<=0.0)continue;vec3 mg=normalize(A.xyz+Bq.xyz);vec3 ch=Bq.xyz-A.xyz;float hs=0.5*length(ch);
+       vec3 ex=ch/(2.0*hs),nl=normalize(cross(ex,mg));float den=dot(D,nl);if(abs(den)<0.002)continue;
+       vec3 X=O+(dot(mg-O,nl)/den)*D;if(length(X)<1.0)continue;vec3 q=X-mg;float fl=1.0+5.0*uFl.y*step(abs(uFl.x-float(g)),0.1);
+       for(int k=0;k<4;k++){float rl=hs*(1.6+1.05*float(k));float dd=length(q)-rl,tw=0.004+0.03*rl;
+         float psi=atan(dot(q,mg),dot(q,ex));float kn=0.45+0.55*pow(0.5+0.5*sin(psi*12.0-uTime*1.2+float(k)*1.7+float(g)),4.0);
+         loops+=exp(-dd*dd/(tw*tw))*kn*fl*min(A.w/0.02,1.5)/max(abs(den),0.2);}}
+     /* prominences: vertical sheets through the Sun's centre (plane spanned by c and e), with fine vertical threads */
+     float prom=0.0;
+     for(int i=0;i<6;i++){vec4 C=uPr[i],E=uPe[i];if(C.w<=0.0)continue;vec3 nb=normalize(cross(C.xyz,E.xyz));float den=dot(D,nb);if(abs(den)<0.002)continue;
+       vec3 X=O+(-dot(O,nb)/den)*D;float r=length(X),hh=r-1.0;if(hh<0.0)continue;float a=atan(dot(X,E.xyz),dot(X,C.xyz));float al=2.0*a/C.w;if(abs(al)>1.0)continue;
+       float Hl=E.w*sqrt(max(1.0-pow(al,4.0),0.0))*(0.65+0.35*vn(vec3(a*45.0,float(i)*7.0,uTime*0.03)));
+       float er=step(abs(uFl.z-float(i)),0.1)*(1.0-smoothstep(0.0,0.12,max(uCme.w,0.0)))+(1.0-step(abs(uFl.z-float(i)),0.1));   // the erupting one leaves
+       float th=0.35+0.65*pow(vn(vec3(a*520.0,hh*24.0-uTime*0.12,float(i))),2.0);
+       prom+=smoothstep(Hl,Hl*0.75,hh)*smoothstep(0.0,0.004,hh)*th*er/max(abs(den),0.25);}
+     vec3 col;
+     float K=1.0-exp(-2.3*pow(Iw/5.0,0.47));
+     if(uFilt<0.5){col=vec3(1.0,0.96,0.9)*K+vec3(1.0,0.32,0.42)*(chrom*0.75+prom*0.6)+vec3(1.0,0.75,0.55)*loops*0.06;}
+     else if(uFilt<1.5){col=vec3(1.0,0.28,0.18)*(chrom*1.1+prom*2.0+loops*0.12*uFl.y+Ic*1.5)+vec3(1.0,0.4,0.3)*K*0.06;}
+     else{float E=1.0-exp(-1.6*pow(Ie/0.3,0.35));col=vec3(1.0,0.74,0.26)*(E*0.8+min(loops,4.0)*0.4);}
+     gl_FragColor=vec4(col,clamp(max(col.r,max(col.g,col.b)),0.0,1.0));}`});   // alpha follows the light: the Sun's layer is composited over the sky
+  const s=new THREE.Mesh(new THREE.PlaneGeometry(2,2),m);s.frustumCulled=false;bodyScene.add(s);B.sun.corona=s;
+  /* per frame: the view-to-Sun-frame matrix, the cycle's activity, prominences, flares and CMEs */
+  let cmeCyc=-1,cmeSrc=0;const M4=new THREE.Matrix4(),yAx=new THREE.Vector3(0,1,0),tv=new THREE.Vector3(),cv=new THREE.Vector3(),ev=new THREE.Vector3();
+  s.onBeforeRender=(rr,sc,cam)=>{const U=m.uniforms;U.uInv.value.copy(M4.multiplyMatrices(cam.matrixWorldInverse,B.sun.mesh.matrixWorld)).invert();
+    const yr=2000+(state.jd-2451545)/365.25;let tm=(yr-2019.96)*12;tm=((tm%132)+132)%132;const f=x=>x*x*x/(Math.exp(x*x/2916)-0.71),A=Math.max(0,Math.min(1,f(tm)/f(58.3)));
+    U.uAct.value=A;U.uTilt.value=0.18+0.9*A;const T=U.uTime.value;
+    /* prominences: three quiescent (polar crown, ~60 deg) and up to three beside active regions, lying along the polarity inversion line */
+    let k=0;const P=(c,e,L,H)=>{if(k>=6)return;U.uPr.value[k].set(c.x,c.y,c.z,L);U.uPe.value[k].set(e.x,e.y,e.z,H);k++;};
+    [[1.05,0.7],[-1.0,2.6],[1.1,4.4]].forEach(([la,lo],i)=>{cv.set(Math.cos(la)*Math.cos(lo),Math.sin(la),Math.cos(la)*Math.sin(lo));ev.crossVectors(yAx,cv).normalize();P(cv.clone(),ev.clone(),0.38,0.06+0.03*i);});
+    const SP=U.uSp.value;for(let g=0;g<6&&k<6;g++){const a=SP[2*g],b=SP[2*g+1];if(a.w<=0)continue;cv.set(a.x+b.x,a.y+b.y,a.z+b.z).normalize();
+      tv.set(b.x-a.x,b.y-a.y,b.z-a.z).normalize();cv.addScaledVector(yAx,Math.sign(cv.y||1)*0.09).normalize();ev.crossVectors(cv,tv).normalize();P(cv.clone(),ev.clone(),0.2,0.045);}
+    const nP=k;for(;k<6;k++)U.uPr.value[k].w=0;
+    /* a flare every ~37 s in one active region; a CME every ~53 s from one of the prominences */
+    const act=[];for(let g=0;g<6;g++)if(SP[2*g].w>0)act.push(g);
+    const fp=T/37,fph=fp-Math.floor(fp);U.uFl.value.x=act.length?act[Math.floor(fp)%act.length]:-1;U.uFl.value.y=act.length?Math.min(1,fph/0.02)*Math.exp(-Math.max(0,fph-0.02)/0.12):0;
+    /* each CME erupts from the prominence nearest the limb as seen when it starts (as coronagraphs see them best), and keeps that source */
+    const cp=T/53,cyc=Math.floor(cp),cph=(cp-cyc)/0.35;
+    if(cph<1){if(cyc!==cmeCyc){cmeCyc=cyc;const e_=U.uInv.value.elements;tv.set(e_[12],e_[13],e_[14]).normalize();let best=1e9;cmeSrc=0;
+        for(let i=0;i<nP;i++){const pr=U.uPr.value[i],q=Math.abs(pr.x*tv.x+pr.y*tv.y+pr.z*tv.z);if(q<best){best=q;cmeSrc=i;}}}
+      const pr=U.uPr.value[cmeSrc];U.uCme.value.set(pr.x,pr.y,pr.z,cph);U.uFl.value.z=cmeSrc;}else{U.uCme.value.w=-1;U.uFl.value.z=-1;}};}
+
 // Moon: low-precision geocentric ephemeris (Astronomical Almanac), ~0.3 deg
 function moonGeo(T,out){const s=d=>Math.sin(d*D2R),c=d=>Math.cos(d*D2R);
   const lam=218.32+481267.881*T+6.29*s(135.0+477198.87*T)-1.27*s(259.3-413335.36*T)+0.66*s(235.7+890534.22*T)+0.21*s(269.9+954397.74*T)-0.19*s(357.5+35999.05*T)-0.11*s(186.5+966404.03*T);
@@ -919,7 +1127,7 @@ galaxy({g:0.6,id:'m87',name:'M87 and its jet',ra:187.7059,dec:12.3911,d:16.4e6,p
    boundary is an irregular watershed surface. Flow particles are schematic: inside a basin of attraction
    peculiar velocities point inward, which is the definition of the basin.                                  */
 {
- const TM=DATA.tmrs,TP=f32(TM.pos),TN=TM.n;
+ const TM=DATA.tmrs,TP=L.tmrs.pts.geometry.attributes.position.array,TN=TM.n;   // the catalogue layer itself (Mpc)
  const FLVS=`attribute vec3 acol;attribute float aph;attribute float asp;uniform float uScale,uPx,uOp,uMax,uT,uK;varying vec3 vC;varying float vA;
  void main(){float f=fract(aph+uT*asp);vec3 p=position*(1.0-uK*f*f*(3.0-2.0*f));vec4 mv=modelViewMatrix*vec4(p,1.0);gl_Position=projectionMatrix*mv;
   gl_PointSize=min(2.6,uMax);vC=acol;vA=uOp*0.8*sin(3.14159*f);}`;
@@ -934,10 +1142,8 @@ galaxy({g:0.6,id:'m87',name:'M87 and its jet',ra:187.7059,dec:12.3911,d:16.4e6,p
  const ID=new THREE.Matrix4();
  /* ---- Virgo Cluster ---- */
  {const C=skyPos(187.7059,12.3911,16.5e6),u=C.clone().normalize(),r=rng(1650),gal=PS(),sh=PS(),fl=PS(),ph=[],sp=[];
-  const cmax=Math.cos(6*D2R);let n=0;
-  for(let i=0;i<TN;i++){const x=TP[3*i],y=TP[3*i+1],z=TP[3*i+2],d=Math.hypot(x,y,z);if(d<3||d>35)continue;
-    if((x*u.x+y*u.y+z*u.z)/d<cmax)continue;const dd=(16.5+(d-18.2)*0.15)*1e6;
-    put(gal,x/d*dd-C.x,y/d*dd-C.y,z/d*dd-C.z,mix([1,.8,.5],[1,.93,.8],r()),42000,1.0);n++;}
+  let n=0;   // members already moved to the cluster distance in the layer (FOG.virgo)
+  for(const i of FOG.virgo){put(gal,TP[3*i]*1e6-C.x,TP[3*i+1]*1e6-C.y,TP[3*i+2]*1e6-C.z,mix([1,.8,.5],[1,.93,.8],r()),42000,1.0);n++;}
   shell(sh,r,1.7e6,900,[1,.85,.6],22000,.12);shell(sh,r,7.0e6,2600,[1,.7,.4],45000,.08);
   for(let i=0;i<2400;i++){const ct=2*r()-1,st=Math.sqrt(1-ct*ct),a=r()*6.2832,R0=(1.9+5.1*Math.sqrt(r()))*1e6;
     put(fl,R0*st*Math.cos(a),R0*st*Math.sin(a),R0*ct,[.62,.82,1],1,1);ph.push(r());sp.push(.06+.06*r());}
@@ -1233,7 +1439,7 @@ star({act:0.35,id:'betelgeuse',name:'Betelgeuse',ra:88.7929,dec:7.4071,d:168,Rs:
  note:'A red supergiant in Orion, 168 pc away (Joyce et al. 2020), about 764 times the Sun\u2019s radius: placed at the Sun it would reach past Mars. Its surface has only a few giant convection cells, which boil visibly here, and it sheds dusty gas (the slow brown outflow). In 2019\u201320 it faded by more than a magnitude (the Great Dimming), caused by a dust cloud it ejected (Montarg\u00e8s et al. 2021). It will explode as a core-collapse supernova, probably within ~100,000 years.'});
 star({act:0.05,id:'rigel',name:'Rigel',ra:78.6345,dec:-8.2016,d:264,Rs:79,T:12100,gran:5,
  note:'A blue supergiant about 264 pc away, roughly 79 solar radii and 12,100 K, some 100,000 times the Sun\u2019s luminosity. Hot massive stars like this live only ~10 million years.'});
-star({act:0.45,id:'aldebaran',name:'Aldebaran',ra:68.9802,dec:16.5093,d:20.0,Rs:44,T:3900,gran:24,con:1.25,
+star({act:0.45,id:'aldebaran',name:'Aldebaran',ra:68.9802,dec:16.5093,d:20.43,Rs:44,T:3900,gran:24,con:1.25,
  note:'An orange (K5) giant 20 pc away, about 44 solar radii: what the Sun will look like in roughly 5 billion years, after its core hydrogen runs out.'});
 star({act:1.3,id:'proxima',name:'Proxima Centauri',ra:217.4289,dec:-62.6795,d:1.3020,Rs:0.154,T:3042,gran:720,inc:40,Pvis:8,planets:[{a:0.0485,P:11.19,r:1.07,c:[.7,.55,.45]}],
  note:'The nearest star to the Sun, 1.302 pc (4.25 light-years): a red dwarf 15 % of the Sun\u2019s size and 3,042 K. Its planet Proxima b (Anglada-Escud\u00e9 et al. 2016) orbits every 11.2 days at 0.049 AU, inside the habitable zone, though frequent flares strip it. Red dwarfs are three quarters of all stars and live for trillions of years.'});
@@ -1257,7 +1463,7 @@ function psr(o){const objs=[beacon(COLX.ns)];const tk=pulsar(o,objs);TK.push(tk)
 psr({id:'velapsr',name:'Vela pulsar',ra:128.8358,dec:-45.1764,d:287,P:0.0893,Pvis:2.0,pa:130.6,inc:63.6,pwn:{Rt:0.07,Lj:0.12},seed:41,
  note:'A neutron star 287 pc away (VLBI parallax, Dodson et al. 2003), left by a supernova about 11,000 years ago: 1.4 solar masses in a ball ~12 km across, spinning 11.2 times a second. Its radio beams (drawn as cones along the tilted magnetic axis) sweep past Earth once per turn. Bright polar caps, heated by returning particles, sit where the magnetic axis meets the surface; the faint loops are the dipole field, closed inside the light cylinder and open beyond it. Zoom out to about 0.3 pc to see its X-ray wind nebula: a torus in the spin equator and a jet along the spin axis, as Chandra images it. The circle is the light cylinder, c P / 2\u03c0 = 4,260 km, where co-rotation would reach the speed of light. Spin slowed about 22\u00d7 here.'});
 psr({id:'crabpsr',name:'Crab pulsar',ra:83.6332,dec:22.0145,d:2000,P:0.0337,Pvis:2.0,pa:124,inc:61.3,pwn:{Rt:0.35,Lj:0.45},seed:42,
- note:'The neutron star at the heart of the Crab Nebula, born in the supernova seen in 1054. It spins 29.9 times a second and powers the whole nebula through its wind. Zoom out to about 1 pc to see the wind nebula Chandra photographed: inner ring, torus and polar jets, with wisps flowing outward. Spin slowed about 60\u00d7.'});
+ note:'The neutron star at the heart of the Crab Nebula, born in the supernova seen in 1054. It spins 29.7 times a second and powers the whole nebula through its wind. Zoom out to about 1 pc to see the wind nebula Chandra photographed: inner ring, torus and polar jets, with wisps flowing outward. Spin slowed about 60\u00d7.'});
 psr({id:'j0437',name:'PSR J0437\u22124715 (millisecond pulsar)',ra:69.3162,dec:-47.2525,d:156.8,P:0.005757,Pvis:1.6,
  note:'The nearest and brightest millisecond pulsar, 157 pc away, spinning 174 times a second after being spun up by accreting from its white-dwarf companion. NICER X-ray pulse modelling measured its radius, 11.4 km for 1.42 M\u2609 (Choudhury et al. 2024), which constrains the equation of state of matter above nuclear density. It is one of the most precise clocks in the pulsar timing arrays. Spin slowed about 280\u00d7.'});
 psr({id:'sgr1806',name:'SGR 1806\u221220 (magnetar)',ra:272.1638,dec:-20.4110,d:8700,P:7.56,Pvis:7.56,flare:1,
@@ -1365,9 +1571,8 @@ snr({id:'velasnr',name:'Vela supernova remnant',ra:128.5,dec:-45.5,d:287,Rpc:19,
  exo({side:1,id:'mwhalo',name:'Milky Way dark-matter halo',cat:'Dark matter & lensing',ra:266.41684,dec:-29.00781,d:8178,pa:0,inc:0,R:2e5,view:7.5e5,lmin:2000,objs:[points(ps)],g:1,win:[5.2,5.7,6.6,7.1],
   note:'The Galaxy\u2019s stars and gas are a small part of its mass. The flat rotation curve (about 230 km/s far beyond the stellar disc, Ch 18) needs a roughly spherical halo of dark matter some 200 kpc in radius and about 10\u00b9\u00b2 solar masses, five to ten times the visible mass. Drawn here as points sampled from an NFW profile (scale radius 20 kpc), the shape found in cold-dark-matter simulations. It is invisible in reality.'});}
 {const ps=PS(),r=rng(1933),d=99e6;nfw(ps,r,0.45e6,4.5,16000,[.62,.42,1],1.2e4,0.06);
- const gal=PS(),TM=DATA.tmrs,TP=f32(TM.pos),C=skyPos(194.9531,27.9807,d),u=C.clone().normalize();let n=0;
- for(let i=0;i<TM.n;i++){const x=TP[3*i],y=TP[3*i+1],z=TP[3*i+2],dd=Math.hypot(x,y,z);if(dd<70||dd>135)continue;if((x*u.x+y*u.y+z*u.z)/dd<Math.cos(2.4*D2R))continue;
-   const D2=(99+(dd-101)*0.1)*1e6;put(gal,x/dd*D2-C.x,y/dd*D2-C.y,z/dd*D2-C.z,[1,.85,.6],4e4,1.0);n++;}
+ const gal=PS(),TP=L.tmrs.pts.geometry.attributes.position.array,C=skyPos(194.9531,27.9807,d);let n=0;
+ for(const i of FOG.coma){put(gal,TP[3*i]*1e6-C.x,TP[3*i+1]*1e6-C.y,TP[3*i+2]*1e6-C.z,[1,.85,.6],4e4,1.0);n++;}   // members as placed in the layer
  const hot=PS();for(let i=0;i<5000;i++){const R=0.3e6*Math.pow(r(),0.6)*2,ct=2*r()-1,st=Math.sqrt(1-ct*ct),ph=r()*6.2832;put(hot,R*st*Math.cos(ph),R*st*Math.sin(ph),R*ct,[1,.45,.7],2.5e4,0.05);}
  const o=exo({id:'coma',name:'Coma Cluster',cat:'Large-scale structure',ra:194.9531,dec:27.9807,d,pa:0,inc:0,R:2.5e6,view:9e6,lmin:1e4,objs:[points(ps),points(hot),points(gal)],mk:[6.2,9.4],
   note:`A rich cluster about 99 Mpc away with more than a thousand galaxies and roughly 10\u00b9\u2075 solar masses. In 1933 Fritz Zwicky measured its galaxies moving at about 1,000 km/s, far too fast to be held by the visible mass, and inferred \u201cdunkle Materie\u201d: the first evidence for dark matter. Gold: ${n} member galaxies from 2MRS (placed at the cluster distance); pink: the 10\u2078 K X-ray gas, which outweighs the stars; violet: the dark-matter halo (NFW, schematic sampling), which outweighs both.`});}
@@ -1711,11 +1916,64 @@ const TSUN=tgt({id:'sun',name:'Sun',cat:'Solar System',pos:()=>ZERO,lmin:B.sun.R
 tgt({id:'sgra',name:'Sgr A*: S-star orbits',cat:'Galactic Centre',pos:()=>GC.C,lmin:GC.rs*6,view:.03,
  note:'The black hole at the centre of the Milky Way, 4.3 million solar masses. The star S2 follows its measured 16-year orbit (GRAVITY 2020), coming within 120 AU of the hole. The surrounding cluster is a statistical model.'});
 tgt({id:'sgrah',name:'Sgr A*: the event horizon',cat:'Galactic Centre',pos:()=>GC.C,lmin:GC.rs*4,view:GC.rs*24,
- note:'Ray-traced: every pixel follows a light ray through Schwarzschild spacetime. The shadow is \u221a27 \u2248 5.2 M across (2.6 Schwarzschild radii; r_s = 12.7 million km), ringed by the photon ring where light orbits the hole. The glowing gas is the hot, thin flow seen at 230 GHz in EHT false colour, inclined 30\u00b0 to us: the side moving towards us is Doppler-boosted, light from behind the hole is bent over the top, and the stars behind are lensed into an Einstein ring and mirror images. Spin is neglected (it changes the shadow by under 4 %). Fly in and orbit it.'});
+ note:'Ray-traced: every pixel follows a light ray through Schwarzschild spacetime. The shadow is 2\u221a27 \u2248 10.4 M across (5.2 Schwarzschild radii, about 66 million km; r_s = 12.7 million km), ringed by the photon ring where light orbits the hole. The glowing gas is the hot, thin flow seen at 230 GHz in EHT false colour, inclined 30\u00b0 to us: the side moving towards us is Doppler-boosted, light from behind the hole is bent over the top, and the stars behind are lensed into an Einstein ring and mirror images. Spin is neglected (it changes the shadow by under 4 %). Fly in and orbit it.'});
+/* ---------------- dark-matter annihilation targets: the Galactic Centre and dwarf spheroidal satellites -------
+   If dark matter annihilates, the signal scales with the J-factor, the line-of-sight integral of rho^2. The dwarfs
+   are always shown; the Galactic Centre glow is its own layer. Stars: Plummer spheres with the measured half-light radius. Violet glow: the
+   annihilation emissivity rho^2 of an NFW halo, sampled exactly (for rho^2 ~ x^-2 (1+x)^-4 the emission inside x is
+   1 - (1+x)^-3, so x = (1-u)^(-1/3) - 1); the dwarfs' halo scale radii (3 r_half) are schematic.
+   log10 J within 0.5 deg [GeV^2 cm^-5]: Fermi-LAT, Ackermann et al. 2015 (Reticulum II: later estimates, ~18.9). */
+{const rho2=(ps,r,rs,rmax,n,col,size,al)=>{for(let i=0;i<n;i++){let x;do{x=Math.pow(1-r(),-1/3)-1;}while(x*rs>rmax);
+   const ct=2*r()-1,st=Math.sqrt(1-ct*ct),ph=r()*6.2832,R=x*rs;put(ps,R*st*Math.cos(ph),R*st*Math.sin(ph),R*ct,col,size*(0.6+0.8*r()),al);}};
+ const plummer=(ps,r,a,n,col,size,al)=>{for(let i=0;i<n;i++){let R;do{R=a/Math.sqrt(Math.pow(Math.max(r(),1e-9),-2/3)-1);}while(R>8*a);
+   const ct=2*r()-1,st=Math.sqrt(1-ct*ct),ph=r()*6.2832;put(ps,R*st*Math.cos(ph),R*st*Math.sin(ph),R*ct,mix(col,[1,.95,.85],r()*.5),size*(0.6+0.8*r()),al);}};
+ const DM_COL=[.66,.45,1];
+ {const ps=PS(),r=rng(3101);rho2(ps,r,20000,4500,9000,DM_COL,260,0.14);
+  exo({id:'gcdm',name:'Dark-matter glow at the Galactic Centre',cat:'Dark matter & lensing',ra:266.41684,dec:-29.00781,d:8178,pa:0,inc:0,R:4500,view:1.6e4,lmin:200,
+   objs:[points(ps)],g:1,layer:'dmj',win:[2.9,3.4,5.4,5.9],
+   note:'If dark matter annihilates into ordinary particles, the glow traces density squared, so it is brightest where the halo is densest: the Galactic Centre. For an NFW halo the J-factor of the inner few degrees is far larger than that of any dwarf galaxy, but this region is also crowded with pulsars, cosmic rays and gas, which is why the Fermi-LAT “Galactic Centre excess” of GeV gamma rays is still debated. Violet: emissivity ∝ ρ² of the same NFW halo as the Milky Way halo model (scale radius 20 kpc).'});}
+ [['segue1','Segue 1',151.7667,16.0819,23,29,19.5],
+  ['uma2','Ursa Major II',132.8726,63.1335,32,149,19.3],
+  ['ret2','Reticulum II',53.9203,-54.0513,32,32,18.9],
+  ['comaber','Coma Berenices dwarf',186.7454,23.9069,44,77,19.0],
+  ['draco','Draco dwarf',260.0517,57.9153,76,221,18.8],
+  ['umi','Ursa Minor dwarf',227.2854,67.2225,76,181,18.8],
+  ['sculptor','Sculptor dwarf',15.0392,-33.7092,86,283,18.6],
+  ['sextans','Sextans dwarf',153.2625,-1.6147,86,695,18.4],
+  ['carinadw','Carina dwarf',100.4029,-50.9661,105,250,18.1],
+  ['fornax','Fornax dwarf',39.9971,-34.4492,147,710,18.2]].forEach(([id,name,ra,dec,dk,rh,J],k)=>{
+   const r=rng(3200+k),st=PS(),gl=PS();plummer(st,r,rh,1400,[1,.84,.62],rh*0.11,0.9);rho2(gl,r,3*rh,8*rh,1800,DM_COL,rh*0.22,0.05);
+   /* dwarf spheroidals have very low surface brightness: drawn faint (15 %) unless one is the object in view. Without this the
+      northern ones (Ursa Minor, Draco, Segue 1, UMa II), which sit high above the disc, glare in front of a top-down view of the Galaxy */
+   const pS=points(st),pG=points(gl);let me=null;
+   [pS,pG].forEach(obj=>{const ob=obj.onBeforeRender;obj.onBeforeRender=function(...q){if(ob)ob.apply(this,q);const f=state.fly?state.fly.t:state.focus;
+     if(!(me&&f&&f.dso===me))obj.material.uniforms.uOp.value*=0.15;};});
+   const e=exo({id,name,cat:'Dark matter & lensing',ra,dec,d:dk*1000,pa:0,inc:0,R:rh*6,view:rh*14,lmin:rh*0.4,objs:[pG,pS,beacon(COLX.dm)],g:1,mk:[3.4,6.2,4.5],
+    note:`A dwarf spheroidal satellite of the Milky Way, ${dk} kpc away, with a half-light radius of ${rh} pc. Its stars move too fast to be held by their own mass: dark matter outweighs them by a factor of ten to several thousand, and there is almost no gas or young stars to make gamma rays. That makes it one of the cleanest places to look for dark-matter annihilation: log₁₀ J ≈ ${J.toFixed(1)} (GeV² cm⁻⁵, within 0.5°, Fermi-LAT). No signal has been found, which limits the annihilation cross-section to below the thermal-relic value for masses up to about 100 GeV (annihilation to b quarks). Violet: the annihilation glow ∝ ρ² of an NFW halo (schematic).`});
+   me=e;
+   e.facts=['Dwarf spheroidal galaxy',[['Distance',`${dk} kpc`],['Half-light radius',`${rh} pc`],['log\u2081\u2080 J (within 0.5\u00b0)',`${J.toFixed(1)} GeV\u00b2 cm\u207b\u2075`],['Dark matter to stars','10 to several thousand times'],['Gamma-ray signal','none found yet (Fermi-LAT)']]];});}
+
+/* One object, one place. Several objects exist twice: as a catalogue point (HYG star, 2MRS or SDSS galaxy, text
+   label) and as a 3D model, and the two used different distances (e.g. M31 at 820 vs 765 kpc, M104 at 10.95 vs
+   9.55 Mpc, Betelgeuse at 153 vs 168 pc, Cygnus X-1's star at 595 pc from a poor Hipparcos parallax vs 2.22 kpc),
+   so a second copy floated in front of or behind the model. Here every catalogue point and label in the direction
+   of a model (stars: within 0.01 deg; galaxies: 0.02 deg, or the model's angular radius for galaxy models so that
+   satellites such as M32, M110 and NGC 5195 come along) is moved along its own line of sight to the model's
+   distance. Absolute magnitudes are adjusted so the brightness seen from the Sun is unchanged. */
+{const LAY=[[L.stars,1,0],[L.tmrs,MPC,1],[L.sdss,MPC,1]],SKIP={'Nebulae':1,'Large-scale structure':1,'Galactic Centre':1};
+ DSO.forEach(o=>{const d=o.C.length();if(!(d>0))return;const u=o.C.clone().divideScalar(d),gal=d>2e4;
+  if(!SKIP[o.cat]&&o.id!=='mwhalo'){
+   const rad=o.cat==='Galaxies'?Math.min(Math.atan(o.R/d),2*D2R):(gal?0.02:0.01)*D2R,cm=Math.cos(rad);
+   LAY.forEach(([Ly,unit,isGal])=>{if(!!isGal!==gal||!Ly||!Ly.pts)return;const ga=Ly.pts.geometry.attributes,P=ga.position.array,Mg=ga.amag.array,n=P.length/3,dl=d/unit;let hit=0;
+    for(let i=0;i<n;i++){const x=P[3*i],y=P[3*i+1],z=P[3*i+2],r=Math.hypot(x,y,z);if(!(r>0)||(x*u.x+y*u.y+z*u.z)/r<cm)continue;
+      const q=dl/r;if(gal?(q<0.6||q>1.6):(q<0.2||q>5))continue;
+      P[3*i]*=q;P[3*i+1]*=q;P[3*i+2]*=q;Mg[i]-=5*Math.log10(q);hit++;}
+    if(hit){ga.position.needsUpdate=true;ga.amag.needsUpdate=true;}});}
+  LBLV.forEach(e=>{const r=e.v.length();if(e.v.dot(u)/r<Math.cos(0.05*D2R))return;const q=d/r;if(q<0.6||q>1.6)return;e.v.copy(o.C);e.lab.twin=o;});});}
 DSO.forEach(o=>tgt({id:o.id,name:o.name,cat:o.cat,pos:()=>o.C,lmin:o.lmin||o.R*.08,view:o.view,dso:o,note:o.note,ctl:o.ctl}));
 /* close-up targets that follow the hole itself (in a binary it orbits the barycentre) */
 [['cygx1','Cygnus X-1: the black hole',130,'Ray-traced through Schwarzschild spacetime: the 21 M\u2609 black hole of Cygnus X-1 and the inner edge of its accretion disc, which sits at the innermost stable circular orbit, 6 M = 3 Schwarzschild radii = 190 km (spin neglected). The disc is a thin Novikov\u2013Thorne disc at about 10 million K, so it glows in X-rays (drawn as blue-white); the approaching side is Doppler-boosted and bluer, the far side of the disc is lifted over the shadow by lensing, and a thin secondary image hugs the shadow. The blue supergiant companion is 0.24 AU away.',62],
- ['m87','M87*: the event horizon',40,'Ray-traced: the 6.5 billion M\u2609 black hole at the centre of M87, the first black hole imaged (EHT 2019). Its shadow is 5.2 M = 0.0016 light-years across, larger than the Solar System out to Neptune\u2019s orbit three times over. The hot gas, drawn in EHT false colour at 230 GHz, orbits clockwise as seen from Earth, so the bright side is the approaching one; the jet axis is 17\u00b0 from our line of sight. Spin is neglected.',75],
+ ['m87','M87*: the event horizon',40,'Ray-traced: the 6.5 billion M\u2609 black hole at the centre of M87, the first black hole imaged (EHT 2019). Its shadow is 2\u221a27 \u2248 10.4 M \u2248 0.0105 light-years (about 670 AU) across, eleven times the diameter of Neptune\u2019s orbit. The hot gas, drawn in EHT false colour at 230 GHz, orbits clockwise as seen from Earth, so the bright side is the approaching one; the jet axis is 17\u00b0 from our line of sight. Spin is neglected.',75],
  ['ton618','TON 618: the black hole',90,'Ray-traced: one of the most massive black holes known (about 4 \u00d7 10\u00b9\u2070 M\u2609). Its accretion disc, a thin disc whose inner edge glows at tens of thousands of kelvin, is drawn with gravitational redshift and Doppler beaming; light from the far side is bent over and under the shadow. Its event horizon would hold the Solar System many times over.',70]].forEach(([id,name,vk,note,el])=>{
   const b=BHS.find(o=>o.id===id);if(!b)return;
   tgt({id:id+'h',name,cat:'Black holes',pos:()=>b.pos(b),lmin:b.Mpc*4,view:b.Mpc*vk,note,
@@ -1916,14 +2174,16 @@ const COMETS=[
  addLabel('Hills (inner Oort) cloud',()=>ecl2three(-9000,9000,0,new THREE.Vector3()).multiplyScalar(AU),-2.6,-0.6);
  addLabel('Outer Oort cloud',()=>ecl2three(-45000,45000,30000,new THREE.Vector3()).multiplyScalar(AU),-1.6,0.9);}
 
-/* Milky Way: a painted face-on disc from the same analytic model (4 log-spiral arms, 12.5 deg pitch,
-   27 deg bar), with dust lanes on the inner edge of each arm and star-forming knots */
+/* Milky Way: a painted face-on disc from the same analytic model (27 deg bar, the maser-parallax arm centrelines of
+   Reid et al. 2019 in MW_ARMS, trailing), with dust lanes on the inner (concave) edge of each arm and star-forming knots */
 {const N=768,Rm=16000,cv=document.createElement('canvas');cv.width=cv.height=N;const cx=cv.getContext('2d'),img=cx.createImageData(N,N),d=img.data;
  const bar=27*D2R,k=1/Math.tan(12.5*D2R),r=rng(9);
  for(let j=0;j<N;j++)for(let i=0;i<N;i++){const X=(i/N*2-1)*Rm,Y=(j/N*2-1)*Rm,R=Math.hypot(X,Y);let o=4*(j*N+i);if(R>Rm){d[o+3]=255;continue;}
-   const ph=Math.atan2(Y,X),base=k*Math.log(Math.max(R,900)/3000);let arm=0,dust=0;
-   for(let a=0;a<4;a++){let dp=ph-(a*Math.PI/2+base);dp=((dp+Math.PI)%(2*Math.PI)+2*Math.PI)%(2*Math.PI)-Math.PI;
-     arm=Math.max(arm,Math.exp(-dp*dp/(2*0.24*0.24)));dust=Math.max(dust,Math.exp(-Math.pow(dp+0.16,2)/(2*0.05*0.05)));}
+   const phd=Math.atan2(Y,X)/D2R;let arm=0,dust=0;
+   for(const A of MW_ARMS){const lo=A[0]-A[7],hi=A[1]+A[8];
+     for(let n=Math.ceil((lo-phd)/360);n<=Math.floor((hi-phd)/360);n++){const b=phd+360*n,Rc=armRc(A,b);if(Rc<2500||Rc>16500)continue;
+       const w=Math.max(350,2*A[6]*1000*Rc/(A[3]*1000)),dR=R-Rc,f=(b<A[0]||b>A[1]?0.85:1)*A[9];
+       arm=Math.max(arm,f*Math.exp(-dR*dR/(2*w*w)));dust=Math.max(dust,f*Math.exp(-Math.pow(dR+0.7*w,2)/(2*0.06*w*w)));}}
    const disc=Math.exp(-R/2600),edge=1-Math.pow(R/Rm,6);
    const xb=X*Math.cos(bar)+Y*Math.sin(bar),yb=-X*Math.sin(bar)+Y*Math.cos(bar);
    const bul=Math.exp(-(xb*xb/(2*1700*1700)+yb*yb/(2*620*620)))+0.8*Math.exp(-R*R/(2*500*500));
@@ -1933,7 +2193,8 @@ const COMETS=[
    d[o]=Math.min(255,rr*255);d[o+1]=Math.min(255,gg*255);d[o+2]=Math.min(255,bb_*255);d[o+3]=255;}
  cx.putImageData(img,0,0);
  cx.globalCompositeOperation='lighter';
- for(let n=0;n<900;n++){const a=Math.floor(r()*4),R=2500+r()*10500,ph=a*Math.PI/2+k*Math.log(R/3000)+gs(r)*0.12,X=R*Math.cos(ph),Y=R*Math.sin(ph);
+ for(let n=0;n<900;n++){let X=0,Y=0;for(;;){const A=MW_ARMS[Math.floor(r()*MW_ARMS.length)],b=A[0]-A[7]+(A[1]-A[0]+A[7]+A[8])*r(),Rc=armRc(A,b);
+     if(Rc<2500||Rc>14000)continue;const R=Rc+gs(r)*A[6]*1000;X=R*Math.cos(b*D2R);Y=R*Math.sin(b*D2R);break;}
    const px=(X/Rm+1)/2*N,py=(Y/Rm+1)/2*N,s=0.6+r()*1.6,g=cx.createRadialGradient(px,py,0,px,py,s*2);g.addColorStop(0,'rgba(255,120,170,.55)');g.addColorStop(1,'rgba(255,120,170,0)');cx.fillStyle=g;cx.fillRect(px-s*2,py-s*2,s*4,s*4);}
  const tex=new THREE.CanvasTexture(cv);tex.minFilter=THREE.LinearMipmapLinearFilter;tex.anisotropy=Math.min(8,renderer.capabilities.getMaxAnisotropy());
  const R0=8178,pos=[],uv=[];for(const[x,y]of[[-Rm,-Rm],[Rm,-Rm],[Rm,Rm],[-Rm,Rm]]){pos.push(R0-x,0,-y);uv.push((x/Rm+1)/2,1-(y/Rm+1)/2);}
@@ -1942,7 +2203,7 @@ const COMETS=[
    vertexShader:`varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}`,
    fragmentShader:`uniform sampler2D tex;uniform float uOp;varying vec2 vUv;void main(){vec3 c=texture2D(tex,vUv).rgb;gl_FragColor=vec4(c,uOp);}`});
  const mesh=new THREE.Mesh(g,m);mesh.frustumCulled=false;mesh.renderOrder=-0.5;
- mesh.onBeforeRender=()=>{m.uniforms.uOp.value=L.mw.a*0.85*smooth(3.5,4.2,state.logD);};
+ mesh.onBeforeRender=()=>{m.uniforms.uOp.value=L.mw.a*0.85*smooth(3.5,4.2,state.logD)*(L.mw.band===undefined?1:L.mw.band);};
  L.mw.g.add(mesh);}
 /* ---------------- overview targets ---------------- */
 {const N_=ecl2three(0,0,1,new THREE.Vector3()).normalize(),X_=ecl2three(1,0,0,new THREE.Vector3()).normalize();
@@ -1953,7 +2214,7 @@ const COMETS=[
  ov({id:'ov-outer',name:'Outer planets and the Kuiper belt',pos:()=>ZERO,view:140*AU,dir:tilt(0.85),note:'Jupiter to Neptune, the Kuiper belt beyond 42 AU (cold classicals on nearly flat orbits, hot classicals tilted), the plutinos sharing Pluto\u2019s 3:2 resonance with Neptune, and the start of the scattered disc.'});
  ov({id:'ov-helio',name:'Heliosphere and the Voyagers',pos:()=>ZERO,view:900*AU,dir:tilt(1.15),note:'The bubble the solar wind blows in the interstellar medium. The interstellar wind (drifting points) arrives from the direction of Scorpius\u2013Ophiuchus at 26 km/s; inside the blue termination shock the wind is supersonic, and at the amber heliopause it meets interstellar plasma. Both Voyagers have crossed it (green); the surface here is fitted to pass through both crossing points, and the north\u2013south asymmetry comes from the interstellar magnetic field. The tail extends hundreds of AU downwind; whether it is comet-like or a two-lobed \u201ccroissant\u201d is still debated.'});
  ov({id:'ov-oort',name:'Oort cloud',pos:()=>ZERO,view:2.6e5*AU,dir:tilt(0.9),note:'Perhaps 10\u00b9\u00b2 icy bodies from about 2,000 to 100,000 AU, inferred from the orbits of long-period comets (Oort 1950) and never seen directly. Drawn as a population with number density falling as r\u207b\u00b3\u1427\u2075: most bodies sit in the inner (Hills) cloud, flattened towards the planets\u2019 plane, and the outer cloud is a near-spherical halo shaped by passing stars and the Galactic tide. Its outer edge is a third of the way to Proxima Centauri, where the Sun\u2019s gravity stops winning against the Galaxy\u2019s. The small amber bubble at the centre is the heliosphere.'});
- ov({id:'ov-mw',name:'Milky Way from above',pos:()=>new THREE.Vector3(8178,0,0),view:6.5e4,lmin:100,dir:new THREE.Vector3(0.12,1,0.05),note:'Our Galaxy face-on, drawn from an analytic model: a 27\u00b0 bar, four log-spiral arms with dust lanes on their inner edges and pink star-forming regions. The Sun sits 8.2 kpc from the centre, about 20 pc above the plane. No one has seen this view; it is reconstructed from star counts, gas velocities and Gaia distances.'});
+ ov({id:'ov-mw',name:'Milky Way from above',pos:()=>new THREE.Vector3(8178,0,0),view:6.5e4,lmin:100,dir:new THREE.Vector3(0.12,1,0.05),note:'Our Galaxy face-on, drawn from an analytic model: a 27\u00b0 bar and the spiral arms traced by maser parallaxes (Reid et al. 2019: Norma, Scutum\u2013Centaurus, Sagittarius\u2013Carina, the Local spur, Perseus, Outer; extrapolated where unmeasured), with dust lanes on their inner edges and pink star-forming regions. The Sun sits 8.2 kpc from the centre, about 20 pc above the plane. No one has seen this view; it is reconstructed from star counts, gas velocities and Gaia distances.'});
  ov({id:'ov-lg',name:'Local Group',pos:()=>{const m=DSO.find(o=>o.id==='m31');return m?m.C.clone().multiplyScalar(0.4):ZERO;},view:3.2e6,lmin:1e4,dir:new THREE.Vector3(0.3,0.8,0.5),note:'The Milky Way, Andromeda (M31) and Triangulum (M33) with their satellites, all within about 1.5 Mpc. Andromeda is approaching at about 110 km/s and will merge with us in roughly 4\u20135 billion years.'});}
 
 
@@ -1975,7 +2236,7 @@ document.getElementById('layersBtn').addEventListener('click',closeMenu);
 
 /* ------------------------------------------------------------------ per-object controls */
 const ctlEl=document.getElementById('objctl');let ctlFor=null;
-function ctlSync(){const t=state.fly?null:state.focus;const c=t&&t.ctl;if(t===ctlFor&&(!c||!ctlEl.hidden))return;ctlFor=t;
+function ctlSync(){const t0=state.fly?null:state.focus,t=t0===TSUN&&Math.pow(10,state.logD)>0.25*AU?null:t0;/* the Sun's filters only at the Sun */const c=t&&t.ctl;if(t===ctlFor&&(!c||!ctlEl.hidden))return;ctlFor=t;
   if(!c){ctlEl.hidden=true;ctlEl.innerHTML='';return;}
   ctlEl.innerHTML='';const lab=document.createElement('span');lab.textContent=c.title||'View';ctlEl.appendChild(lab);
   c.items.forEach(it=>{const b=document.createElement('button');b.textContent=it.label;b.setAttribute('aria-pressed',String(!!(it.on&&it.on())));
@@ -2011,7 +2272,7 @@ function step(now,T_){bodyPositions(T_);ctlSync();
     const l=u<.5?f.la+(f.peak-f.la)*sm(u/.5):f.peak+(f.lb-f.peak)*sm((u-.5)/.5);
     const m=sm(clamp01((u-.2)/.6));state.F.copy(f.A).lerp(f.t.pos(),m);
     state.logD=state.target=l;state.az=f.az0+(f.az1-f.az0)*sm(u);state.el=f.el0+(f.el1-f.el0)*sm(u);
-    if(u>=1){state.fly=null;state.focus=f.t;state.lmin=Math.log10(f.t.lmin);state.logD=state.target=f.lb;}}
+    if(u>=1){state.fly=null;state.focus=f.t.id==='sun'?TSUN:f.t;state.lmin=Math.log10(f.t.lmin);state.logD=state.target=f.lb;}}
   else state.F.copy(state.focus.pos());}
 
 const camPc=new THREE.Vector3(),rel=new THREE.Vector3(),SC=new THREE.Matrix4();
@@ -2030,13 +2291,13 @@ function update(D,T_,now){const F=state.F,px=pxScale();camPc.copy(camera.positio
     b.u.sunW.value.copy(sunW);if(b.key==='earth')b.u.cRot.value=(d*.004)%1;
     if(b.ring){X.copy(b.Q);Y.crossVectors(b.P,X).negate();b.ring.matrix.makeBasis(X,b.P,Y).scale(tv.set(s,s,s)).setPosition(rel);b.ring.matrixWorldNeedsUpdate=true;
       const u=b.ring.material.uniforms;u.sunW.value.copy(sunW);u.cW.value.copy(rel);u.Rw.value=s;}
-    if(b.corona){b.corona.position.copy(rel);b.corona.scale.setScalar(s*9);b.u.uPxR.value=ang;b.u.uDays.value=((d%270)+270)%270;sunSpots(state.jd,b.u.uSp.value);}});
+    if(b.corona){b.corona.position.copy(rel);b.corona.scale.setScalar(s*12);b.u.uPxR.value=ang;b.u.uDays.value=((d%270)+270)%270;sunSpots(state.jd,b.u.uSp.value);}});
   EX.bodiesOn=any;
   if(any){bodyCam.copy(camera);bodyCam.near=Math.max(near*.9,far*2e-6,1e-12);bodyCam.far=far*1.1;bodyCam.updateProjectionMatrix();}
   /* deep-sky models */
-  DSO.forEach(o=>{const dist=o.C.distanceTo(camPc),ang=o.R/dist*px;const lw=o.win?win(o.win[0],o.win[1],o.win[2],o.win[3],Math.log10(D)):1;const lD_=Math.log10(D),mkOn=!!(o.mk&&lD_>=o.mk[0]&&lD_<=o.mk[1]);const vis=enabled.dso&&(ang>1.2||mkOn)&&lw>0.002;o.grp.visible=vis;if(!vis)return;
+  DSO.forEach(o=>{const dist=o.C.distanceTo(camPc),ang=o.R/dist*px;const lw=o.win?win(o.win[0],o.win[1],o.win[2],o.win[3],Math.log10(D)):1;const lD_=Math.log10(D),mkOn=!!(o.mk&&lD_>=o.mk[0]&&lD_<=o.mk[1]);const vis=dsoOn(o)&&(ang>1.2||mkOn)&&lw>0.002;o.grp.visible=vis;if(!vis)return;
     rel.copy(o.C).sub(F).multiplyScalar(1/D);o.grp.matrix.copy(o.Bm).multiply(SC.makeScale(1/D,1/D,1/D)).setPosition(rel);o.grp.matrixWorldNeedsUpdate=true;
-    const op=Math.max(clamp01((ang-1.2)/6),mkOn?1:0)*lw*(o.cat==='Galaxies'?0.15+0.85*clamp01(2.5*o.R/dist):1);o.grp.children.forEach(c=>{const u=c.material.uniforms;u.uScale.value=1/D;u.uPx.value=px;u.uOp.value=op*(c.material.blending===THREE.NormalBlending?(o.dg||.5):(o.g||1));});if(o.tick)o.tick(now,op);});EX_TICK(now);
+    const op=bandGain(o)*Math.max(clamp01((ang-1.2)/6),mkOn?1:0)*lw*(o.cat==='Galaxies'?0.15+0.85*clamp01(2.5*o.R/dist):1);o.grp.children.forEach(c=>{const u=c.material.uniforms;u.uScale.value=1/D;u.uPx.value=px;u.uOp.value=op*(u.uGain?Math.min(1,bandGain(o)):1)*(c.material.blending===THREE.NormalBlending?(o.dg||.5):(o.g||1));});if(o.tick)o.tick(now,op);});EX_TICK(now);
   /* Galactic Centre */
   {const dist=GC.C.distanceTo(camPc);const vis=enabled.dso&&dist<60;GC.grp.visible=vis;
    if(vis){rel.copy(GC.C).sub(F).multiplyScalar(1/D);GC.grp.position.copy(rel);GC.grp.scale.setScalar(1/D);
@@ -2045,19 +2306,429 @@ function update(D,T_,now){const F=state.F,px=pxScale();camPc.copy(camera.positio
      [GC.stars,GC.s2pt].forEach(o=>{const u=o.material.uniforms;u.uD.value=D;u.uExpo.value=ex;u.uMlim.value=state.mlim;u.uOpacity.value=clamp01((60-dist)/20);});
      GC.orbit.material.opacity=.75*clamp01((0.3-D)/0.2);}
    }
-  grUpdate(D,px);}
+  grUpdate(D,px);addonsFrame(D,px,now);}
 function render(){
   if(EX.lens){renderer.setRenderTarget(rt);renderer.render(scene,camera);
     if(EX.grHalf){renderer.setRenderTarget(grRT);renderer.render(grScene,orthoCam);renderer.setRenderTarget(null);renderer.render(cpScene,orthoCam);}
     else{renderer.setRenderTarget(null);renderer.render(grScene,orthoCam);}}
   else renderer.render(scene,camera);
   if(EX.bodiesOn){renderer.autoClear=false;renderer.clearDepth();renderer.render(bodyScene,bodyCam);renderer.autoClear=true;}}
+/* ---------- key facts for the info card. Where the model states a value (distance, mass, size) the card uses the same one ---------- */
+const FACTS={
+ sun:['G2 V main-sequence star',[['Radius','696,000 km (109 Earths)'],['Mass','1.989 × 10³⁰ kg (333,000 Earths)'],['Surface','5,772 K'],['Core','15.7 million K'],['Luminosity','3.83 × 10²⁶ W'],['Age','4.6 billion years'],['Rotation','25 days (equator) to 35 days (poles)']]],
+ mercury:['Rocky planet',[['Radius','2,440 km (0.38 Earth)'],['Mass','0.055 Earth'],['Orbit','0.387 AU, 88.0 days'],['Solar day','176 Earth days'],['Surface','−180 to 430 °C'],['Moons','0']]],
+ venus:['Rocky planet',[['Radius','6,052 km (0.95 Earth)'],['Mass','0.815 Earth'],['Orbit','0.723 AU, 224.7 days'],['Rotation','243 days, retrograde'],['Surface','464 °C, 92 bar of CO₂'],['Moons','0']]],
+ earth:['Rocky planet',[['Radius','6,371 km'],['Mass','5.97 × 10²⁴ kg'],['Orbit','1 AU (149.6 million km), 365.26 days'],['Sidereal day','23 h 56 min'],['Axial tilt','23.44°'],['Moons','1']]],
+ moon:['Earth’s natural satellite',[['Radius','1,737 km (0.27 Earth)'],['Mass','7.35 × 10²² kg (1/81 Earth)'],['Mean distance','384,400 km'],['Orbit','27.32 days (29.53 days new Moon to new Moon)'],['Surface gravity','1.62 m/s²'],['Receding','3.8 cm per year']]],
+ mars:['Rocky planet',[['Radius','3,390 km (0.53 Earth)'],['Mass','0.107 Earth'],['Orbit','1.524 AU, 687 days'],['Day','24 h 37 min'],['Axial tilt','25.2°'],['Highest peak','Olympus Mons, ~22 km'],['Moons','2 (Phobos, Deimos)']]],
+ jupiter:['Gas giant',[['Radius','69,911 km (11.2 Earths)'],['Mass','318 Earths'],['Orbit','5.20 AU, 11.86 years'],['Day','9 h 56 min'],['Great Red Spot','a storm wider than Earth'],['Moons','95+']]],
+ saturn:['Gas giant',[['Radius','58,232 km (9.4 Earths)'],['Mass','95.2 Earths'],['Density','0.69 g/cm³, less than water'],['Orbit','9.58 AU, 29.4 years'],['Day','10 h 33 min'],['Rings','280,000 km across, tens of metres thick'],['Moons','274 known (2025)']]],
+ uranus:['Ice giant',[['Radius','25,362 km (4.0 Earths)'],['Mass','14.5 Earths'],['Orbit','19.2 AU, 84 years'],['Day','17 h 14 min, retrograde'],['Axial tilt','97.8°'],['Moons','28+']]],
+ neptune:['Ice giant',[['Radius','24,622 km (3.9 Earths)'],['Mass','17.1 Earths'],['Orbit','30.1 AU, 164.8 years'],['Day','16 h 6 min'],['Winds','up to ~2,000 km/h'],['Moons','16']]],
+ sgra:['Supermassive black hole',[['Mass','4.3 million M☉'],['Distance','8.18 kpc (26,700 ly)'],['Schwarzschild radius','12.7 million km (0.085 AU)'],['Star S2','16.05-year orbit, within 120 AU at 7,650 km/s'],['Imaged','Event Horizon Telescope, 2022'],['Nobel Prize','2020 (Genzel, Ghez)']]],
+ sgrah:['Supermassive black hole',[['Mass','4.3 million M☉'],['Schwarzschild radius','12.7 million km'],['Photon sphere','19 million km (3 M)'],['Shadow diameter','66 million km (2√27 M)'],['Seen from Earth','~50 microarcseconds'],['Imaged','Event Horizon Telescope, 2022']]],
+ m42:['Emission nebula (H II region)',[['Distance','412 pc (1,340 ly)'],['Size','~7 pc (24 ly)'],['Young stars','~2,000 in the Orion Nebula Cluster'],['Main ionising star','θ¹ Orionis C, ~33 M☉'],['Naked eye','yes, magnitude 4']]],
+ b33:['Dark nebula (dust pillar)',[['Distance','422 pc'],['Seen against','IC 434, glowing hydrogen'],['Lit by','σ Orionis'],['Part of','the Orion B molecular cloud'],['Discovered','1888, Williamina Fleming']]],
+ m16:['Star-forming pillars in the Eagle Nebula',[['Distance','1.74 kpc (5,700 ly)'],['Tallest pillar','~1.3 pc (4 ly)'],['Eroded by','the young cluster NGC 6611'],['Famous images','Hubble 1995 and 2014, JWST 2022']]],
+ m1:['Supernova remnant (pulsar wind nebula)',[['Distance','2 kpc (6,500 ly)'],['Supernova','seen in July 1054'],['Size','~3.4 pc (11 ly)'],['Expanding','~1,500 km/s'],['Powered by','the Crab pulsar, 4.5 × 10³¹ W']]],
+ ngc7293:['Planetary nebula',[['Distance','200 pc (650 ly)'],['Age','~10,000 years'],['Central star','white dwarf, ~100,000 K'],['Cometary knots','thousands']]],
+ m57:['Planetary nebula',[['Distance','790 pc (2,600 ly)'],['Age','~4,000 years'],['Central star','white dwarf, ~125,000 K'],['Shape','a barrel seen almost end-on'],['Discovered','1779']]],
+ ngc3372:['Emission nebula (H II region)',[['Distance','2.35 kpc (7,700 ly)'],['Brightest star','η Carinae, a system of ~100+ M☉'],['Great Eruption','1843, briefly the second-brightest star'],['Clusters','Trumpler 14 and 16']]],
+ m8:['Emission nebula (H II region)',[['Distance','1.25 kpc (4,100 ly)'],['Size','~34 × 15 pc'],['Bright core','the Hourglass, lit by Herschel 36'],['Naked eye','yes, magnitude ~6']]],
+ lmc:['Barred Magellanic spiral galaxy',[['Distance','50 kpc (163,000 ly)'],['Diameter','~10 kpc'],['Mass','~1.4 × 10¹¹ M☉ with dark matter'],['Stars','~30 billion'],['Hosts','the Tarantula Nebula, SN 1987A']]],
+ smc:['Dwarf irregular galaxy',[['Distance','62 kpc (200,000 ly)'],['Diameter','~6 kpc'],['Mass','~7 × 10⁹ M☉'],['Stars','a few hundred million'],['Linked to the LMC by','the Magellanic Bridge']]],
+ m31:['Spiral galaxy (SA(s)b)',[['Distance','765 kpc (2.5 million ly)'],['Disc diameter','~46 kpc'],['Stars','~1 trillion'],['Total mass','~1–1.5 × 10¹² M☉'],['Central black hole','~1.4 × 10⁸ M☉'],['Approaching us at','~110 km/s']]],
+ m33:['Spiral galaxy (SA(s)cd)',[['Distance','840 kpc (2.7 million ly)'],['Diameter','~19 kpc'],['Stars','~40 billion'],['Central black hole','none found (< 1,500 M☉)'],['Giant H II region','NGC 604']]],
+ cena:['Radio galaxy (elliptical with a dust lane)',[['Distance','3.8 Mpc (12 million ly)'],['Black hole','~5.5 × 10⁷ M☉'],['Jet','~4 kpc in X-rays'],['History','swallowed a gas-rich spiral a few hundred million years ago']]],
+ m51:['Grand-design spiral galaxy',[['Distance','8.6 Mpc (28 million ly)'],['Diameter','~23 kpc'],['Companion','NGC 5195'],['First spiral seen','Lord Rosse, 1845']]],
+ m101:['Spiral galaxy (SAB(rs)cd)',[['Distance','6.7 Mpc (22 million ly)'],['Diameter','~52 kpc'],['Stars','~1 trillion'],['Recent supernovae','SN 2011fe, SN 2023ixf']]],
+ m104:['Spiral galaxy, nearly edge-on',[['Distance','9.6 Mpc (31 million ly)'],['Diameter','~15 kpc'],['Black hole','~10⁹ M☉'],['Globular clusters','~2,000']]],
+ m87:['Giant elliptical galaxy',[['Distance','16.4 Mpc (53 million ly)'],['Black hole','6.5 × 10⁹ M☉'],['Jet','1.5 kpc'],['Globular clusters','~12,000'],['Position','centre of the Virgo Cluster']]],
+ m87h:['Supermassive black hole',[['Mass','6.5 × 10⁹ M☉'],['Schwarzschild radius','1.9 × 10¹³ m (128 AU)'],['Shadow diameter','~670 AU (0.0105 ly)'],['Seen from Earth','~42 microarcseconds'],['Imaged','Event Horizon Telescope, 2019 (first ever)']]],
+ virgo:['Galaxy cluster',[['Distance','16.5 Mpc (54 million ly)'],['Members','~1,500 galaxies'],['Velocity dispersion','640 km/s'],['Virial mass','6.3 × 10¹⁴ M☉'],['Zero-velocity radius','7.0 Mpc']]],
+ laniakea:['Supercluster',[['Diameter','~160 Mpc (520 million ly)'],['Mass','~10¹⁷ M☉'],['Large galaxies','~100,000'],['Defined by','where galaxies flow (Tully et al. 2014)'],['Great Attractor','~70 Mpc away']]],
+ coma:['Rich galaxy cluster',[['Distance','~99 Mpc (320 million ly)'],['Members','1,000+ galaxies'],['Mass','~10¹⁵ M☉'],['Galaxy speeds','~1,000 km/s'],['Dark matter','first inferred here, Zwicky 1933']]],
+ betelgeuse:['Red supergiant (M1–2 Ia)',[['Distance','168 pc (550 ly)'],['Radius','764 R☉ (past Mars’s orbit)'],['Surface','3,600 K'],['Mass','~17–19 M☉'],['Luminosity','~100,000 L☉'],['Fate','supernova, probably within 100,000 years']]],
+ rigel:['Blue supergiant (B8 Ia)',[['Distance','264 pc (860 ly)'],['Radius','79 R☉'],['Surface','12,100 K'],['Luminosity','~100,000 L☉'],['Mass','~21 M☉']]],
+ aldebaran:['Red giant (K5 III)',[['Distance','20.4 pc (67 ly)'],['Radius','44 R☉'],['Surface','3,900 K'],['Mass','~1.2 M☉'],['Luminosity','~440 L☉']]],
+ proxima:['Red dwarf (M5.5 V)',[['Distance','1.302 pc (4.25 ly), the nearest star'],['Radius','0.154 R☉'],['Surface','3,042 K'],['Mass','0.12 M☉'],['Planets','Proxima b (11.2 d, habitable zone), Proxima d']]],
+ barnard:['Red dwarf (M4 V)',[['Distance','1.83 pc (6.0 ly)'],['Radius','0.187 R☉'],['Surface','3,195 K'],['Mass','0.16 M☉'],['Proper motion','10.4″ per year, the largest known'],['Planets','four small planets (2024–25)']]],
+ trappist:['Ultracool red dwarf (M8 V)',[['Distance','12.5 pc (40.7 ly)'],['Radius','0.119 R☉ (about Jupiter’s size)'],['Surface','2,566 K'],['Mass','0.09 M☉'],['Planets','7 Earth-sized, 1.5–18.8 d orbits, 3 in the habitable zone']]],
+ sirius:['Binary: A-type star and white dwarf',[['Distance','2.64 pc (8.6 ly)'],['Sirius A','2.06 M☉, 1.71 R☉, 9,940 K'],['Sirius B','1.02 M☉ in 0.0084 R☉ (Earth-sized), ~25,000 K'],['Orbit','50.1 years'],['Brightest star in the night sky','magnitude −1.46']]],
+ velapsr:['Pulsar (neutron star)',[['Distance','287 pc (940 ly)'],['Spin','89.3 ms (11.2 turns per second)'],['Age','~11,000 years'],['Mass and size','~1.4 M☉ in ~12 km'],['Known for','frequent glitches (sudden spin-ups)']]],
+ crabpsr:['Pulsar (neutron star)',[['Distance','2 kpc (6,500 ly)'],['Spin','33.7 ms (29.7 turns per second)'],['Slowing by','36 ns per day'],['Spin-down power','4.5 × 10³¹ W'],['Born','in the supernova of 1054']]],
+ j0437:['Millisecond pulsar',[['Distance','157 pc (510 ly)'],['Spin','5.76 ms (174 turns per second)'],['Mass','1.42 M☉'],['Radius','11.4 km (NICER)'],['Companion','white dwarf, 5.74-day orbit']]],
+ sgr1806:['Magnetar',[['Distance','~8.7 kpc'],['Spin','7.56 s'],['Magnetic field','~2 × 10¹⁵ gauss'],['Giant flare','27 December 2004']]],
+ cygx1:['Black hole X-ray binary',[['Distance','2.22 kpc (7,200 ly)'],['Black hole','21.2 M☉'],['Companion','blue supergiant, 41 M☉'],['Orbit','5.6 days'],['First black hole identified','1971–72']]],
+ cygx1h:['Stellar-mass black hole',[['Mass','21.2 M☉'],['Schwarzschild radius','63 km'],['Inner disc edge (ISCO)','190 km'],['Disc temperature','~10 million K (X-rays)']]],
+ gaiabh1:['Dormant black hole in a binary',[['Distance','480 pc (1,560 ly)'],['Black hole','9.6 M☉'],['Companion','a Sun-like star'],['Orbit','186 days, 1.4 AU, e = 0.45'],['Found','2022, Gaia astrometry']]],
+ gaiabh3:['Dormant black hole in a binary',[['Distance','590 pc (1,920 ly)'],['Black hole','33 M☉, heaviest stellar one known in the Galaxy'],['Companion','old, metal-poor giant'],['Orbit','11.6 years, e = 0.73'],['Found','2024, Gaia']]],
+ hulse:['Binary neutron star (pulsar)',[['Distance','~6 kpc (uncertain)'],['Masses','1.44 + 1.39 M☉'],['Orbit','7.75 hours, e = 0.62'],['Pulsar spin','59 ms'],['Orbital decay','matches GR to 0.2%'],['Nobel Prize','1993 (Hulse, Taylor)']]],
+ dpsr:['Double pulsar',[['Distance','735 pc (2,400 ly)'],['Pulsars','A: 22.7 ms, B: 2.77 s'],['Masses','1.34 + 1.25 M☉'],['Orbit','2.45 hours'],['GR test','orbital decay to 0.013%'],['Merger in','85 million years']]],
+ casa:['Supernova remnant (core collapse)',[['Distance','3.4 kpc (11,000 ly)'],['Light arrived','around 1680'],['Size','~5 pc'],['Central object','neutron star (Chandra, 1999)']]],
+ tycho:['Supernova remnant (type Ia)',[['Distance','~2.7 kpc (2.5–4)'],['Seen','November 1572, by Tycho Brahe'],['Progenitor','an exploding white dwarf'],['Spectrum','from light echoes, 2008']]],
+ kepler:['Supernova remnant (type Ia)',[['Distance','~5.1 kpc'],['Seen','October 1604, by Kepler'],['Last naked-eye supernova','in the Milky Way']]],
+ sn1006:['Supernova remnant (type Ia)',[['Distance','2.2 kpc (7,200 ly)'],['Peak brightness','magnitude ~−7.5'],['Recorded in','China, Egypt, Iraq, Japan, Europe'],['Shock electrons','~100 TeV']]],
+ velasnr:['Supernova remnant',[['Distance','287 pc (940 ly)'],['Age','~11,000 years'],['Size on the sky','8°, sixteen full Moons'],['Left behind','the Vela pulsar']]],
+ sn1987a:['Supernova (type II)',[['Distance','51.4 kpc, in the LMC'],['Seen','23 February 1987'],['Progenitor','blue supergiant Sanduleak −69° 202'],['Neutrinos','24 detected, ~2 hours before the light'],['Neutron star','evidence from JWST, 2024']]],
+ sn2011fe:['Supernova (type Ia), in M101',[['Distance','6.4–6.7 Mpc'],['Discovered','24 August 2011, within hours'],['Role','calibrator for the distance ladder']]],
+ sn2023ixf:['Supernova (type II), in M101',[['Distance','6.7 Mpc'],['Discovered','19 May 2023'],['Progenitor','red supergiant, found in archival images']]],
+ gw170817:['Binary neutron-star merger',[['Distance','40 Mpc (130 million ly)'],['Detected','17 August 2017 (LIGO, Virgo)'],['Masses','1.17–1.60 M☉'],['Host galaxy','NGC 4993'],['Gamma-ray burst','1.7 s after the merger'],['Kilonova','AT2017gfo: gold, platinum']]],
+ oj287:['Blazar (binary black hole candidate)',[['Redshift','z = 0.306'],['Outbursts','about every 12 years since 1888'],['Proposed masses','1.8 × 10¹⁰ + ~10⁸ M☉ (debated)']]],
+ ton618:['Hyperluminous quasar',[['Redshift','z = 2.219'],['Light left','10.8 billion years ago'],['Black hole','~4–6 × 10¹⁰ M☉']]],
+ ton618h:['Ultramassive black hole',[['Mass','~4 × 10¹⁰ M☉'],['Schwarzschild radius','~790 AU'],['Light left','10.8 billion years ago']]],
+ '3c273':['Quasar',[['Redshift','z = 0.158'],['Light left','~2 billion years ago'],['Identified','1963, Maarten Schmidt'],['Jet','~60 kpc'],['Brightest quasar in our sky','magnitude ~12.9']]],
+ mwhalo:['Dark-matter halo',[['Radius','~200 kpc'],['Mass','~10¹² M☉, 5–10× the visible mass'],['Profile drawn','NFW, scale radius 20 kpc'],['Density at the Sun','~0.3–0.4 GeV/cm³']]],
+ bullet:['Colliding galaxy clusters',[['Redshift','z = 0.296'],['Light left','~3.4 billion years ago'],['Shock speed','~4,700 km/s'],['Key result','lensing mass offset from the hot gas (Clowe et al. 2006)']]],
+ einsteincross:['Quadruply lensed quasar',[['Quasar','z = 1.695'],['Lens galaxy','z = 0.039'],['Einstein radius','0.90″'],['Image spread','~1.8″'],['Discovered','1985']]],
+ twinqso:['Doubly lensed quasar',[['Quasar','z = 1.41'],['Lens','galaxy G1 and its cluster, z = 0.36'],['Separation','6.1″'],['Time delay','~417 days'],['First lens found','1979']]],
+ horseshoe:['Near-complete Einstein ring',[['Source','z = 2.38'],['Lens galaxy','z = 0.444'],['Ring radius','5″, 300° of arc'],['Mass inside the ring','~5 × 10¹² M☉']]],
+ a1689:['Massive lensing cluster',[['Redshift','z = 0.183'],['Einstein radius','~47″'],['Lensed images','100+ of ~30 background galaxies']]],
+ gcdm:['Dark-matter annihilation target',[['Distance','8.18 kpc'],['J-factor','the largest on the sky'],['Signal','Fermi-LAT GeV excess, debated (pulsars?)'],['Glow traces','density squared, ρ²']]],
+ voyager1:['Spacecraft',[['Launched','5 September 1977'],['Heliopause crossed','25 August 2012, at 121.6 AU'],['Speed','~17 km/s (3.6 AU per year)'],['Status','most distant human-made object']]],
+ voyager2:['Spacecraft',[['Launched','20 August 1977'],['Visited','Jupiter, Saturn, Uranus 1986, Neptune 1989'],['Heliopause crossed','5 November 2018, at 119.7 AU'],['Speed','~15 km/s']]],
+ halley:['Periodic comet',[['Period','~76 years'],['Nucleus','~15 × 8 km'],['Last perihelion','9 February 1986'],['Next','28 July 2061'],['Meteor showers','Eta Aquariids, Orionids']]],
+ halebopp:['Long-period comet',[['Nucleus','~60 km'],['Perihelion','1 April 1997'],['Naked eye','18 months, a record'],['Returns','around 4380 AD']]],
+ neowise:['Long-period comet',[['Perihelion','3 July 2020, 0.29 AU'],['Aphelion','~700 AU'],['Returns in','~6,700 years']]],
+ oumuamua:['First interstellar object',[['Found','19 October 2017, Pan-STARRS'],['Eccentricity','1.20 (unbound)'],['Speed far from the Sun','26 km/s'],['Puzzle','no coma, yet a slight non-gravitational push']]],
+ borisov:['Interstellar comet',[['Found','August 2019, Gennadiy Borisov'],['Eccentricity','3.36'],['Speed far from the Sun','32 km/s'],['Coma','rich in carbon monoxide']]],
+ atlas3i:['Interstellar object',[['Found','1 July 2025, ATLAS'],['Eccentricity','6.14'],['Speed far from the Sun','58 km/s'],['Perihelion','29 October 2025, 1.36 AU']]],
+ 'ov-ss':['Planetary system',[['Planets','8'],['Age','4.57 billion years'],['Mass in the Sun','99.86%'],['Edge of the heliosphere','~120 AU']]],
+ 'ov-inner':['Rocky planets and the main belt',[['Planets','Mercury, Venus, Earth, Mars'],['Main belt','2.1–3.3 AU'],['Belt mass','~3% of the Moon’s'],['Gaps','Kirkwood gaps, Jupiter resonances']]],
+ 'ov-outer':['Giant planets and the Kuiper belt',[['Planets','Jupiter, Saturn, Uranus, Neptune'],['Kuiper belt','~30–50 AU'],['Pluto','39.5 AU, 248 years, 3:2 with Neptune']]],
+ 'ov-helio':['The Sun’s bubble in interstellar space',[['Termination shock','84–94 AU'],['Heliopause','~120 AU'],['Interstellar wind','26 km/s from Scorpius–Ophiuchus'],['Crossed by','Voyager 1 (2012), Voyager 2 (2018)']]],
+ 'ov-oort':['Cloud of icy bodies (inferred)',[['Extent','~2,000 to 100,000 AU'],['Bodies','perhaps 10¹²'],['Outer edge','over a third of the way to Proxima'],['Evidence','orbits of long-period comets (Oort 1950)']]],
+ 'ov-mw':['Barred spiral galaxy',[['Disc diameter','~30 kpc (100,000 ly)'],['Stars','100–400 billion'],['Total mass','~1–1.5 × 10¹² M☉'],['Sun','8.18 kpc from the centre, ~230 km/s'],['One orbit of the Sun','~220 million years']]],
+ 'ov-lg':['Galaxy group',[['Extent','~1.5 Mpc'],['Members','80+ galaxies'],['Largest','Andromeda, the Milky Way, Triangulum'],['Andromeda','approaching at ~110 km/s']]]};
+/* the scale levels, shown in the card while zooming freely out from the Sun */
+Object.assign(FACTS,{
+ 'reg:Cosmic neutrino background':['Relic neutrinos',[['Released','~1 s after the Big Bang (T ≈ 1 MeV)'],['Temperature today','1.95 K, (4/11)^1/3 of the CMB’s'],['Number density','~336 per cm³ (three flavours, ν and ν̅)'],['Shell drawn at','~14.2 Gpc (massless approximation)'],['Detected','not directly; N_eff = 2.99 ± 0.17 from the CMB (Planck 2018)']]],
+ 'reg:Cosmic microwave background':['The oldest light',[['Released','380,000 years after the Big Bang, z ≈ 1090'],['Temperature today','2.7255 K'],['Fluctuations','about 1 part in 100,000'],['Comoving distance','13.9 Gpc'],['Map shown','WMAP 7-year ILC']]],
+ 'reg:Cosmic web':['Large-scale structure',[['Pattern','filaments, walls and voids'],['Typical void','~30–50 Mpc across'],['Galaxies shown','SDSS DR17 and 2MRS redshift surveys'],['Large structures','Sloan Great Wall, ~420 Mpc long']]],
+ 'reg:Local Universe':['Our cosmic neighbourhood',[['Out to','~300 Mpc'],['Galaxies shown','2MRS, ~43,500 with measured redshifts'],['Home supercluster','Laniakea'],['Landmarks','Virgo, Coma, the Great Attractor']]],
+ 'reg:Stellar neighbourhood':['The Sun’s neighbourhood',[['Stars shown','~109,000 (HYG catalogue)'],['Nearest star','Proxima Centauri, 1.30 pc'],['Within 10 pc','~540 stars and brown dwarfs'],['Local Bubble','hot, thin gas ~100 pc across']]]});
+FACTS['reg:Local Group']=FACTS['ov-lg'];FACTS['reg:Milky Way']=FACTS['ov-mw'];FACTS['reg:Solar System']=FACTS['ov-ss'];
+
+/* ---------- 9. light bands: see the sky as it looks at other wavelengths ----------
+   Not a simulation of each band's physics: every object and catalogue is re-weighted by how bright that class of source is
+   in the band, and the view is drawn in false colour. Stars get a colour-dependent weight (cool, red stars brighten in the
+   infrared; blue ones fade). Index: 0 radio, 1 microwave, 2 infrared, 3 visible, 4 X-ray, 5 gamma-ray. */
+const BANDS=[
+ ['Radio','Synchrotron from jets, remnants and pulsars; cold hydrogen. Ordinary stars all but vanish.','sepia(0.85) saturate(1.8) hue-rotate(-18deg)'],
+ ['Microwave','The cosmic microwave background, 2.7 K; little else shines.','saturate(0.6) brightness(0.9)'],
+ ['Infrared','Cool stars and warm dust; it sees through dust into the Galactic Centre.','sepia(0.45) saturate(1.5) hue-rotate(-28deg)'],
+ ['Visible','What the eye sees.',''],
+ ['X-ray','Million-degree gas: cluster gas, supernova remnants, gas falling into black holes, the solar corona.','sepia(0.6) saturate(2.1) hue-rotate(168deg)'],
+ ['Gamma-ray','The most energetic light: pulsars, blazars, the Galactic plane, the GW170817 burst.','sepia(0.6) saturate(2.3) hue-rotate(245deg)']];
+const BAND={i:3};
+/* catalogue layers: [linear gain, red-weight exponent] per band */
+const BCAT={stars:[[0.01,0],[0.004,0],[1.0,1.6],[1,0],[0.02,0],[0.003,0]],
+  tmrs:[[0.3,0],[0.05,0],[1.3,0.8],[1,0],[0.12,0],[0.03,0]],
+  sdss:[[0.25,0],[0.05,0],[1.1,0.8],[1,0],[0.12,0],[0.03,0]],
+  mw:[[0.05,0],[0.02,0],[1.2,1.6],[1,0],[0.012,0],[0.04,0]]};
+/* objects: weight per category, with per-object overrides */
+const BCATW={'Stars':[0.04,0.01,1.2,1,0.06,0.01],'Neutron stars & pulsars':[1.8,0.3,0.4,0.7,1.5,1.7],
+  'Binaries & gravitational waves':[0.8,0.1,0.8,1,1.0,0.6],'Supernovae':[1.6,0.3,1.1,1,1.6,0.8],'Black holes':[1.5,0.4,1.0,1,1.4,1.2],
+  'Nebulae':[0.7,0.3,1.6,1,0.12,0.02],'Galaxies':[0.35,0.1,1.0,1,0.2,0.05],'Dark matter & lensing':[0.3,0.05,0.9,1,0.5,0.1],
+  'Large-scale structure':[0.3,0.05,1.0,1,1.0,0.1],'Galactic Centre':[1.3,0.4,1.6,0.35,0.7,0.6],'Comets & spacecraft':[0.3,0.05,0.9,1,0.3,0.02]};
+const BOBJ={m1:[1.6,0.4,1.1,1,1.8,1.7],ngc3372:[0.7,0.3,1.6,1,0.6,0.05],b33:[0.3,0.2,1.5,1,0.05,0.01],
+  cena:[1.9,0.4,1,1,1.0,0.6],m87:[1.9,0.3,1,1,1.1,0.5],m51:[0.6,0.1,1,1,0.25,0.05],m31:[0.35,0.1,1.1,1,0.2,0.05],
+  cygx1:[0.9,0.1,0.7,1,1.9,0.5],gaiabh1:[0.02,0.01,1,1,0.03,0],gaiabh3:[0.02,0.01,1,1,0.03,0],
+  hulse:[1.8,0.2,0.2,0.5,0.4,0.6],dpsr:[1.8,0.2,0.2,0.5,0.4,0.6],gw170817:[0.9,0.1,1.2,1,0.9,1.9],
+  sn1006:[1.4,0.3,0.6,1,1.8,1.0],casa:[1.9,0.4,1.2,1,1.7,0.7],sn2011fe:[0.3,0.05,1,1,0.15,0.05],sn2023ixf:[0.3,0.05,1,1,0.15,0.05],sn1987a:[1.3,0.3,1.2,1,1.2,0.3],
+  oj287:[1.8,0.6,1,1,1.4,1.8],ton618:[0.3,0.2,1.1,1,1.0,0.2],'3c273':[1.8,0.5,1,1,1.5,1.4],
+  bullet:[0.4,0.1,0.8,1,1.6,0.05],a1689:[0.3,0.05,0.9,1,1.3,0.05],coma:[0.6,0.1,1,1,1.4,0.05],virgo:[0.5,0.1,1,1,1.2,0.1],
+  laniakea:[1,1,1,1,1,1],mwhalo:[1,1,1,1,1,1],gcdm:[1,1,1,1,1,1.8]};
+['segue1','uma2','ret2','comaber','draco','umi','sculptor','sextans','carinadw','fornax'].forEach(id=>{BOBJ[id]=[0.02,0.01,0.9,1,0.02,0.02];});
+function bandGain(o){const b=BAND.i;if(b===3)return 1;const t=BOBJ[o.id]||BCATW[o.cat],w=t?t[b]:1;return w<1?w*w:w;}   // weights below 1 squared: faint sources fade properly
+/* catalogue shader: brightness offset in magnitudes, gain x (colour proxy)^exponent */
+['stars','tmrs','sdss','mw'].forEach(k=>{const m=L[k]&&L[k].pts&&L[k].pts.material;if(m)m.uniforms.uBand.value.set(1,0,0,0);});
+function setBand(i){BAND.i=i;['stars','tmrs','sdss','mw'].forEach(k=>{const m=L[k]&&L[k].pts&&L[k].pts.material,w=BCAT[k][i];if(m)m.uniforms.uBand.value.set(w[0],w[1],0,0);});
+  renderer.domElement.style.filter=BANDS[i][2];
+  B.sun.u.uFilt.value=i>=4?2:0;B.sun.corona.material.uniforms.uFilt.value=i>=4?2:0;   // the Sun in X-ray / gamma: its million-degree corona
+  L.mw.band=BDISC[i];L.cmb.band=BCMB[i];
+  bandUI();}
+/* the painted face-on Milky Way and the CMB map follow the band too (factors kept on their layers, read by the render loop) */
+const BDISC=[0.12,0.04,1.0,1,0.03,0.12],BCMB=[0.35,1,0.12,1,0.04,0.04];
+L.mw.band=1;L.cmb.band=1;
+
+/* =====================================================================================
+   ADD-ONS
+   1. Per-object overlays: black-hole radii (horizon, photon sphere, ISCO, exact shadow edge), lens Einstein radius,
+      Milky Way rotation curve (with and without the dark-matter halo).
+   2. Dark-sector layers: cosmic neutrino background shell, dark-matter wind at the Sun (targets are DSO models).
+   3. Look-back horizon: show only light emitted within a chosen look-back time.
+   5. Sound on the objects that have one: pulsars at their true spin periods, the GW170817 chirp in real time.
+   6. Locator map. 7. Sky-event calendar. 8. Info card with key facts for the object in view.
+   ===================================================================================== */
+const HOOKS=[];
+const $id=id=>document.getElementById(id);
+const byId=id=>T.find(t=>t.id===id);
+function addCtl(t,item,title){if(!t)return;if(!t.ctl)t.ctl={title:title||'More',items:[]};t.ctl.items.push(item);}
+const cssPx=()=>pxScale()/renderer.getPixelRatio();
+const A1=new THREE.Vector3(),A2=new THREE.Vector3(),A3=new THREE.Vector3();
+let Dcur=1;
+function prj(p,D,w,h){A1.copy(p).sub(state.F).multiplyScalar(1/D).project(camera);return{x:(A1.x*.5+.5)*w,y:(-A1.y*.5+.5)*h,front:A1.z<1&&A1.z>-1};}
+function fmtLen(pc){const km=pc*3.0856776e13;if(km<1e6)return Math.round(km).toLocaleString()+' km';if(pc<0.02)return (pc/AU).toPrecision(3)+' AU';
+  if(pc<1e3)return pc.toPrecision(3)+' pc';if(pc<1e6)return (pc/1e3).toPrecision(3)+' kpc';if(pc<1e9)return (pc/1e6).toPrecision(3)+' Mpc';return (pc/1e9).toPrecision(3)+' Gpc';}
+const OV={bh:false,ein:false,map:innerWidth>=720};
+
+/* ---------- 1. overlays on a 2D canvas above the WebGL view ---------- */
+const ovl=document.createElement('canvas');ovl.id='ovl';ovl.setAttribute('aria-hidden','true');document.body.insertBefore(ovl,$id('labels'));
+const og=ovl.getContext('2d');let ovW=0,ovH=0,ovR=0,ovUsed=false;
+function ovSize(){const r=window.devicePixelRatio||1,w=innerWidth,h=innerHeight;if(w!==ovW||h!==ovH||r!==ovR){ovW=w;ovH=h;ovR=r;ovl.width=Math.round(w*r);ovl.height=Math.round(h*r);}og.setTransform(r,0,0,r,0,0);}
+function ring(cx,cy,pts,col,dash,lab,lw){og.save();og.strokeStyle=col;og.lineWidth=lw||1.3;og.setLineDash(dash||[]);og.beginPath();
+  pts.forEach((p,i)=>i?og.lineTo(p.x,p.y):og.moveTo(p.x,p.y));og.closePath();og.stroke();og.restore();
+  if(lab){let b=pts[0];pts.forEach(p=>{if(p.x>b.x)b=p;});og.fillStyle=col;og.font='500 12px Figtree, system-ui, sans-serif';og.fillText(lab,b.x+6,b.y+4);}}
+function circ(c,r,n){const p=[];for(let i=0;i<n;i++){const a=i/n*6.2832;p.push({x:c.x+r*Math.cos(a),y:c.y+r*Math.sin(a)});}return p;}
+function bhOverlay(D,w,h){const f=state.fly?null:state.focus;if(!OV.bh||!f)return false;const b=BHS.find(o=>o.id+'h'===f.id);if(!b)return false;
+  b.pos(b);b.nrm(b);const c=prj(b.p,D,w,h);if(!c.front)return false;const M=b.Mpc,r=b.p.distanceTo(camPc);if(r<3.2*M)return false;
+  const F=cssPx();
+  /* exact apparent edge of the shadow for a static observer at radius r (Synge 1966): sin(alpha) = sqrt(27) M / r * sqrt(1 - 2M/r) */
+  const sa=Math.min(1,Math.sqrt(27)*M/r*Math.sqrt(1-2*M/r)),rs=Math.tan(Math.asin(sa))*F;
+  const leg=[['rgba(236,230,218,.95)','Shadow edge, b = √27 M (lensed, exact)']];let xr=c.x+rs;
+  ring(c.x,c.y,circ(c,rs,128),'rgba(236,230,218,.95)',null,null,1.6);
+  const n=b.n,e1=A2.set(0,1,0).cross(n);if(e1.lengthSq()<1e-8)e1.set(1,0,0).cross(n);e1.normalize();const e2=A3.copy(n).cross(e1).normalize();
+  const Mkm=M*3.0856776e13;
+  [[2,'rgba(255,120,110,.95)','Event horizon 2M'],[3,'rgba(255,200,120,.95)','Photon sphere 3M'],[6,'rgba(150,200,255,.95)','ISCO 6M']].forEach(([k,col,lab])=>{
+    const pts=[];for(let i=0;i<120;i++){const a=i/120*6.2832;const p=b.p.clone().addScaledVector(e1,k*M*Math.cos(a)).addScaledVector(e2,k*M*Math.sin(a));const q=prj(p,D,w,h);if(!q.front)return;pts.push(q);}
+    const km=k*Mkm;pts.forEach(q=>{if(q.x>xr)xr=q.x;});ring(c.x,c.y,pts,col,[5,4],null,1.2);leg.push([col,`${lab} = ${km<1e6?Math.round(km).toLocaleString()+' km':(km/1.495978707e8).toPrecision(3)+' AU'}`]);});
+  const narrow=w<720,lx=narrow?78:Math.min(xr+16,w-260),ly=narrow?Math.min(h-250,c.y+rs+28):c.y-30;   // phones: legend under the ring
+  og.font='500 12px Figtree, system-ui, sans-serif';leg.forEach(([col,t],i)=>{const y=ly+i*17;og.fillStyle=col;og.fillRect(lx,y-4,12,2);og.fillText(t,lx+18,y);});
+  og.fillStyle='rgba(236,230,218,.7)';og.font='400 11.5px Figtree, system-ui, sans-serif';
+  const mtxt='M = GM/c² = '+(Mkm<1e6?Math.round(Mkm).toLocaleString()+' km':(Mkm/1.495978707e8).toPrecision(3)+' AU');
+  if(narrow){og.fillText('Dashed: true radii in the disc plane, not lensed.',lx,ly+4*17+4);og.fillText(mtxt,lx,ly+5*17+4);}
+  else og.fillText('Dashed: true radii in the disc plane, not lensed. '+mtxt,Math.max(12,c.x-rs),Math.min(h-90,c.y+rs+22));
+  return true;}
+function lensOverlay(D,w,h){const f=state.fly?null:state.focus;if(!OV.ein||!f||!f.dso||!f.dso.lensRef)return false;const o=f.dso,L_=o.lensRef,c=prj(o.C,D,w,h);if(!c.front)return false;
+  const R=L_.th(L_.m.b),rp=R/o.C.distanceTo(camPc)*cssPx();
+  ring(c.x,c.y,circ(c,rp,128),'rgba(140,255,210,.95)',[6,4],null,1.4);
+  og.fillStyle='rgba(140,255,210,.95)';og.font='500 12px Figtree, system-ui, sans-serif';og.textAlign='center';   // caption under the ring, clear of the object's label
+  og.fillText(`Einstein radius θE = ${L_.m.b.toFixed(2)}″ = ${fmtLen(R)} at the lens`,Math.max(150,Math.min(w-150,c.x)),c.y+rp+20);og.textAlign='left';return true;}
+T.filter(t=>BHS.some(o=>o.id+'h'===t.id)).forEach(t=>addCtl(t,{label:'Horizon, photon sphere and ISCO',on:()=>OV.bh,go:()=>{OV.bh=!OV.bh;}},'Overlay'));
+T.filter(t=>t.dso&&t.dso.lensRef).forEach(t=>addCtl(t,{label:'Einstein radius',on:()=>OV.ein,go:()=>{OV.ein=!OV.ein;}}));
+
+/* rotation curve card: bulge (Hernquist 1e10 Msun, a = 0.6 kpc), disc (Miyamoto-Nagai 6.5e10 Msun, a = 3 kpc, b = 0.28 kpc)
+   and an NFW halo with r_s = 20 kpc normalised so the total is 229 km/s at R0 = 8.178 kpc; observed: Eilers et al. 2019,
+   v_c = 229.0 - 1.7 (R - 8.122) km/s from 5 to 25 kpc (systematic band +-8 km/s) */
+/* drawn into the info card of the Milky Way entries */
+function drawRC(rcCv){const r=window.devicePixelRatio||1,W=rcCv.clientWidth||300,H=rcCv.clientHeight||170;rcCv.width=W*r;rcCv.height=H*r;const g=rcCv.getContext('2d');g.setTransform(r,0,0,r,0,0);g.clearRect(0,0,W,H);
+  const G=4.3009e-6,vb2=R=>G*1e10*R/((R+0.6)*(R+0.6)),vd2=R=>G*6.5e10*R*R/Math.pow(R*R+3.28*3.28,1.5),fN=x=>Math.log(1+x)-x/(1+x),R0=8.178;
+  const K=(229*229-vb2(R0)-vd2(R0))*R0/fN(R0/20),vh2=R=>K*fN(R/20)/R;
+  const x0=34,x1=W-8,y0=H-22,y1=8,X=R=>x0+(x1-x0)*R/25,Y=v=>y0-(y0-y1)*v/300;
+  g.font='400 10.5px Figtree, system-ui, sans-serif';g.fillStyle='#8f8a80';g.strokeStyle='rgba(236,230,218,.14)';g.lineWidth=1;
+  for(let v=0;v<=300;v+=100){g.beginPath();g.moveTo(x0,Y(v));g.lineTo(x1,Y(v));g.stroke();g.fillText(String(v),4,Y(v)+3.5);}
+  for(let R=0;R<=25;R+=5){g.fillText(String(R),X(R)-(R?5:0),H-6);}
+  g.fillText('km/s',4,y1+2);g.textAlign='right';g.fillText('R, kpc',x1,H-6);g.textAlign='left';
+  g.fillStyle='rgba(236,230,218,.16)';g.beginPath();for(let R=5;R<=25;R+=0.5)g.lineTo(X(R),Y(229-1.7*(R-8.122)+8));for(let R=25;R>=5;R-=0.5)g.lineTo(X(R),Y(229-1.7*(R-8.122)-8));g.closePath();g.fill();
+  const line=(fn,col,dash,wd)=>{g.save();g.strokeStyle=col;g.lineWidth=wd;g.setLineDash(dash||[]);g.beginPath();for(let R=0.2;R<=25;R+=0.1)g.lineTo(X(R),Y(Math.sqrt(fn(R))));g.stroke();g.restore();};
+  line(vh2,'rgba(168,115,255,.8)',[4,3],1.2);line(R=>vb2(R)+vd2(R),'#ffc58a',null,1.8);line(R=>vb2(R)+vd2(R)+vh2(R),'#a9c8ff',null,1.8);
+  g.fillStyle='#ece6da';g.beginPath();g.arc(X(R0),Y(229),3,0,7);g.fill();g.fillText('Sun',X(R0)+5,Y(229)-6);}
+HOOKS.push(()=>{document.body.classList.toggle('hasctl',!$id('objctl').hidden);});   // phones: the scale list steps aside for object controls
+
+/* ---------- 2. dark-sector layers ---------- */
+const CNU_COL=new THREE.Vector3(.45,.9,.85);
+const limbMat=(col,k)=>new THREE.ShaderMaterial({transparent:true,depthTest:false,depthWrite:false,blending:THREE.AdditiveBlending,side:THREE.DoubleSide,uniforms:{uOp:{value:0},uCol:{value:col}},
+  vertexShader:`varying vec3 vN;varying vec3 vV;void main(){vec4 mv=modelViewMatrix*vec4(position,1.0);vN=normalize(normalMatrix*normal);vV=normalize(-mv.xyz);gl_Position=projectionMatrix*mv;}`,
+  fragmentShader:`uniform float uOp;uniform vec3 uCol;varying vec3 vN;varying vec3 vV;void main(){float f=1.0-abs(dot(normalize(vN),normalize(vV)));gl_FragColor=vec4(uCol,uOp*(${k[0].toFixed(3)}+${k[1].toFixed(3)}*pow(f,3.0)));}`});
+const cnuMesh=new THREE.Mesh(new THREE.SphereGeometry(1,96,48),limbMat(CNU_COL,[0.025,0.5]));cnuMesh.frustumCulled=false;cnuMesh.renderOrder=-1;
+cnuMesh.onBeforeRender=()=>{cnuMesh.material.uniforms.uOp.value=L.cnub.a;};L.cnub.g.add(cnuMesh);
+const cnuLab=new THREE.Vector3();addLabel('Cosmic neutrino background, 1.95 K',()=>cnuLab,9.55,11);
+/* dark-matter wind: the Sun moves through the (non-rotating) halo at (U, V + v_c, W) = (11.1, 12.24 + 233, 7.25) km/s
+   (Schonrich et al. 2010; v_c ~ 233 km/s), i.e. ~245 km/s towards l = 87.4 deg, b = 1.7 deg, in Cygnus. The wind blows the
+   other way, with the halo's ~160 km/s velocity dispersion (Standard Halo Model) shown as a spread of directions. */
+const VSUN=(()=>{const l=87.4*D2R,b=1.7*D2R;return new THREE.Vector3(Math.cos(b)*Math.cos(l),Math.sin(b),-Math.cos(b)*Math.sin(l));})();
+{const n=1800,r=rng(1717),a0=new Float32Array(n*3),ad=new Float32Array(n*3),ap=new Float32Array(n),as=new Float32Array(n);
+ const w=VSUN.clone().negate(),u=new THREE.Vector3(0,1,0).cross(w).normalize(),v=w.clone().cross(u);
+ for(let i=0;i<n;i++){const rr=Math.sqrt(r()),t=r()*6.2832;const p=u.clone().multiplyScalar(rr*Math.cos(t)).addScaledVector(v,rr*Math.sin(t)).addScaledVector(w,-1);
+   a0.set([p.x,p.y,p.z],3*i);const s=245/160,d=w.clone().multiplyScalar(s).add(new THREE.Vector3(gs(r),gs(r),gs(r))).normalize();
+   ad.set([d.x,d.y,d.z],3*i);ap[i]=r();as[i]=0.05+0.05*r();}
+ const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(a0,3));g.setAttribute('adir',new THREE.BufferAttribute(ad,3));g.setAttribute('aph',new THREE.BufferAttribute(ap,1));g.setAttribute('asp',new THREE.BufferAttribute(as,1));
+ const m=new THREE.ShaderMaterial({transparent:true,depthTest:false,depthWrite:false,blending:THREE.AdditiveBlending,uniforms:{uT:{value:0},uOp:{value:0},uPs:{value:3.6*DPR}},
+  vertexShader:`attribute vec3 adir;attribute float aph,asp;uniform float uT,uPs;varying float vF;void main(){float f=fract(aph+uT*asp);vF=f;vec3 p=position+adir*f*2.0;gl_Position=projectionMatrix*modelViewMatrix*vec4(p,1.0);gl_PointSize=uPs;}`,
+  fragmentShader:`uniform float uOp;varying float vF;void main(){vec2 q=gl_PointCoord*2.0-1.0;float r2=dot(q,q);if(r2>1.0)discard;gl_FragColor=vec4(0.78,0.6,1.0,uOp*sin(3.14159*vF)*exp(-1.6*r2));}`});
+ const pts=new THREE.Points(g,m);pts.frustumCulled=false;pts.renderOrder=7;L.dmwind.g.add(pts);
+ pts.onBeforeRender=()=>{m.uniforms.uT.value=performance.now()/1000;m.uniforms.uOp.value=L.dmwind.a;};
+ HOOKS.push(D=>{pts.scale.setScalar(0.45*D);});}
+const windLab=new THREE.Vector3();addLabel('Dark-matter wind from Cygnus, ~245 km/s',()=>windLab.copy(VSUN).multiplyScalar(0.5*Dcur),-0.4,2.2);
+
+/* ---------- relic-neutrino shell radius: comoving distance a massless particle covers from z = 1e10 to today, in the
+   page's flat LambdaCDM (Planck 2018, H0 = 67.66, Omega_m = 0.30966, Omega_r h^2 = 4.165e-5, which reproduces the baked tables) ---------- */
+const Zt=C.ztab,ZSTAR=zOfChi(C.chistar);
+const interp=(xs,ys,x)=>{if(x<=xs[0])return ys[0]*x/xs[0];for(let i=1;i<xs.length;i++)if(xs[i]>=x){const f=(x-xs[i-1])/(xs[i]-xs[i-1]);return ys[i-1]+f*(ys[i]-ys[i-1]);}return ys[ys.length-1];};
+const CHINU=(()=>{const H0=67.66,Om=0.30966,h=H0/100,Or=4.165e-5/(h*h),OL=1-Om-Or,E=z=>Math.sqrt(Om*(1+z)*(1+z)*(1+z)+Or*Math.pow(1+z,4)+OL);
+  const fc=u=>{const z=Math.expm1(u);return(1+z)/E(z);},n=8000,uE=Math.log1p(1e10),d=uE/n;let s=fc(0)+fc(uE);for(let k=1;k<n;k++)s+=(k%2?4:2)*fc(k*d);
+  return s*d/3*299792.458/H0;})();   // Mpc
+cnuMesh.scale.setScalar(CHINU);
+HOOKS.push(()=>{const e=camera.matrixWorld.elements;cnuLab.set(e[4],e[5],e[6]).normalize().multiplyScalar(CHINU*1e6);});   // label rides the shell's upper edge as seen
+const SDZ=f32(DATA.sdss.z);
+function dsoOn(o){if(!enabled.dso)return false;const f=state.fly?state.fly.t:state.focus;if(f&&f.dso===o)return true;   // what you fly to is always drawn
+  return(!o.layer||enabled[o.layer])&&!(o.tl>LB.t);}
+
+/* ---------- 3. look-back horizon ---------- */
+const ATL={sdss:new Float32Array(SDZ.length),tmrs:new Float32Array(DATA.tmrs.n)};
+L.sdss.pts.geometry.setAttribute('atl',new THREE.BufferAttribute(ATL.sdss,1));L.tmrs.pts.geometry.setAttribute('atl',new THREE.BufferAttribute(ATL.tmrs,1));
+function lbAttrs(){for(let i=0;i<SDZ.length;i++)ATL.sdss[i]=tlbOfZ(SDZ[i]);
+  const a=L.tmrs.pts.geometry.attributes.position.array;for(let i=0;i<ATL.tmrs.length;i++)ATL.tmrs[i]=tlbOfZ(zOfChi(Math.hypot(a[3*i],a[3*i+1],a[3*i+2])));
+  L.sdss.pts.geometry.attributes.atl.needsUpdate=true;L.tmrs.pts.geometry.attributes.atl.needsUpdate=true;
+  DSO.forEach(o=>{const d=o.C.length();o.tl=d>1e6?tlbOfZ(zOfChi(d/1e6)):d*3.2616e-9;});}
+const zOfT=t=>interp(C.tlbtab,Zt,t);
+const shellG=new THREE.Group();scene.add(shellG);const shell=new THREE.Mesh(new THREE.SphereGeometry(1,96,48),limbMat(new THREE.Vector3(1,.78,.45),[0.008,0.32]));shell.frustumCulled=false;shellG.add(shell);shellG.visible=false;
+let lbLast=-1;HOOKS.push(()=>{if(LB.t===lbLast)return;lbLast=LB.t;LBLV.forEach(e=>{const d=e.v.length();e.lab.lbHide=LB.t<1e8&&(d>1e6?tlbOfZ(zOfChi(d/1e6)):0)>LB.t;});});
+HOOKS.push(D=>{if(LB.t>1e8){shellG.visible=false;return;}const z=zOfT(LB.t),chi=interp(Zt,C.chitab,z);shellG.visible=state.logD>6.8;shellG.scale.setScalar(MPC/D);shellG.position.copy(state.F).multiplyScalar(-1/D);
+  shell.scale.setScalar(Math.max(chi,1e-3));shell.material.uniforms.uOp.value=smooth(6.8,7.6,state.logD)*0.8;});
+
+/* ---------- 5. sound: offered on the objects that have one, as a control that appears with them ----------
+   Pulsars click at their true spin periods; GW170817 plays its inspiral chirp in real time. Nothing plays until asked,
+   and the sound stops on leaving the object. */
+const SND={ctx:null,on:false,id:null,voice:null};
+const PSR_P={velapsr:0.08933,crabpsr:0.033704,j0437:0.0057575,sgr1806:7.5476,hulse:0.059030,dpsr:0.022699};
+function sndCtx(){if(SND.ctx)return SND.ctx;const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return null;const c=new AC();
+  SND.g=c.createGain();SND.g.gain.value=0.5;SND.g.connect(c.destination);SND.ctx=c;return c;}
+function pulseBuf(P){const c=SND.ctx,sr=c.sampleRate,n=Math.max(16,Math.round(P*sr)),b=c.createBuffer(1,n,sr),d=b.getChannelData(0),m=Math.min(n,Math.round(0.004*sr));
+  for(let i=0;i<m;i++){const t=i/sr;d[i]=Math.exp(-t/0.0009)*(0.7*Math.sin(2*Math.PI*1700*t)+0.3*(Math.random()*2-1));}return b;}
+/* GW170817 inspiral, leading-order (Newtonian) chirp: f(tau) = (1/pi) (5/(256 tau))^(3/8) (G Mc/c^3)^(-5/8), Mc = 1.188 Msun;
+   played in real time for the last 4 s before merger, amplitude ~ f^(2/3), cut at f_ISCO ~ 1.6 kHz; repeats every 10 s */
+function chirpBuf(){const c=SND.ctx,sr=c.sampleRate,b=c.createBuffer(1,Math.round(10*sr),sr),d=b.getChannelData(0),tM=1.188*4.925491e-6;let ph=0;
+  for(let i=0;i<4*sr;i++){const tau=4-i/sr;const f=Math.pow(5/(256*tau),0.375)*Math.pow(tM,-0.625)/Math.PI;if(f>1600)break;ph+=2*Math.PI*f/sr;d[i]=0.9*Math.pow(f/1600,2/3)*Math.sin(ph)*Math.min(1,i/(0.3*sr));}return b;}
+function sndStop(){if(SND.voice){try{SND.voice.stop();}catch(e){}SND.voice=null;}SND.on=false;SND.id=null;}
+function sndPlay(id){const c=sndCtx();if(!c){toast('Sound is not available in this browser');return;}c.resume();sndStop();
+  const s=c.createBufferSource();s.buffer=PSR_P[id]?pulseBuf(PSR_P[id]):chirpBuf();s.loop=true;s.connect(SND.g);s.start();SND.voice=s;SND.on=true;SND.id=id;}
+[...Object.keys(PSR_P),'gw170817'].forEach(id=>addCtl(byId(id),{label:id==='gw170817'?'♪ Play the chirp':'♪ Play the pulses',on:()=>SND.on&&SND.id===id,go:()=>{if(SND.on&&SND.id===id)sndStop();else sndPlay(id);}},'Sound'));
+HOOKS.push(()=>{if(!SND.on)return;const f=state.fly?state.fly.t:state.focus;if(!f||f.id!==SND.id)sndStop();});
+
+/* ---------- 6. locator map ---------- */
+const lm=$id('locmap'),lg=lm.getContext('2d');
+const LMK=[['Sun',()=>ZERO,1e-9],...['mercury','venus','earth','mars','jupiter','saturn','uranus','neptune'].map(k=>[B[k].name,()=>B[k].pos,1e-9]),
+  ...[['proxima','Proxima Centauri'],['betelgeuse','Betelgeuse'],['m42','Orion Nebula'],['lmc','LMC'],['smc','SMC'],['m31','Andromeda'],['m33','M33'],['cena','Centaurus A'],['virgo','Virgo Cluster'],['laniakea','Great Attractor'],['coma','Coma Cluster']]
+   .map(([id,n])=>{const o=DSO.find(x=>x.id===id);return o?[n,()=>o.C,0]:null;}).filter(Boolean),['Galactic Centre',()=>GC.C,0]];
+HOOKS.push(D=>{const off=!OV.map||['explore','panel','events'].some(id=>!$id(id).hidden);lm.hidden=off;if(off)return;/* steps aside for the side panels */const r=window.devicePixelRatio||1,W=lm.clientWidth,H=lm.clientHeight;if(lm.width!==Math.round(W*r)){lm.width=Math.round(W*r);lm.height=Math.round(H*r);}
+  lg.setTransform(r,0,0,r,0,0);lg.clearRect(0,0,W,H);const S=Math.max(D*5,1e-9),F=state.F,cx=W/2,cy=H/2+6,k=(W/2-8)/S;
+  const P=p=>({x:cx+(p.x-F.x)*k,y:cy+(p.z-F.z)*k});const inb=q=>q.x>-4&&q.x<W+4&&q.y>12&&q.y<H+4;
+  lg.strokeStyle='rgba(236,230,218,.2)';lg.lineWidth=1;
+  if(S<80*AU)EL.slice(0,8).forEach(p=>{const a=p[1][0]*AU*k;if(a>2&&a<W*2){const c=P(ZERO);lg.beginPath();lg.arc(c.x,c.y,a,0,7);lg.stroke();}});
+  if(S>1500&&S<4e5){const c=P(GC.C);lg.beginPath();lg.arc(c.x,c.y,16000*k,0,7);lg.stroke();lg.beginPath();lg.arc(c.x,c.y,8178*k,0,7);lg.setLineDash([2,3]);lg.stroke();lg.setLineDash([]);}
+  if(S>5e8){const c=P(ZERO);lg.strokeStyle='rgba(245,160,70,.5)';lg.beginPath();lg.arc(c.x,c.y,C.chistar*1e6*k,0,7);lg.stroke();}
+  const placed=[];lg.font='400 10px Figtree, system-ui, sans-serif';
+  LMK.forEach(([n,fp,maxS])=>{if(maxS&&S>(n==='Sun'?1e12:2e-3))return;const q=P(fp());if(!inb(q))return;lg.fillStyle='#ece6da';lg.beginPath();lg.arc(q.x,q.y,1.8,0,7);lg.fill();
+    const tw=lg.measureText(n).width,bx={x:q.x+4,y:q.y-9,w:tw,h:11};if(bx.x+tw>W-2)bx.x=q.x-4-tw;if(placed.some(p=>bx.x<p.x+p.w&&bx.x+bx.w>p.x&&bx.y<p.y+p.h&&bx.y+bx.h>p.y))return;placed.push(bx);lg.fillStyle='rgba(236,230,218,.75)';lg.fillText(n,bx.x,bx.y+9);});
+  const cam=P(camPc);lg.strokeStyle='#a9c8ff';lg.fillStyle='#a9c8ff';const fq=P(F);lg.beginPath();lg.moveTo(cam.x,cam.y);lg.lineTo(fq.x,fq.y);lg.globalAlpha=.5;lg.stroke();lg.globalAlpha=1;
+  lg.beginPath();lg.arc(cam.x,cam.y,3,0,7);lg.fill();lg.fillStyle='#8f8a80';lg.fillText('You are here (top view)',6,11);
+  lg.textAlign='right';lg.fillText('width '+fmtLen(2*S),W-6,H-6);lg.textAlign='left';});
+
+/* ---------- 7. sky events: computed from this page's own ephemeris (oppositions, Jupiter-Saturn conjunction, Halley),
+   eclipses and the Mercury transit from NASA's canon (times of greatest eclipse / transit, UT) ---------- */
+const ECLN=ecl2three(0,0,1,new THREE.Vector3()).normalize();
+const toEcl=v=>{const g=[v.x,-v.z,v.y],x=RG[0][0]*g[0]+RG[1][0]*g[1]+RG[2][0]*g[2],y=RG[0][1]*g[0]+RG[1][1]*g[1]+RG[2][1]*g[2],z=RG[0][2]*g[0]+RG[1][2]*g[1]+RG[2][2]*g[2];
+  return Math.atan2(y*Math.cos(EPS)+z*Math.sin(EPS),x);};
+const ELp=n=>EL.find(p=>p[0]===n);
+function geoLon(name,jd){const T_=(jd-2451545)/36525,e=planetPos(ELp('Earth'),T_,new THREE.Vector3()),p=planetPos(ELp(name),T_,new THREE.Vector3());return toEcl(p.sub(e));}
+function sunLon(jd){const e=planetPos(ELp('Earth'),(jd-2451545)/36525,new THREE.Vector3());return toEcl(e.negate());}
+const wrap=a=>((a+Math.PI)%(2*Math.PI)+2*Math.PI)%(2*Math.PI)-Math.PI;
+function findRoot(fn,a,b){let fa=fn(a);for(let i=0;i<40;i++){const m=(a+b)/2,fm=fn(m);if(fa*fm<=0)b=m;else{a=m;fa=fm;}}return(a+b)/2;}
+function oppositions(name,jd0,years,max){const out=[],g=jd=>wrap(geoLon(name,jd)-sunLon(jd)-Math.PI);let prev=g(jd0);
+  for(let jd=jd0+1;jd<jd0+years*365.25&&out.length<max;jd+=1){const v=g(jd);if(prev*v<=0&&Math.abs(v)<0.5&&Math.abs(prev)<0.5)out.push(findRoot(g,jd-1,jd));prev=v;}return out;}
+function geoVec(name,jd){const T_=(jd-2451545)/36525,e=planetPos(ELp('Earth'),T_,new THREE.Vector3());return planetPos(ELp(name),T_,new THREE.Vector3()).sub(e).normalize();}
+function minSep(n1,n2,a,b){let best=a,bv=9;for(let jd=a;jd<b;jd+=0.25){const v=geoVec(n1,jd).angleTo(geoVec(n2,jd));if(v<bv){bv=v;best=jd;}}return[best,bv];}
+const jdUT=(y,mo,d,h,mi)=>Date.UTC(y,mo-1,d,h,mi)/864e5+2440587.5;
+const dateStr=jd=>new Date((jd-2440587.5)*864e5).toLocaleDateString(undefined,{year:'numeric',month:'long',day:'numeric'});
+function eventList(){const now=Date.now()/864e5+2440587.5,ev=[];
+  [[2027,2,6,16,0,'Annular solar eclipse (South America, Africa)','sol'],[2027,8,2,10,7,'Total solar eclipse (Spain, North Africa, Egypt; 6 min 23 s)','sol'],
+   [2028,1,12,4,13,'Partial lunar eclipse','lun'],[2028,7,22,2,56,'Total solar eclipse (Australia, New Zealand)','sol'],[2028,12,31,16,52,'Total lunar eclipse','lun'],
+   [2029,6,26,3,22,'Total lunar eclipse (one of the century’s longest)','lun'],[2029,12,20,22,42,'Total lunar eclipse','lun'],
+   [2030,11,25,6,51,'Total solar eclipse (southern Africa, Australia)','sol'],[2032,11,13,8,54,'Transit of Mercury across the Sun','mer']]
+   .forEach(([y,mo,d,h,mi,t,k])=>{const jd=jdUT(y,mo,d,h,mi);if(jd>now-1)ev.push({jd,t,k});});
+  oppositions('Mars',now,6,3).forEach(jd=>ev.push({jd,t:'Mars at opposition (near its closest and brightest)',k:'opp',p:'mars'}));
+  oppositions('Jupiter',now,1.2,1).forEach(jd=>ev.push({jd,t:'Jupiter at opposition',k:'opp',p:'jupiter'}));
+  oppositions('Saturn',now,1.1,1).forEach(jd=>ev.push({jd,t:'Saturn at opposition',k:'opp',p:'saturn'}));
+  {const [jd,s]=minSep('Jupiter','Saturn',jdUT(2040,6,1,0,0),jdUT(2041,4,1,0,0));ev.push({jd,t:`Great conjunction: Jupiter and Saturn ${(s/D2R).toFixed(1)}° apart in our sky`,k:'conj'});}
+  {const c=COMETS.find(x=>x.id==='halley');if(c){const a=c.q/(1-c.e),P=2*Math.PI/(KGAUSS/Math.pow(a,1.5));const jd=c.T+Math.ceil((now-c.T)/P)*P;
+    ev.push({jd,t:'Halley’s Comet at perihelion (real date 28 July 2061; this unperturbed orbit gives '+dateStr(jd)+')',k:'halley'});}}
+  return ev.sort((a,b)=>a.jd-b.jd);}
+function jumpTo(e){const pb=clockBtns.find(b=>b.dataset.speed==='0');if(pb)pb.click();state.speed=0;state.jd=e.jd;bodyPositions((e.jd-2451545)/36525);
+  const earth=byId('earth'),E=B.earth.pos.clone(),sunDir=E.clone().negate().normalize(),side=sunDir.clone().cross(ECLN).normalize();
+  let t;if(e.k==='sol'||e.k==='lun'){const d=side.clone().multiplyScalar(0.94).addScaledVector(ECLN,0.34).normalize();t=Object.assign({},earth,{view:4.2e-8,dirf:()=>d,dir:null});}
+  else if(e.k==='opp'||e.k==='mer'){const d=ECLN.clone().addScaledVector(side,0.25).normalize(),pl=e.p?B[e.p].pos.distanceTo(E):1;t=Object.assign({},earth,{view:e.k==='mer'?2.2*AU:Math.max(2.4*AU,1.9*pl),dirf:()=>d,dir:null});}
+  else if(e.k==='conj'){const d=ECLN.clone().addScaledVector(side,0.3).normalize();t=Object.assign({},TSUN,{view:16*AU,dirf:()=>d,dir:null});}
+  else t=byId('halley');
+  if(t)flyTo(t);}
+
+/* ---------- UI ---------- */
+function toast(msg){const t=$id('toast');t.textContent=msg;t.classList.add('on');clearTimeout(toast.h);toast.h=setTimeout(()=>t.classList.remove('on'),2200);}
+/* look-back horizon (in Layers and sources) */
+const lbR=$id('lbR');lbR.max=String(Math.floor(C.age*100)/100);lbR.value=lbR.max;
+function lbUI(){const v=+lbR.value,all=v>=+lbR.max-0.005;LB.t=all?1e9:v;$id('lbV').textContent=all?'all':v.toFixed(2)+' Gyr';
+  if(all){$id('lbInfo').textContent=`All light is shown, back to the cosmic microwave background, emitted ${C.age.toFixed(2)} billion years ago at z ≈ ${ZSTAR.toFixed(0)}.`;return;}
+  const z=zOfT(v),chi=interp(Zt,C.chitab,z);$id('lbInfo').textContent=`Only light that left its source less than ${v.toFixed(2)} billion years ago: out to z = ${z<1?z.toFixed(3):z.toFixed(2)}, a comoving distance of ${fmtLen(chi*1e6)} (gold shell). Light from farther away is still on its way to us.`;}
+lbR.addEventListener('input',lbUI);
+$id('lbGo').addEventListener('click',()=>sunScale(9.75));
+/* locator map: its own button */
+function mapUI(){$id('mapBtn').setAttribute('aria-pressed',String(OV.map));}
+$id('mapBtn').addEventListener('click',()=>{OV.map=!OV.map;mapUI();});
+/* events panel */
+let evBuilt=false;
+function buildEvents(){if(evBuilt)return;evBuilt=true;const box=$id('evList');box.innerHTML='';
+  eventList().forEach(e=>{const b=document.createElement('button');b.className='evt';b.innerHTML='<b></b><span></span>';b.firstChild.textContent=dateStr(e.jd);b.lastChild.textContent=e.t;
+    b.addEventListener('click',()=>{jumpTo(e);if(innerWidth<720)closeEvents();});box.appendChild(b);});}
+const evP=$id('events'),evBtn=$id('eventsBtn');
+function closeEvents(){evP.hidden=true;evBtn.setAttribute('aria-expanded','false');}
+evBtn.addEventListener('click',()=>{const o=evP.hidden;evP.hidden=!o;evBtn.setAttribute('aria-expanded',String(o));
+  if(o){buildEvents();[['explore','exploreBtn'],['panel','layersBtn']].forEach(([p,b])=>{$id(p).hidden=true;$id(b).setAttribute('aria-expanded','false');});}});
+['exploreBtn','layersBtn'].forEach(b=>$id(b).addEventListener('click',closeEvents));
+lbAttrs();lbUI();mapUI();
+/* phones: "Layers and sources" shortens to "Layers" so the four buttons fit in two rows */
+{const lb=$id('layersBtn'),full=lb.textContent;const fit=()=>{lb.textContent=innerWidth<720?'Layers':full;};fit();window.addEventListener('resize',fit);}
+
+/* ---------- info card: the object in view, its note and key facts. Collapsed to a tab by default; once opened it
+   stays open from object to object until closed. Zooming freely out from the Sun, the card describes the scale level ---------- */
+const card=$id('info'),cTab=$id('infoTab'),cRC=$id('infoRC'),snEl=$id('scaleNote'),camEl=$id('camLine'),pills=$id('pills');
+let cardFor=null,cardOpen=false,rcFor=null,lastN=null,lastC=null;
+const REGT={};REG.forEach(r=>{REGT[r[0]]={id:'reg:'+r[0],name:r[0]};});
+const sunFree=()=>state.focus&&state.focus.id==='sun'&&!state.fly&&Math.pow(10,state.logD)>0.25*AU;
+function cardTarget(){if(state.fly||state.tour)return null;if(sunFree()){const r=REG.find(q=>state.logD>=q[2][0]&&state.logD<q[2][1]);return r?REGT[r[0]]:null;}return state.focus;}
+const factsOf=t=>t&&(FACTS[t.id]||(t.dso&&t.dso.facts))||null;
+function cardFill(t){const f=factsOf(t);$id('infoT').textContent=t.name;$id('infoK').textContent=f[0];const dl=$id('infoB');dl.innerHTML='';
+  f[1].forEach(([k,v])=>{const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=k;dd.textContent=v;dl.append(dt,dd);});
+  cRC.hidden=!(t.id==='ov-mw'||t.id==='mwhalo'||t.id==='reg:Milky Way');rcFor=null;card.scrollTop=0;lastN=lastC=null;}
+const setOpen=o=>{cardOpen=o;cTab.setAttribute('aria-expanded',String(o));};
+$id('infoX').addEventListener('click',()=>setOpen(false));
+cTab.addEventListener('click',()=>setOpen(!cardOpen));   // the button stays and toggles the card
+window.addEventListener('keydown',e=>{if(e.key==='Escape'&&cardOpen)setOpen(false);});
+const roEl=$id('readout'),ctlE=$id('objctl'),botE=$id('bottom');
+HOOKS.push(()=>{const t=cardTarget(),f=factsOf(t);
+  if(t!==cardFor){cardFor=t;if(f)cardFill(t);}
+  const narrow=innerWidth<720,panelOpen=narrow&&['explore','panel','events'].some(id=>!$id(id).hidden);   // phones: a panel covers the card
+  const show=!!f&&cardOpen&&!panelOpen;card.hidden=!show;cTab.hidden=!f;document.body.classList.toggle('hascard',show);
+  /* the "About" tab and the light selector sit under the readout; the card under them, above the controls or bottom bar */
+  const top=roEl.getBoundingClientRect().bottom+12;pills.style.top=top+'px';
+  if(!show)return;
+  const n=snEl.innerHTML,c=camEl.textContent;if(n!==lastN){$id('infoN').innerHTML=n;lastN=n;}if(c!==lastC){$id('infoC').textContent=c;$id('infoC').hidden=!c;lastC=c;}   // the readout's light-time line, note and camera line
+  const ct=pills.getBoundingClientRect().bottom+8,lim=(!ctlE.hidden?ctlE.getBoundingClientRect().top:botE.getBoundingClientRect().top)-12;
+  card.style.top=ct+'px';card.style.maxHeight=Math.max(120,lim-ct)+'px';if(!cRC.hidden&&rcFor!==t){drawRC($id('rcplot'));rcFor=t;}});
+
+/* ---------- light selector ---------- */
+const bandBtn=$id('bandBtn'),bandP=$id('bands');
+BANDS.forEach(([n,d],i)=>{const b=document.createElement('button');b.className='band';b.setAttribute('role','menuitemradio');b.innerHTML='<b></b><span></span>';b.firstChild.textContent=n;b.lastChild.textContent=d;
+  b.addEventListener('click',()=>{setBand(i);closeBands();});bandP.insertBefore(b,bandP.lastElementChild);});
+function bandUI(){bandBtn.textContent=(innerWidth<720?'':'Light: ')+BANDS[BAND.i][0];bandBtn.setAttribute('aria-pressed',String(BAND.i!==3));
+  [...bandP.querySelectorAll('.band')].forEach((b,k)=>b.setAttribute('aria-checked',String(k===BAND.i)));}
+function closeBands(){bandP.hidden=true;bandBtn.setAttribute('aria-expanded','false');}
+bandBtn.addEventListener('click',e=>{e.stopPropagation();const o=bandP.hidden;bandP.hidden=!o;bandBtn.setAttribute('aria-expanded',String(o));});
+document.addEventListener('click',e=>{if(!bandP.hidden&&!bandP.contains(e.target))closeBands();});
+window.addEventListener('keydown',e=>{if(e.key==='Escape'&&!bandP.hidden)closeBands();});
+window.addEventListener('resize',bandUI);bandUI();
+
+/* per-frame: overlays and the other hooks */
+function addonsFrame(D,px,now){Dcur=D;HOOKS.forEach(f=>f(D,px,now));ovSize();const w=ovW,h=ovH;
+  if(ovUsed){og.clearRect(0,0,w,h);ovUsed=false;}
+  if(bhOverlay(D,w,h))ovUsed=true;if(lensOverlay(D,w,h))ovUsed=true;}
+
 function labels(D,w,h){const F=state.F,px=pxScale()/DPR;
   T.forEach(t=>{const el=t.el,p=t.pos(),dist=p.distanceTo(camPc);let show=false;
     const R=t.body?t.body.R:t.dso?t.dso.R:GC.rs*40,ang=R/dist*px;
     if(t.body)show=(t.id==='sun'||dist<.03)&&ang<h*.3;
-    else if(t.dso&&t.dso.mk&&Math.log10(D)>=t.dso.mk[0]&&Math.log10(D)<=(t.dso.mk[2]||t.dso.mk[1]))show=enabled.dso&&ang<h*.45;
-    else if(t.dso)show=enabled.dso&&ang>3&&ang<h*.45&&(!t.dso.win||win(t.dso.win[0],t.dso.win[1],t.dso.win[2],t.dso.win[3],Math.log10(D))>0.3);
+    else if(t.dso&&t.dso.mk&&Math.log10(D)>=t.dso.mk[0]&&Math.log10(D)<=(t.dso.mk[2]||t.dso.mk[1]))show=dsoOn(t.dso)&&ang<h*.45;
+    else if(t.dso)show=dsoOn(t.dso)&&ang>3&&ang<h*.45&&(!t.dso.win||win(t.dso.win[0],t.dso.win[1],t.dso.win[2],t.dso.win[3],Math.log10(D))>0.3);
     else if(t.nolab)show=false;
     else show=t.id==='sgra'?dist<40&&dist>0.004:dist<(t.labD||0.004)&&ang<h*.3;
     if(state.fly)show=show&&t!==state.fly.t;
@@ -2092,8 +2763,8 @@ function frame(now){
   // layers
   for(const m of META){const Ly=L[m.key];const a=enabled[m.key]?win(m.w[0],m.w[1],m.w[2],m.w[3],logD):0;
     Ly.g.visible=a>0.003;Ly.g.scale.setScalar(Ly.g.userData.unit/D);Ly.g.position.copy(state.F).multiplyScalar(-1/D);Ly.a=a;
-    if(Ly.pts){const u=Ly.pts.material.uniforms;u.uD.value=D;u.uOpacity.value=a*(m.key==='sdss'?1-0.7*smooth(9.3,10.4,logD):1);u.uMlim.value=state.mlim;u.uExpo.value=5*Math.log10(Math.max(D,Ly.dref)/Ly.dref);}}
-  L.cmb.mesh.material.uniforms.uOpacity.value=L.cmb.a;
+    if(Ly.pts){const u=Ly.pts.material.uniforms;u.uD.value=D;u.uOpacity.value=a*(m.key==='sdss'?1-0.7*smooth(9.3,10.4,logD):1);u.uMlim.value=state.mlim;u.uExpo.value=5*Math.log10(Math.max(D,Ly.dref)/Ly.dref);u.uTl.value=LB.t;}}
+  L.cmb.mesh.material.uniforms.uOpacity.value=L.cmb.a*(LB.t>1e8?1:0)*(L.cmb.band===undefined?1:L.cmb.band);
   if(L.planets.g.visible){planetObjs.forEach(o=>{planetPos(o.p,T,o.v);const pa=o.dot.geometry.attributes.position;pa.setXYZ(0,o.v.x,o.v.y,o.v.z);pa.needsUpdate=true;
       o.dot.material.opacity=L.planets.a;o.line.material.opacity=0.32*L.planets.a*smooth(Math.log10(o.p[1][0]*AU)-1.25,Math.log10(o.p[1][0]*AU)-0.6,logD);});}
   // sun: bright up close, a faint beacon further out
@@ -2105,7 +2776,8 @@ function frame(now){
   EX.update(D,T,now);EX.render();
   // labels
   const w=window.innerWidth,h=window.innerHeight;
-  for(const lab of LBL){if(lab.hidden){lab.el.style.opacity=0;continue;}let op=win(lab.lo-0.5,lab.lo,lab.hi,lab.hi+0.4,logD);
+  for(const lab of LBL){if(lab.hidden||lab.lbHide){lab.el.style.opacity=0;continue;}
+    if(lab.twin){if(lab.tt===undefined)lab.tt=EX.T.find(t=>t.dso===lab.twin)||null;if(lab.tt&&lab.tt.el&&lab.tt.el.style.opacity==='1'){lab.el.style.opacity=0;continue;}}let op=win(lab.lo-0.5,lab.lo,lab.hi,lab.hi+0.4,logD);
     if(lab.lo<=-9)op=1-smooth(lab.hi,lab.hi+0.4,logD);
     if(op>0.01){tmp.copy(lab.getPos()).sub(state.F).multiplyScalar(1/D);
       const dist=tmp.distanceTo(camera.position);tmp.project(camera);

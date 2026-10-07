@@ -2152,6 +2152,125 @@ VOY.forEach(V=>{const dir=icrs3(rd(V.ra,V.dec)).normalize();V.dir=dir;V.p=new TH
   tgt({id:V.id,name:V.name,cat:'Comets & spacecraft',pos:()=>V.at(state.jd),lmin:1e-9,view:60*AU,labD:0.006,
    note:`${V.name}, launched in 1977, is the ${V.id==='voyager1'?'most distant human-made object':'only spacecraft to have visited Uranus and Neptune'}. It crossed the termination shock on ${V.ts}, where the solar wind abruptly slows from supersonic, and the heliopause on ${V.hp}, entering interstellar plasma. Its distance here comes from JPL on 3 October 2026 and grows by ${V.v.toFixed(2)} AU a year. The green line is its outbound direction (the inner, planet-flyby part of the path is not drawn).`});});
 
+/* ---------------- Satellites and observatories (Cosmic Frontier edition). Earth orbiters use their real altitude,
+   inclination and period; orbit nodes and phases are illustrative (no live TLEs offline). Sun–Earth L2 spacecraft fly
+   halo/Lissajous orbits of roughly their real size and ~180-day period, and appear only during their missions. ---------- */
+{
+const FACTS_EXTRA=window.FACTS_EXTRA=window.FACTS_EXTRA||{};
+const KM=1/149597870.7, REK=6378.137, MUE=398600.4418;            // km -> AU; Earth radius (km), GM (km^3/s^2)
+const EX=icrs3(rd(0,0)).normalize(),EY=icrs3(rd(90,0)).normalize(),EZ=icrs3(rd(0,90)).normalize();   // equatorial frame
+const ECN=ecl2three(0,0,1,new THREE.Vector3()).normalize();
+const jdOf=(y,m,d)=>Date.UTC(y,m-1,d)/864e5+2440587.5;
+const SG=new THREE.Group();scene.add(SG);                           // Earth-centred, AU units, placed every frame
+const sv=new THREE.Vector3(),sw=new THREE.Vector3();
+/* position (AU, Earth-centred) on a Keplerian orbit given a(km), e, i, node, arg of perigee (deg), phase at J2000 */
+function kep(o,jd,out){const a=o.a,n=Math.sqrt(MUE/(a*a*a))*86400;let M=(o.M0*D2R+n*(jd-2451545))%(2*Math.PI);
+  let E=M;for(let k=0;k<8;k++)E-=(E-o.e*Math.sin(E)-M)/(1-o.e*Math.cos(E));
+  const x=a*(Math.cos(E)-o.e),y=a*Math.sqrt(1-o.e*o.e)*Math.sin(E),w=o.w*D2R,O=o.O*D2R,I=o.i*D2R;
+  const xp=x*Math.cos(w)-y*Math.sin(w),yp=x*Math.sin(w)+y*Math.cos(w);
+  const X=xp*Math.cos(O)-yp*Math.sin(O)*Math.cos(I),Y=xp*Math.sin(O)+yp*Math.cos(O)*Math.cos(I),Z=yp*Math.sin(I);
+  return out.set(0,0,0).addScaledVector(EX,X*KM).addScaledVector(EY,Y*KM).addScaledVector(EZ,Z*KM);}
+const ORB=[
+ {id:'iss',name:'International Space Station',a:REK+420,e:0.0005,i:51.64,O:40,w:0,M0:10,col:[1,0.95,0.75],px:5,
+  facts:['Crewed station',[['Size','109 m × 73 m (the icon is not to scale)'],['Altitude','~420 km'],['Inclination','51.6°'],['Period','92.9 min, 15.5 orbits a day'],['Speed','7.66 km/s'],['Crewed since','2 November 2000'],['Mass','~420 tonnes']]],
+  note:'The International Space Station, continuously crewed since November 2000. At 420 km it is barely above the atmosphere, which still drags it down by ~2 km a month, so it is re-boosted several times a year. Its 51.6° inclination lets it be reached from Baikonur.'},
+ {id:'tiangong',name:'Tiangong',a:REK+390,e:0.0006,i:41.5,O:200,w:0,M0:120,col:[1,0.8,0.6],px:4,
+  facts:['Crewed station',[['Altitude','~390 km'],['Inclination','41.5°'],['Period','~92 min'],['Completed','November 2022']]],
+  note:'China’s modular space station, completed in 2022 and crewed by three taikonauts in rotation.'},
+ {id:'hubble',name:'Hubble Space Telescope',a:REK+515,e:0.0003,i:28.47,O:120,w:0,M0:200,col:[0.75,0.88,1],px:4.5,
+  facts:['Space telescope',[['Launched','24 April 1990'],['Altitude','~515 km, slowly decaying'],['Inclination','28.5°'],['Period','~95 min'],['Mirror','2.4 m'],['Serviced','five Shuttle missions, 1993–2009']]],
+  note:'Hubble orbits low enough to have been serviced by astronauts five times. Its Key Project measured H₀ = 72 ± 8 km/s/Mpc, and its Cepheids anchor today’s distance ladder (Chapter 24).'},
+ {id:'fermi',name:'Fermi Gamma-ray Space Telescope',a:REK+525,e:0.001,i:25.6,O:300,w:0,M0:300,col:[0.85,0.7,1],px:4,
+  facts:['Gamma-ray observatory',[['Launched','11 June 2008'],['Altitude','~525 km'],['Inclination','25.6°'],['Band','20 MeV – 300 GeV (LAT)'],['Sky coverage','whole sky every 3 hours']]],
+  note:'Fermi’s Large Area Telescope maps the whole gamma-ray sky every three hours; its Galactic-Centre GeV excess is a long-running dark-matter debate (Chapter 19). Its GBM saw GRB 170817A 1.7 s after the neutron-star merger.'},
+ {id:'chandra',name:'Chandra X-ray Observatory',a:80800,e:0.74,i:28.5,O:60,w:270,M0:40,col:[0.6,0.85,1],px:4,
+  facts:['X-ray observatory',[['Launched','23 July 1999'],['Orbit','highly elliptical, ~16,000 × 133,000 km'],['Period','~64 hours'],['Resolution','0.5″, the sharpest X-ray optics flown']]],
+  note:'Chandra spends most of each 64-hour orbit far above the radiation belts so it can observe for long stretches. Its X-ray map of the Bullet Cluster’s gas, set against the lensing mass, is one of the clearest pieces of evidence for dark matter.'},
+ {id:'gps',name:'GPS satellite (one of 31)',a:26560,e:0.01,i:55,O:0,w:0,M0:80,col:[0.6,1,0.75],px:4,
+  facts:['Navigation satellite',[['Altitude','20,200 km'],['Period','11 h 58 min (half a sidereal day)'],['Planes','6, inclined 55°'],['Relativity','clocks gain +38.5 μs a day net (Chapter 03)']]],
+  note:'GPS clocks run fast by 45.7 μs a day from weaker gravity and slow by 7.2 μs a day from their speed. Without the net +38.5 μs correction, positions would drift by about 11 km a day.'},
+ {id:'geo',name:'Geostationary satellite',a:42164,e:0,i:0,O:0,w:0,M0:0,col:[1,0.85,0.5],px:4,geo:1,
+  facts:['Communications orbit',[['Altitude','35,786 km'],['Period','one sidereal day, 23 h 56 min'],['Inclination','0°'],['Effect','hangs over one point of the equator']]],
+  note:'At 42,164 km from Earth’s centre an orbit takes exactly one sidereal day, so a satellite there stays above one point of the equator. Hundreds of communications and weather satellites share this ring.'}];
+const ringLine=(o,n,col,op)=>{const pts=[];const oo=Object.assign({},o,{e:o.e});for(let k=0;k<=n;k++){const M=360*k/n;kep(Object.assign({},oo,{M0:M}),2451545,sv);pts.push(sv.clone());}
+  const l=new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),new THREE.LineBasicMaterial({color:new THREE.Color(...col),transparent:true,opacity:op,depthTest:false,depthWrite:false}));l.frustumCulled=false;SG.add(l);return l;};
+ORB.forEach(o=>{o.line=ringLine(o,240,o.col,0.35);o.dot=mdot(o.col,o.px);o.dot.renderOrder=9;SG.add(o.dot);o.p=new THREE.Vector3();o.pp=new THREE.Vector3();
+  /* the geostationary slot turns with the Earth: its node follows sidereal time */
+  o.at=jd=>{if(o.geo){const th=(280.46061837+360.98564736629*(jd-2451545))%360;return kep(Object.assign({},o,{M0:th}),2451545,o.p);}return kep(o,jd,o.p);};
+  o.pos=()=>o.pp.copy(o.at(state.jd)).multiplyScalar(AU).add(B.earth.pos);
+  o.t=tgt({id:o.id,name:o.name,cat:'Satellites & observatories',labR:1e-14,pos:o.pos,lmin:3e-12,view:o.a>30000?o.a*KM*AU*3.2:REK*KM*AU*4.2,labD:o.a>30000?2.5e-8:2.5e-9,note:o.note});
+  if(o.facts)FACTS_EXTRA[o.id]=o.facts;});
+/* the GPS constellation (6 planes x 4) and the geostationary belt, as faint context */
+{const pts=[];for(let pl=0;pl<6;pl++)for(let s=0;s<4;s++){kep({a:26560,e:0,i:55,O:60*pl,w:0,M0:90*s+15*pl},2451545,sv);pts.push(sv.x,sv.y,sv.z);}
+ const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pts,3));
+ const GPS=new THREE.Points(g,new THREE.PointsMaterial({color:0x9fe0b4,size:2.2*DPR,sizeAttenuation:false,transparent:true,opacity:0.6,depthTest:false,depthWrite:false}));GPS.frustumCulled=false;SG.add(GPS);
+ const n0=Math.sqrt(MUE/Math.pow(26560,3))*86400;GPS.userData.tick=jd=>{const P=g.attributes.position.array;let q=0;for(let pl=0;pl<6;pl++)for(let s=0;s<4;s++){kep({a:26560,e:0,i:55,O:60*pl,w:0,M0:90*s+15*pl},jd,sv);P[q++]=sv.x;P[q++]=sv.y;P[q++]=sv.z;}g.attributes.position.needsUpdate=true;};
+ SG.userData.gps=GPS;}
+/* a Starlink-like shell: 72 planes x 22 at 550 km, 53 degrees (illustrative snapshot of one shell) */
+{const pts=[];for(let pl=0;pl<72;pl++)for(let s=0;s<22;s++){kep({a:REK+550,e:0,i:53,O:5*pl,w:0,M0:360/22*s+2.7*pl},2451545,sv);pts.push(sv.x,sv.y,sv.z);}
+ const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pts,3));
+ const SL=new THREE.Points(g,new THREE.PointsMaterial({color:0xcfd6e6,size:1.2*DPR,sizeAttenuation:false,transparent:true,opacity:0.35,depthTest:false,depthWrite:false}));SL.frustumCulled=false;SG.add(SL);
+ SL.userData.tick=jd=>{const P=g.attributes.position.array;let q=0;for(let pl=0;pl<72;pl++)for(let s=0;s<22;s++){kep({a:REK+550,e:0,i:53,O:5*pl,w:0,M0:360/22*s+2.7*pl},jd,sv);P[q++]=sv.x;P[q++]=sv.y;P[q++]=sv.z;}g.attributes.position.needsUpdate=true;};
+ SG.userData.sl=SL;}
+
+/* ISS icon: drawn from the station's real layout (integrated truss, four pairs of solar-array wings, radiators,
+   US/Russian module stack). Shown at a fixed screen size when zoomed in near Earth; the station itself is 109 m. */
+const ISSTX=(()=>{const c=document.createElement('canvas');c.width=512;c.height=320;const x=c.getContext('2d');x.translate(256,150);
+  const arr=(cx,cy,w,h)=>{const g=x.createLinearGradient(cx-w/2,0,cx+w/2,0);g.addColorStop(0,'#5a3b1e');g.addColorStop(0.5,'#a8742e');g.addColorStop(1,'#5a3b1e');
+    x.fillStyle=g;x.fillRect(cx-w/2,cy-h/2,w,h);x.strokeStyle='rgba(255,220,160,.55)';x.lineWidth=1;for(let i=1;i<8;i++){x.beginPath();x.moveTo(cx-w/2+i*w/8,cy-h/2);x.lineTo(cx-w/2+i*w/8,cy+h/2);x.stroke();}
+    x.strokeStyle='#d9c9a8';x.strokeRect(cx-w/2,cy-h/2,w,h);};
+  [-205,-150,150,205].forEach(cx=>{arr(cx,-26,46,40);arr(cx,26,46,40);});                       // 8 solar-array wings
+  x.fillStyle='#c9ccd2';x.fillRect(-235,-4,470,8);x.strokeStyle='#8a8f98';x.strokeRect(-235,-4,470,8);   // integrated truss
+  x.fillStyle='#e8ebf0';[-115,-95,95,115].forEach(cx=>x.fillRect(cx-7,8,14,60));                 // radiators below the truss
+  x.fillStyle='#dfe3ea';[[-60,-30],[-30,-30],[0,-30],[30,-30],[60,-30]].forEach(([cx,cy])=>{x.fillRect(cx-14,cy-11,28,22);});   // lab modules along the top
+  x.fillStyle='#d4d8de';x.fillRect(-10,-110,20,240);                                             // pressurised stack
+  x.fillStyle='#f4f6f9';x.beginPath();x.ellipse(0,-118,12,10,0,0,7);x.fill();                     // docked capsule
+  arr(-34,92,40,14);arr(34,92,40,14);arr(-24,128,30,10);arr(24,128,30,10);                       // Russian-segment arrays
+  x.fillStyle='#ffd27a';x.beginPath();x.arc(0,60,6,0,7);x.fill();
+  const t=new THREE.CanvasTexture(c);return t;})();
+const ISSP=new THREE.Sprite(new THREE.SpriteMaterial({map:ISSTX,transparent:true,depthTest:false,depthWrite:false,sizeAttenuation:false}));ISSP.renderOrder=11;SG.add(ISSP);
+TK.push(()=>{if(!SG.visible){return;}const o=ORB[0],k=(enabled.planets?1:0)*win(-14,-13.5,-9.9,-9.3,state.logD);ISSP.visible=k>0.02;if(ORB[0].t)ORB[0].t.nolab=k>0.3;if(!ISSP.visible)return;
+  ISSP.position.copy(o.at(state.jd));ISSP.material.opacity=k;const D=Math.pow(10,state.logD),sc=SG.scale.x||1;ISSP.scale.set(0.36/sc,0.225/sc,1);});
+/* Sun–Earth L2: 1.5 million km beyond Earth on the Sun–Earth line */
+const L2D=1.5e6*KM;
+const L2=[
+ {id:'jwst',name:'James Webb Space Telescope',ay:800000,az:250000,P:180,ph:0,from:jdOf(2022,1,24),to:1e9,col:[1,0.85,0.45],
+  facts:['Infrared space telescope',[['Launched','25 December 2021'],['Orbit','halo around Sun–Earth L2, ~800,000 km'],['Mirror','6.5 m, 18 segments'],['Sunshield','5 layers, keeps the optics near 40 K']]],
+  note:'Webb sits behind the Earth at L2 so its sunshield can block the Sun, Earth and Moon at once. Its Cepheid photometry ruled out crowding as the cause of the Hubble tension (Chapter 24).'},
+ {id:'euclid',name:'Euclid',ay:1000000,az:400000,P:180,ph:120,from:jdOf(2023,8,28),to:1e9,col:[0.7,0.9,1],
+  facts:['Dark-energy survey telescope',[['Launched','1 July 2023'],['Orbit','halo around L2'],['Survey','a third of the sky, billions of galaxies'],['Measures','weak lensing and BAO, Chapter 23']]],
+  note:'Euclid maps the shapes and positions of billions of galaxies to measure dark matter through weak lensing and the expansion history through baryon acoustic oscillations.'},
+ {id:'gaia',name:'Gaia',ay:340000,az:90000,P:180,ph:240,from:jdOf(2014,1,8),to:jdOf(2025,3,27),col:[0.8,1,0.8],
+  facts:['Astrometry mission',[['Launched','19 December 2013'],['Operated','2014 – March 2025, then retired to a heliocentric orbit'],['Catalogue','~1.8 billion stars'],['Parallax precision','~20 μas at 15th mag']]],
+  note:'Gaia measured parallaxes for nearly two billion stars, the first rung of every distance ladder. It was switched off in March 2025 and pushed away from L2, so it is shown here only for dates during its mission.'},
+ {id:'planck',name:'Planck',ay:400000,az:400000,P:180,ph:60,from:jdOf(2009,7,3),to:jdOf(2013,10,23),col:[1,0.6,0.6],
+  facts:['CMB satellite',[['Launched','14 May 2009'],['Operated','2009 – 23 October 2013, at L2'],['Detectors','cooled to 0.1 K'],['Key result','six ΛCDM parameters to ~1 %, Chapter 22']]],
+  note:'Planck mapped the CMB temperature and polarisation from L2 in 2009–2013 and fixed ΛCDM’s six parameters to about a per cent. It was retired into a heliocentric orbit in October 2013, so it appears here only for dates during its mission; set the clock to 2010 to see it.'},
+ {id:'wmap',name:'WMAP',ay:200000,az:200000,P:180,ph:300,from:jdOf(2001,10,1),to:jdOf(2010,9,8),col:[1,0.75,0.9],
+  facts:['CMB satellite',[['Launched','30 June 2001'],['Operated','2001–2010, at L2'],['Key result','the age and flat geometry of the universe to a few per cent']]],
+  note:'WMAP was the first spacecraft to use L2 as a permanent station. Its nine years of CMB maps established the ΛCDM model before Planck.'}];
+const hv=new THREE.Vector3(),side=new THREE.Vector3();
+L2.forEach(o=>{o.dot=mdot(o.col,4.5);o.dot.renderOrder=9;SG.add(o.dot);o.p=new THREE.Vector3();o.pp=new THREE.Vector3();
+  const pts=[];for(let k=0;k<=120;k++)pts.push(new THREE.Vector3());o.line=new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),new THREE.LineBasicMaterial({color:new THREE.Color(...o.col),transparent:true,opacity:0.3,depthTest:false,depthWrite:false}));o.line.frustumCulled=false;SG.add(o.line);
+  o.at=jd=>{const sun=hv.copy(B.earth.pos).normalize();side.copy(sun).cross(ECN).normalize();const f=2*Math.PI*((jd-2451545)/o.P+o.ph/360);
+    return o.p.copy(sun).multiplyScalar(L2D).addScaledVector(side,o.ay*KM*Math.cos(f)).addScaledVector(ECN,o.az*KM*Math.sin(f));};
+  o.on=()=>state.jd>=o.from&&state.jd<=o.to;
+  o.pos=()=>o.pp.copy(o.at(state.jd)).multiplyScalar(AU).add(B.earth.pos);
+  o.t=tgt({id:o.id,name:o.name,cat:'Satellites & observatories',labR:1e-14,pos:o.pos,lmin:3e-12,view:2.6e6*KM*AU,labD:1.2e-6,note:o.note});
+  FACTS_EXTRA[o.id]=o.facts;});
+SG.userData.l2t=tgt({id:'l2pt',name:'Sun–Earth L2',cat:'Satellites & observatories',labR:1e-14,pos:()=>sw.copy(B.earth.pos).normalize().multiplyScalar(L2D*AU).add(B.earth.pos),lmin:3e-12,view:3.4e6*KM*AU,labD:1.2e-6,
+ note:'The second Lagrange point, 1.5 million km beyond Earth on the line from the Sun. A spacecraft there keeps pace with Earth around the Sun, with the Sun, Earth and Moon always in the same direction, which is why infrared and CMB telescopes go there. The point is unstable, so they fly large halo or Lissajous orbits around it with small station-keeping burns every few weeks.'});
+FACTS_EXTRA.l2pt=['Lagrange point',[['Distance from Earth','1.5 million km (0.01 AU)'],['Missions','WMAP, Planck, Herschel, Gaia, JWST, Euclid'],['Stability','unstable: station-keeping every ~3 weeks']]];
+TK.push(()=>{if(SG.userData.l2t)SG.userData.l2t.nolab=state.logD<-8.2;const a=enabled.planets?1:0;SG.visible=a>0&&state.logD<-5.4;if(!SG.visible)return;const D=Math.pow(10,state.logD);
+  SG.position.copy(B.earth.pos).sub(state.F).multiplyScalar(1/D);SG.scale.setScalar(AU/D);
+  const near=a*win(-10.9,-10.3,-7.7,-7.0,state.logD),far=a*win(-8.7,-8.2,-6.2,-5.6,state.logD);
+  ORB.forEach(o=>{o.dot.material.uniforms.uC.value.copy(o.at(state.jd));const k=o.a>30000?a*win(-9.9,-9.3,-7.2,-6.5,state.logD):near;o.dot.material.uniforms.uOp.value=k;o.line.material.opacity=0.35*k;o.dot.visible=o.line.visible=k>0.003;});
+  {const g=SG.userData.gps,s=SG.userData.sl,kg=a*win(-9.9,-9.3,-7.2,-6.5,state.logD);g.visible=kg>0.003;s.visible=near>0.003;g.material.opacity=0.6*kg;s.material.opacity=0.35*near;
+   if(g.visible)g.userData.tick(state.jd);if(s.visible)s.userData.tick(state.jd);}
+  L2.forEach(o=>{const on=o.on(),k=on?far:0;if(o.t)o.t.nolab=!on||far<0.05;o.dot.visible=o.line.visible=k>0.003;if(!o.dot.visible)return;o.dot.material.uniforms.uC.value.copy(o.at(state.jd));o.dot.material.uniforms.uOp.value=k;o.line.material.opacity=0.3*k;
+    const pa=o.line.geometry.attributes.position;for(let q=0;q<=120;q++){o.at(state.jd+o.P*q/120);pa.setXYZ(q,o.p.x,o.p.y,o.p.z);}o.at(state.jd);pa.needsUpdate=true;});});
+}
+
 /* ---------------- comets: real orbital elements (J2000 ecliptic), elliptic or hyperbolic Kepler motion -------------- */
 const KGAUSS=0.01720209895;
 /* Kepler's equation for e -> 1: Danby's starting value E0 = M + 0.85 e sgn(sin M) and safeguarded Newton steps
@@ -2294,7 +2413,7 @@ const labRoot=document.getElementById('labels');
 T.forEach(t=>{const el=document.createElement('div');el.className='lab go'+(t.id==='sun'?' big':'');el.textContent=t.name.replace(/: .*/,'');
   el.addEventListener('click',()=>flyTo(t));labRoot.appendChild(el);t.el=el;});
 const list=document.getElementById('exList');
-['Overviews','Solar System','Comets & spacecraft','Galactic Centre','Stars','Neutron stars & pulsars','Binaries & gravitational waves','Supernovae','Black holes','Nebulae','Galaxies','Dark matter & lensing','Large-scale structure'].forEach(c=>{const h=document.createElement('h3');h.textContent=c;list.appendChild(h);
+['Overviews','Solar System','Comets & spacecraft','Satellites & observatories','Galactic Centre','Stars','Neutron stars & pulsars','Binaries & gravitational waves','Supernovae','Black holes','Nebulae','Galaxies','Dark matter & lensing','Large-scale structure'].forEach(c=>{const h=document.createElement('h3');h.textContent=c;list.appendChild(h);
   const w=document.createElement('div');w.className='exrow';list.appendChild(w);
   T.filter(t=>t.cat===c).forEach(t=>{const b=document.createElement('button');b.textContent=t.name;b.addEventListener('click',()=>{flyTo(t);if(innerWidth<720)closeMenu();});w.appendChild(b);t.btn=b;});});
 const exBtn=document.getElementById('exploreBtn'),exP=document.getElementById('explore');
@@ -2470,6 +2589,7 @@ const FACTS={
  'ov-oort':['Cloud of icy bodies (inferred)',[['Extent','~2,000 to 100,000 AU'],['Bodies','perhaps 10¹²'],['Outer edge','over a third of the way to Proxima'],['Evidence','orbits of long-period comets (Oort 1950)']]],
  'ov-mw':['Barred spiral galaxy',[['Disc diameter','~30 kpc (100,000 ly)'],['Stars','100–400 billion'],['Total mass','~1–1.5 × 10¹² M☉'],['Sun','8.18 kpc from the centre, ~230 km/s'],['One orbit of the Sun','~220 million years']]],
  'ov-lg':['Galaxy group',[['Extent','~1.5 Mpc'],['Members','80+ galaxies'],['Largest','Andromeda, the Milky Way, Triangulum'],['Andromeda','approaching at ~110 km/s']]]};
+Object.assign(FACTS,window.FACTS_EXTRA||{});
 /* the scale levels, shown in the card while zooming freely out from the Sun */
 Object.assign(FACTS,{
  'reg:Cosmic neutrino background':['Relic neutrinos',[['Released','~1 s after the Big Bang (T ≈ 1 MeV)'],['Temperature today','1.95 K, (4/11)^1/3 of the CMB’s'],['Number density','~336 per cm³ (three flavours, ν and ν̅)'],['Shell drawn at','~14.2 Gpc (massless approximation)'],['Detected','not directly; N_eff = 2.99 ± 0.17 from the CMB (Planck 2018)']]],
@@ -2500,7 +2620,7 @@ const BCAT={stars:[[0.01,0],[0.004,0],[1.0,1.6],[1,0],[0.02,0],[0.003,0]],
 const BCATW={'Stars':[0.04,0.01,1.2,1,0.06,0.01],'Neutron stars & pulsars':[1.8,0.3,0.4,0.7,1.5,1.7],
   'Binaries & gravitational waves':[0.8,0.1,0.8,1,1.0,0.6],'Supernovae':[1.6,0.3,1.1,1,1.6,0.8],'Black holes':[1.5,0.4,1.0,1,1.4,1.2],
   'Nebulae':[0.7,0.3,1.6,1,0.12,0.02],'Galaxies':[0.35,0.1,1.0,1,0.2,0.05],'Dark matter & lensing':[0.3,0.05,0.9,1,0.5,0.1],
-  'Large-scale structure':[0.3,0.05,1.0,1,1.0,0.1],'Galactic Centre':[1.3,0.4,1.6,0.35,0.7,0.6],'Comets & spacecraft':[0.3,0.05,0.9,1,0.3,0.02]};
+  'Large-scale structure':[0.3,0.05,1.0,1,1.0,0.1],'Galactic Centre':[1.3,0.4,1.6,0.35,0.7,0.6],'Comets & spacecraft':[0.3,0.05,0.9,1,0.3,0.02],'Satellites & observatories':[0.3,0.05,0.9,1,0.3,0.02]};
 const BOBJ={m1:[1.6,0.4,1.1,1,1.8,1.7],ngc3372:[0.7,0.3,1.6,1,0.6,0.05],b33:[0.3,0.2,1.5,1,0.05,0.01],
   cena:[1.9,0.4,1,1,1.0,0.6],m87:[1.9,0.3,1,1,1.1,0.5],m51:[0.6,0.1,1,1,0.25,0.05],m31:[0.35,0.1,1.1,1,0.2,0.05],
   cygx1:[0.9,0.1,0.7,1,1.9,0.5],gaiabh1:[0.02,0.01,1,1,0.03,0],gaiabh3:[0.02,0.01,1,1,0.03,0],
@@ -2820,7 +2940,7 @@ function addonsFrame(D,px,now){Dcur=D;HOOKS.forEach(f=>f(D,px,now));ovSize();con
 
 function labels(D,w,h){const F=state.F,px=pxScale()/DPR;
   T.forEach(t=>{const el=t.el,p=t.pos(),dist=p.distanceTo(camPc);let show=false;
-    const R=t.body?t.body.R:t.dso?t.dso.R:GC.rs*40,ang=R/dist*px;
+    const R=t.body?t.body.R:t.dso?t.dso.R:t.labR||GC.rs*40,ang=R/dist*px;
     if(t.body)show=(t.id==='sun'||dist<.03)&&ang<h*.3;
     else if(t.dso&&t.dso.mk&&Math.log10(D)>=t.dso.mk[0]&&Math.log10(D)<=(t.dso.mk[2]||t.dso.mk[1]))show=dsoOn(t.dso)&&ang<h*.45;
     else if(t.dso)show=dsoOn(t.dso)&&ang>3&&ang<h*.45&&(!t.dso.win||win(t.dso.win[0],t.dso.win[1],t.dso.win[2],t.dso.win[3],Math.log10(D))>0.3);
@@ -2959,6 +3079,32 @@ body.hist>*:not(#hist):not(script):not(style){display:none!important}
 #sbxEmpty[hidden]{display:none}
 #sbxMsg{position:absolute;left:50%;top:calc(env(safe-area-inset-top,0px) + 20px);transform:translateX(-50%);max-width:min(520px,calc(100vw - 44px));background:var(--paper);color:#000;font:500 13px/1.4 var(--sans);padding:9px 14px;border-radius:12px;opacity:0;transition:opacity .25s;pointer-events:none;text-align:center}
 #sbxMsg.on{opacity:1}
+#sbx .sbxPopW{position:relative;display:inline-flex}
+#sbx .sbxPop{position:absolute;bottom:calc(100% + 8px);left:0;min-width:170px;background:rgba(10,10,12,.94);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:12px;padding:5px;display:flex;flex-direction:column;gap:2px;z-index:40}
+#sbx .sbxPop[hidden]{display:none}
+#sbx .sbxPop button{display:block;width:100%;text-align:left;border:0;border-radius:8px;padding:9px 12px;background:none}
+#sbx .sbxPop button:hover{background:rgba(236,230,218,.09)}
+#sbx .sbxPop button[aria-pressed="true"]{background:rgba(236,230,218,.16);color:var(--paper)}
+#sbxShipHud{position:absolute;right:22px;top:calc(env(safe-area-inset-top,0px) + 20px);width:236px;background:rgba(10,10,12,.72);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:12px;padding:10px 12px;font:400 12.5px/1.35 var(--sans);color:#ddd6c8;pointer-events:none}
+#sbxShipHud h3{margin:0 0 6px;font:500 11px/1 var(--sans);letter-spacing:.08em;text-transform:uppercase;color:#7fc4ff}
+#sbxShipData>div{display:flex;justify-content:space-between;gap:8px;padding:2px 0}
+#sbxShipHud span{color:var(--muted)}#sbxShipHud b{font-weight:500;color:var(--paper);font-variant-numeric:tabular-nums;text-align:right}
+#sbxShipHud p{margin:6px 0 0;font-size:11px;color:var(--muted)}
+#sbxShipHud{pointer-events:auto;width:270px}
+#sbxShipHud .keys{display:grid;grid-template-columns:1fr;gap:3px;margin:0 0 8px;font-size:11.5px;color:#cfc8ba}
+#sbxShipHud kbd{display:inline-block;min-width:18px;padding:1px 4px;margin-right:2px;border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;font:500 11px/1.3 var(--sans);text-align:center;color:var(--paper);background:rgba(255,255,255,.06)}
+#sbxShipHud .drvl{font:500 10.5px/1 var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:2px 0 5px}
+#sbxShipHud .drv{display:flex;gap:4px;margin:2px 0 8px;flex-wrap:wrap}
+#sbxShipHud .drv button{font:500 11.5px/1 var(--sans);padding:6px 8px;border:1px solid var(--line);border-radius:999px;color:#ddd6c8;background:rgba(10,10,12,.6)}
+#sbxShipHud .drv button[aria-pressed="true"]{background:var(--paper);color:#000}
+#sbxShipHud b.bad{color:#ff8a5c}#sbxShipHud b.ok{color:#8fe3a8}
+#sbxPad{position:absolute;right:22px;bottom:calc(env(safe-area-inset-bottom,0px) + 70px);display:grid;grid-template-columns:repeat(5,44px);gap:6px}
+#sbxPad[hidden]{display:none}
+#sbxPad button{height:44px;border:1px solid var(--line);border-radius:10px;background:rgba(10,10,12,.6);color:#ddd6c8;font:500 18px/1 var(--sans);touch-action:none}
+#sbxPad button.on{background:var(--paper);color:#000}
+@media (hover:hover) and (pointer:fine){#sbxPad{display:none}}
+@media (max-width:720px){#sbxShipHud{right:14px;top:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 128px);width:200px}#sbxPad{right:14px;bottom:calc(env(safe-area-inset-bottom,0px) + 70px)}}
+
 @media (max-width:720px){
   #sbxHead{left:14px}
   #sbxHead h1{font-size:24px}
@@ -3330,7 +3476,9 @@ window.addEventListener('keydown',e=>{if(root.hidden||e.target.tagName==='INPUT'
 /* ---------------------------------------------------------------- frame */
 let tPrev=0,raf=0,trailAcc=0;
 function frame(now){raf=requestAnimationFrame(frame);const dtR=Math.min(0.1,(now-tPrev)/1000||0);tPrev=now;
-  if(SIM.run&&BODIES.length){const want=SIM.speed*dtR;if(SIM.E0===null)SIM.E0=energy();advance(want);}
+  let doneS=SIM.run?SIM.speed*dtR:0;
+  if(SIM.run&&BODIES.length){const want=SIM.speed*dtR;if(SIM.E0===null)SIM.E0=energy();doneS=advance(want);}
+  if(SHIP.on){shipStep(dtR,doneS);if(SHIP.follow)view.tgt.set(SHIP.x[0],SHIP.x[1],SHIP.x[2]);}
   /* camera */
   if(view.follow&&BODIES.includes(view.follow))view.tgt.set(...view.follow.x);
   const ce=Math.cos(view.el);cam.position.set(view.tgt.x+view.dist*ce*Math.cos(view.az),view.tgt.y+view.dist*Math.sin(view.el),view.tgt.z+view.dist*ce*Math.sin(view.az));cam.near=view.dist*1e-4;cam.far=view.dist*1e4;cam.updateProjectionMatrix();cam.lookAt(view.tgt);
@@ -3348,17 +3496,173 @@ function frame(now){raf=requestAnimationFrame(frame);const dtR=Math.min(0.1,(now
   if(DEB){const P=DEB.geometry.attributes.position.array;for(let i=0;i<3*dN;i++)P[i]=dX[i];DEB.geometry.setDrawRange(0,dN);DEB.geometry.attributes.position.needsUpdate=true;}
   for(let i=FL.length-1;i>=0;i--){const f=FL[i];f.t+=dtR;const s=view.dist*(0.02+0.25*f.t);f.s.scale.setScalar(s);f.s.material.opacity=Math.max(0,1-f.t/1.4);if(f.t>1.4){scene.remove(f.s);f.s.material.dispose();FL.splice(i,1);}}
   if(W<720){const pb=$('sbxPal');pb.style.bottom=(H-$('sbxBar').getBoundingClientRect().top+10)+'px';}else $('sbxPal').style.bottom='';
-  updGrid();selUI();statUI();R3.render(scene,cam);}
+  shipDraw(dtR,wpp);updGrid();selUI();statUI();R3.render(scene,cam);}
 let stT=0;function statUI(){if(performance.now()-stT<300)return;stT=performance.now();const n=BODIES.length;let s=`${n} bod${n===1?'y':'ies'}`+(dN?` and ${dN.toLocaleString()} debris particles`:'')+` · t = ${fmtT(SIM.t)}`;
   if(n>1&&SIM.E0!==null){const dE=Math.abs(energy()-SIM.E0)/Math.max(energyScale(),1e-300);/* relative to KE + |PE| */s+=` · energy drift ${dE<1e-9?'< 10⁻⁹':dE.toExponential(1)}`;}
   if(SIM.slowed)s+=' · slowed down to keep close passes accurate';if(!SIM.run)s+=' · paused';$('sbxStat').textContent=s;}
+/* ---------------------------------------------------------------- SPEED MENU: the clock rates in one drop-up menu */
+{const box=$('sbxSpeed'),rates=[...box.querySelectorAll('button')].filter(b=>b.dataset.v!=='pause'),pb=box.querySelector('button[data-v="pause"]');
+ const wrap=document.createElement('span');wrap.className='sbxPopW';const mb=document.createElement('button');mb.id='sbxSpeedBtn';mb.type='button';mb.setAttribute('aria-haspopup','menu');mb.setAttribute('aria-expanded','false');
+ const menu=document.createElement('div');menu.className='sbxPop';menu.hidden=true;menu.setAttribute('role','menu');rates.forEach(r=>{r.setAttribute('role','menuitemradio');menu.appendChild(r);});
+ wrap.append(mb,menu);box.appendChild(wrap);
+ const lab=()=>{const p=rates.find(x=>x.getAttribute('aria-pressed')==='true');mb.textContent='Speed: '+(p?p.textContent:'custom')+' ▴';};
+ const set=o=>{menu.hidden=!o;mb.setAttribute('aria-expanded',String(o));};
+ mb.addEventListener('click',e=>{e.stopPropagation();set(menu.hidden);});
+ menu.addEventListener('click',e=>{if(e.target.closest('button'))setTimeout(()=>{set(false);lab();},0);});
+ document.addEventListener('click',e=>{if(!wrap.contains(e.target))set(false);});
+ const su=speedUI;speedUI=function(){su();rates.forEach(b=>b.setAttribute('aria-pressed',String(SIM.run&&Math.abs(+b.dataset.v-SIM.speed)<1e-12)));lab();if(pb)pb.textContent=SIM.run?'Pause':'Play';};speedUI();}
+
+/* ---------------------------------------------------------------- SHIP: an original light freighter you fly with the arrow keys.
+   The engine delivers a fixed PROPER acceleration a (chosen from real drive classes). Special relativity: the thrust changes the
+   proper velocity u = gamma v at du/dt = a along the nose (exact for thrust along the motion), so v = u/sqrt(1+u^2/c^2) < c.
+   Gravity from every body acts as on a test particle, du/dt += g (Newtonian field). Whether you can manoeuvre is the ratio
+   a/g: below 1 the engine cannot even hold the ship still against the local pull. The ship's clock runs at d tau = dt/gamma. */
+const G0=9.80665*3.15576e7*3.15576e7/1.495978707e11;            // 1 g in AU/yr^2 (= 65,284)
+const DRIVES=[['Ion drive','10⁻⁴ g',1e-4,'Dawn, Psyche: ~0.1 mN per kW'],['Chemical','0.1 g',0.1,'a loaded upper stage'],['1 g','1 g',1,'a crewed torch ship'],
+              ['30 g','30 g',30,'the limit of any crew'],['Torch','10⁴ g',1e4,'fiction: reaches 0.99 c in ~3 hours']];
+const SHIP={on:false,t0:0,x:new Float64Array(3),u:new Float64Array(3),hd:0,tau:0,keys:{},thr:false,sp:null,fl:null,tl:null,tp:null,tn:0,follow:true,hud:null,hd2:null,
+  drive:2,dv:0,gNow:0,gVec:[0,0,0],arG:null,arT:null};
+/* hull: an original long-range light freighter, drawn nose-up at 512 px. Port (left) navigation light red, starboard green,
+   so the ship's own left and right are always readable whatever way it faces. */
+const SHIPTX=(()=>{const c=document.createElement('canvas');c.width=c.height=512;const x=c.getContext('2d');x.translate(256,256);x.lineJoin='round';x.lineCap='round';
+  const lin=(x0,y0,x1,y1,st)=>{const g=x.createLinearGradient(x0,y0,x1,y1);st.forEach(([o,c])=>g.addColorStop(o,c));return g;};
+  const poly=(pts,fill,stroke,w)=>{x.beginPath();x.moveTo(pts[0][0],pts[0][1]);for(let i=1;i<pts.length;i++)x.lineTo(pts[i][0],pts[i][1]);x.closePath();if(fill){x.fillStyle=fill;x.fill();}if(stroke){x.strokeStyle=stroke;x.lineWidth=w||2;x.stroke();}};
+  const mirror=f=>{f(1);x.save();x.scale(-1,1);f(-1);x.restore();};
+  /* swept wings with a darker underside band */
+  mirror(s=>{poly([[40,-30],[150,70],[168,118],[150,126],[44,96]],lin(40,0,168,0,[[0,'#8a929f'],[0.6,'#c9cfd8'],[1,'#7a828f']]),'#1b2029',3);
+    poly([[60,40],[150,104],[156,118],[60,86]],'rgba(40,46,58,.35)');
+    x.strokeStyle='rgba(25,30,40,.5)';x.lineWidth=1.2;[[70,0,140,80],[56,30,150,100]].forEach(([a,b,cc,d])=>{x.beginPath();x.moveTo(a,b);x.lineTo(cc,d);x.stroke();});});
+  /* wingtip engine nacelles */
+  mirror(s=>{poly([[146,40],[176,40],[182,150],[140,150]],lin(140,0,182,0,[[0,'#6d7584'],[0.5,'#e6eaf0'],[1,'#5f6775']]),'#1b2029',3);
+    x.fillStyle='#2a303b';x.fillRect(146,150,32,10);x.fillStyle='#ffb35c';x.beginPath();x.ellipse(161,160,13,5,0,0,7);x.fill();
+    x.fillStyle='#c94a3a';x.fillRect(150,60,24,6);});
+  /* fuselage: tapered nose, mid-body cargo section, aft engine block */
+  poly([[0,-232],[30,-170],[44,-60],[50,120],[40,196],[-40,196],[-50,120],[-44,-60],[-30,-170]],lin(-50,0,50,0,[[0,'#6f7786'],[0.35,'#d5dbe4'],[0.5,'#f3f5f9'],[0.65,'#d5dbe4'],[1,'#6f7786']]),'#1b2029',3.5);
+  x.strokeStyle='rgba(25,30,40,.55)';x.lineWidth=1.3;[-120,-60,0,60,120,170].forEach(y=>{const w=y<-100?34+(y+120)*0.1:46;x.beginPath();x.moveTo(-w,y);x.lineTo(w,y);x.stroke();});
+  x.beginPath();x.moveTo(0,-150);x.lineTo(0,190);x.stroke();
+  /* greebles on the cargo deck */
+  x.fillStyle='rgba(60,68,82,.7)';[[-36,-40,18,30],[18,-40,18,30],[-36,20,14,24],[22,20,14,24],[-10,70,20,40],[-38,130,16,26],[22,130,16,26]].forEach(r=>x.fillRect(...r));
+  x.fillStyle='#b8c0cc';[[-32,-36,10,6],[22,-36,10,6],[-6,76,12,8]].forEach(r=>x.fillRect(...r));
+  /* livery stripes */
+  x.fillStyle='#c4473a';x.fillRect(-46,-8,92,7);x.fillStyle='#e9ecf1';x.fillRect(-46,-1,92,3);
+  /* cockpit canopy with window frames */
+  poly([[0,-206],[16,-170],[14,-140],[-14,-140],[-16,-170]],lin(0,-206,0,-140,[[0,'#bff0ff'],[0.5,'#3fb2e8'],[1,'#1d4d78']]),'#10141b',2.5);
+  x.strokeStyle='#10141b';x.lineWidth=2;x.beginPath();x.moveTo(0,-200);x.lineTo(0,-142);x.moveTo(-15,-162);x.lineTo(15,-162);x.stroke();
+  /* row of cabin windows */
+  x.fillStyle='#9fe6ff';for(let k=0;k<5;k++){x.fillRect(-42,-112+k*14,5,7);x.fillRect(37,-112+k*14,5,7);}
+  /* aft engine bank: three main nozzles */
+  x.fillStyle='#2a303b';x.fillRect(-42,190,84,16);[-26,0,26].forEach(cx=>{x.fillStyle='#4a5260';x.beginPath();x.ellipse(cx,208,13,7,0,0,7);x.fill();x.fillStyle='#ffb35c';x.beginPath();x.ellipse(cx,209,9,4.5,0,0,7);x.fill();});
+  /* navigation lights: port red, starboard green, white at the nose */
+  const lamp=(px,py,col)=>{const g=x.createRadialGradient(px,py,0,px,py,14);g.addColorStop(0,col);g.addColorStop(1,'rgba(0,0,0,0)');x.fillStyle=g;x.beginPath();x.arc(px,py,14,0,7);x.fill();x.fillStyle='#fff';x.beginPath();x.arc(px,py,2.5,0,7);x.fill();};
+  lamp(-166,118,'rgba(255,60,60,.95)');lamp(166,118,'rgba(60,255,120,.95)');lamp(0,-232,'rgba(255,255,255,.9)');
+  return new THREE.CanvasTexture(c);})();
+const FLTX=tex((x,r)=>{const g=x.createRadialGradient(r,r,0,r,r,r);g.addColorStop(0,'rgba(255,255,255,1)');g.addColorStop(0.25,'rgba(140,200,255,0.9)');g.addColorStop(1,'rgba(60,120,255,0)');x.fillStyle=g;x.fillRect(0,0,128,128);});
+function arrowLine(col){const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(new Float32Array(15),3));
+  const l=new THREE.Line(g,new THREE.LineBasicMaterial({color:col,transparent:true,opacity:0.95,depthTest:false}));l.frustumCulled=false;l.renderOrder=12;scene.add(l);return l;}
+function setArrow(l,p,dir,len){const A=l.geometry.attributes.position.array,n=Math.hypot(dir[0],dir[2])||1,dx=dir[0]/n,dz=dir[2]/n,e=[p[0]+dx*len,p[1],p[2]+dz*len],h=len*0.22;
+  const lx=-dz,lz=dx;A.set([p[0],p[1],p[2],e[0],e[1],e[2],e[0]-dx*h+lx*h*0.6,e[1],e[2]-dz*h+lz*h*0.6,e[0],e[1],e[2],e[0]-dx*h-lx*h*0.6,e[1],e[2]-dz*h-lz*h*0.6]);
+  l.geometry.attributes.position.needsUpdate=true;}
+function shipInit(){if(SHIP.sp)return;
+  SHIP.sp=new THREE.Sprite(new THREE.SpriteMaterial({map:SHIPTX,transparent:true,depthTest:false,depthWrite:false}));SHIP.sp.renderOrder=10;scene.add(SHIP.sp);
+  SHIP.fl=new THREE.Sprite(new THREE.SpriteMaterial({map:FLTX,transparent:true,depthTest:false,depthWrite:false,blending:THREE.AdditiveBlending}));SHIP.fl.renderOrder=9;scene.add(SHIP.fl);
+  const N=1600;SHIP.tp=new Float32Array(N*3);const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(SHIP.tp,3));g.setDrawRange(0,0);
+  SHIP.tl=new THREE.Line(g,new THREE.LineBasicMaterial({color:0x7fc4ff,transparent:true,opacity:0.6}));SHIP.tl.frustumCulled=false;scene.add(SHIP.tl);SHIP.tN=N;
+  SHIP.arG=arrowLine(0xff8a5c);SHIP.arT=arrowLine(0x7fd4ff);
+  const h=document.createElement('div');h.id='sbxShipHud';h.hidden=true;
+  h.innerHTML='<h3>Light freighter</h3><div class="keys"><span><kbd>↑</kbd> thrust (speed up)</span><span><kbd>↓</kbd> brake (slow down)</span><span><kbd>←</kbd><kbd>→</kbd> turn left / right</span><span><kbd>1</kbd>–<kbd>5</kbd> or <kbd>+</kbd><kbd>−</kbd> engine power</span><span><kbd>F</kbd> camera follows / free</span></div><div class="drvl">Engine power</div><div class="drv" role="group" aria-label="Engine power"></div><div id="sbxShipData"></div>';root.appendChild(h);SHIP.hud=h;SHIP.hd2=h.querySelector('#sbxShipData');
+  DRIVES.forEach((d,i)=>{const b=document.createElement('button');b.type='button';b.textContent=d[1];b.title=d[0]+': '+d[3];b.addEventListener('click',()=>{SHIP.drive=i;driveUI();});h.querySelector('.drv').appendChild(b);});driveUI();}
+function driveUI(){[...SHIP.hud.querySelectorAll('.drv button')].forEach((b,i)=>b.setAttribute('aria-pressed',String(i===SHIP.drive)));}
+/* place the ship at x on a circular orbit about the dominant body (or at rest) */
+function shipPlace(x){shipInit();SHIP.x.set(x);const d=dominant(SHIP.x,null);
+  if(d){const rx=SHIP.x[0]-d.x[0],rz=SHIP.x[2]-d.x[2],r=Math.hypot(rx,rz)||1e-9,vc=Math.sqrt(G*d.m/r);SHIP.u.set([d.v[0]+vc*rz/r,0,d.v[2]-vc*rx/r]);SHIP.hd=Math.atan2(SHIP.u[2],SHIP.u[0]);}
+  else{SHIP.u.fill(0);SHIP.hd=0;}SHIP.tau=0;SHIP.dv=0;SHIP.t0=SIM.t;SHIP.tn=0;SHIP.tl.geometry.setDrawRange(0,0);}
+function shipReset(){const t=view.tgt;shipPlace([t.x+view.dist*0.25,t.y,t.z]);}
+function shipToggle(on){SHIP.on=on;shipInit();SHIP.sp.visible=SHIP.fl.visible=SHIP.tl.visible=SHIP.arG.visible=SHIP.arT.visible=on;SHIP.hud.hidden=!on;$('sbxShip').setAttribute('aria-pressed',String(on));
+  if(on){shipReset();view.follow=null;msg('↑ speeds up along the nose, ↓ brakes, ← → turn as seen on screen, 1–5 or +/− set engine power. The orange arrow is gravity, the blue one your thrust: you can only fight gravity where blue beats orange.');}}
+const gam=()=>{const u2=(SHIP.u[0]**2+SHIP.u[1]**2+SHIP.u[2]**2)/(C_AU*C_AU);return Math.sqrt(1+u2);};
+function gravAt(x){let ax=0,ay=0,az=0,rmin=1e30,hit=null;for(const b of BODIES){const dx=b.x[0]-x[0],dy=b.x[1]-x[1],dz=b.x[2]-x[2],r2=dx*dx+dy*dy+dz*dz,r=Math.sqrt(r2);
+  if(r<rmin)rmin=r;if(r<b.R*1.02)hit=b;const f=G*b.m/(r2*r);ax+=f*dx;ay+=f*dy;az+=f*dz;}return{a:[ax,ay,az],rmin,hit};}
+function shipStep(dtR,dtS){const K=SHIP.keys;
+  /* steering is screen-relative: find which way a positive heading change turns the nose on screen, then
+     make Left turn it anticlockwise and Right clockwise as seen by the player, whatever the camera angle */
+  {const turn=(K.ArrowLeft?1:0)-(K.ArrowRight?1:0);if(turn){const p=SHIP.x,e=view.dist*0.05,h0=SHIP.hd,a0=screenOf([p[0]+Math.cos(h0)*e,p[1],p[2]+Math.sin(h0)*e]),a1=screenOf([p[0]+Math.cos(h0+0.01)*e,p[1],p[2]+Math.sin(h0+0.01)*e]),o=screenOf(p);
+    const cr=(a0.x-o.x)*(a1.y-o.y)-(a0.y-o.y)*(a1.x-o.x);   // >0: clockwise on screen (y down)
+    SHIP.hd+=turn*(cr>0?-1:1)*2.2*dtR;}}
+  const hx=Math.cos(SHIP.hd),hz=Math.sin(SHIP.hd);SHIP.thr=!!((K.ArrowUp||K.ArrowDown)&&SIM.run);
+  const aT=DRIVES[SHIP.drive][2]*G0;                                   // proper acceleration, AU/yr^2
+  const g0=gravAt(SHIP.x);SHIP.gVec=g0.a;SHIP.gNow=Math.hypot(...g0.a);
+  if(dtS<=0)return;
+  let left=dtS,guard=0;while(left>0&&guard<600){guard++;const gr=gravAt(SHIP.x);if(gr.hit){shipCrash(gr.hit);return;}
+    const g=gam(),vv=Math.hypot(SHIP.u[0],SHIP.u[1],SHIP.u[2])/g+1e-12,am=Math.hypot(...gr.a)+(SHIP.thr?aT:0)+1e-30;
+    const dt=Math.min(left,0.02*gr.rmin/vv,0.1*Math.sqrt(gr.rmin/am));
+    let tx=0,tz=0;if(K.ArrowUp){tx=aT*hx;tz=aT*hz;}
+    else if(K.ArrowDown){const uu=Math.hypot(SHIP.u[0],SHIP.u[2]);if(uu>aT*dt){tx=-aT*SHIP.u[0]/uu;tz=-aT*SHIP.u[2]/uu;}else{SHIP.u[0]=SHIP.u[2]=0;}}
+    if(!SIM.run){tx=tz=0;}
+    SHIP.u[0]+=(gr.a[0]+tx)*dt;SHIP.u[1]+=gr.a[1]*dt;SHIP.u[2]+=(gr.a[2]+tz)*dt;if(tx||tz)SHIP.dv+=aT*dt;
+    const g2=gam();for(let q=0;q<3;q++)SHIP.x[q]+=SHIP.u[q]/g2*dt;SHIP.tau+=dt/g2;left-=dt;}
+  if(left>0){const g=gam();for(let q=0;q<3;q++)SHIP.x[q]+=SHIP.u[q]/g*left;SHIP.tau+=left/g;}}
+function shipCrash(b){flash([...SHIP.x],b);msg(`The freighter hit ${b.name}. It has been reset to where the view is centred.`);shipReset();}
+const fmtA=a=>{const g=a/G0;return g>=0.1?g.toPrecision(3)+' g':(g*9.80665>=1e-3?(g*9.80665).toPrecision(3)+' m/s²':(g*9.80665*1e3).toPrecision(3)+' mm/s²');};
+const fmtV=v=>{const k=v*4.74047;return k<1e4?k.toPrecision(3)+' km/s':(k/299792.458).toPrecision(3)+' c';};
+function shipDraw(dtR,wpp){if(!SHIP.on)return;const p=SHIP.x;SHIP.sp.position.set(p[0],p[1],p[2]);const dist=cam.position.distanceTo(SHIP.sp.position);
+  SHIP.sp.scale.setScalar(84*dist*wpp);
+  const hx=Math.cos(SHIP.hd),hz=Math.sin(SHIP.hd),a=screenOf(p),b=screenOf([p[0]+hx*view.dist*0.05,p[1],p[2]+hz*view.dist*0.05]);
+  SHIP.sp.material.rotation=Math.atan2(-(b.y-a.y),b.x-a.x)-Math.PI/2;
+  SHIP.fl.visible=SHIP.thr&&SHIP.keys.ArrowUp;if(SHIP.fl.visible){const ox=-hx*36*dist*wpp,oz=-hz*36*dist*wpp;SHIP.fl.position.set(p[0]+ox,p[1],p[2]+oz);SHIP.fl.scale.setScalar((14+5*SHIP.drive)*(0.8+0.4*Math.random())*dist*wpp);}
+  /* force arrows: lengths compare gravity with the engine on one screen scale (equal lengths = the engine just balances gravity) */
+  const aT=DRIVES[SHIP.drive][2]*G0,gN=SHIP.gNow,ref=Math.max(aT,gN),L=90*dist*wpp,lg=v=>L*Math.max(0.12,Math.min(1,v/ref));
+  SHIP.arG.visible=gN>0;if(gN>0)setArrow(SHIP.arG,p,SHIP.gVec,lg(gN));
+  setArrow(SHIP.arT,p,SHIP.keys.ArrowDown?[-SHIP.u[0],0,-SHIP.u[2]]:[hx,0,hz],lg(aT));SHIP.arT.material.opacity=SHIP.thr?0.95:0.35;
+  if(SIM.run){if(SHIP.tn<SHIP.tN)SHIP.tn++;else SHIP.tp.copyWithin(0,3);const i=3*(SHIP.tn-1);SHIP.tp[i]=p[0];SHIP.tp[i+1]=p[1];SHIP.tp[i+2]=p[2];
+    SHIP.tl.geometry.setDrawRange(0,SHIP.tn);SHIP.tl.geometry.attributes.position.needsUpdate=true;}
+  if(performance.now()-(shipDraw.t||0)>200){shipDraw.t=performance.now();const g=gam(),beta=Math.sqrt(1-1/(g*g));
+    const d=dominant(p,null);let rows='';
+    rows+=`<div><span>Engine</span><b>${DRIVES[SHIP.drive][0]}, ${fmtA(aT)}</b></div><div><span>Gravity here</span><b class="${gN>aT?'bad':''}">${gN?fmtA(gN):'none'}</b></div>`;
+    rows+=`<div><span>Engine ÷ gravity</span><b class="${gN>aT?'bad':'ok'}">${gN?(aT/gN<0.01?(aT/gN).toExponential(1):(aT/gN).toPrecision(3)):'∞'}${gN>aT?' · cannot hover':''}</b></div>`;
+    if(d){const r=Math.hypot(d.x[0]-p[0],d.x[1]-p[1],d.x[2]-p[2]),ve=Math.sqrt(2*G*d.m/r),vr=[SHIP.u[0]/g-d.v[0],SHIP.u[1]/g-d.v[1],SHIP.u[2]/g-d.v[2]],vrel=Math.hypot(...vr),eps=vrel*vrel/2-G*d.m/r;
+      rows+=`<div><span>Strongest pull</span><b>${d.name}, ${fmtL(r)}</b></div><div><span>Speed relative to it</span><b>${fmtV(vrel)}</b></div><div><span>Escape speed here</span><b>${fmtV(ve)}</b></div>`;
+      rows+=`<div><span>State</span><b class="${eps<0?'':'ok'}">${eps<0?'bound · needs ≥ '+fmtV(Math.max(0,ve-vrel))+' more':'escaping'}</b></div>`;
+      if(eps<0){const tB=Math.max(0,ve-vrel)/aT;rows+=`<div><span>Escape burn, no gravity losses</span><b>${fmtT(tB)}</b></div>`;}}
+    rows+=`<div><span>Speed</span><b>${beta<0.01?fmtV(beta*C_AU):beta.toFixed(beta>0.99?5:3)+' c'}</b></div><div><span>Lorentz factor γ</span><b>${g<1.0001?'1.000':g.toPrecision(4)}</b></div>`;
+    rows+=`<div><span>Δv spent</span><b>${fmtV(SHIP.dv)}</b></div><div><span>Ship / outside clock</span><b>${fmtT(SHIP.tau)} / ${fmtT(SIM.t-SHIP.t0)}</b></div>`;
+    SHIP.hd2.innerHTML=rows;}}
+window.addEventListener('keydown',e=>{if(root.hidden||!SHIP.on||e.target.tagName==='INPUT')return;
+  if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)){SHIP.keys[e.key]=true;e.preventDefault();}
+  if(/^[1-5]$/.test(e.key)){SHIP.drive=+e.key-1;driveUI();}
+  if(e.key==='+'||e.key==='='||e.key==='PageUp'){SHIP.drive=Math.min(DRIVES.length-1,SHIP.drive+1);driveUI();e.preventDefault();}
+  if(e.key==='-'||e.key==='_'||e.key==='PageDown'){SHIP.drive=Math.max(0,SHIP.drive-1);driveUI();e.preventDefault();}
+  if(e.key==='f'||e.key==='F'){SHIP.follow=!SHIP.follow;}});
+window.addEventListener('keyup',e=>{if(SHIP.keys[e.key])SHIP.keys[e.key]=false;});
+window.addEventListener('blur',()=>{SHIP.keys={};});
+{const b=document.createElement('button');b.id='sbxShip';b.type='button';b.setAttribute('aria-pressed','false');b.textContent='Fly a ship';b.title='A freighter you steer with the arrow keys: how hard is it to fight gravity?';
+ $('sbxTrails').before(b);b.addEventListener('click',()=>shipToggle(!SHIP.on));}
+{const pad=document.createElement('div');pad.id='sbxPad';pad.hidden=true;pad.innerHTML='<button data-k="ArrowLeft" aria-label="Turn left">←</button><button data-k="ArrowUp" aria-label="Thrust">↑</button><button data-k="ArrowDown" aria-label="Brake">↓</button><button data-k="ArrowRight" aria-label="Turn right">→</button>';
+ root.appendChild(pad);pad.querySelectorAll('button').forEach(b=>{const k=b.dataset.k;const on=e=>{e.preventDefault();SHIP.keys[k]=true;b.classList.add('on');},off=()=>{SHIP.keys[k]=false;b.classList.remove('on');};
+  b.addEventListener('pointerdown',on);b.addEventListener('pointerup',off);b.addEventListener('pointerleave',off);b.addEventListener('pointercancel',off);});
+ const st=shipToggle;shipToggle=function(on){st(on);pad.hidden=!on;};}
+/* ship scenarios: strange systems to fly through */
+const SHIPSCEN=[
+ ['Ship: escape a black-hole binary','Black holes of 20 and 8 M☉ orbit 0.5 AU apart; your freighter starts 2 AU out with an ion drive. Try 0.1 g, then 1 g.',()=>{
+   const m1=20,m2=8,a=0.5,v=Math.sqrt(G*(m1+m2)/a);addBody('bh',m1,[-a*m2/(m1+m2),0,0],[0,0,v*m2/(m1+m2)],'Black hole A');addBody('bh',m2,[a*m1/(m1+m2),0,0],[0,0,-v*m1/(m1+m2)],'Black hole B');
+   return{dist:6,speed:1/365.25,ship:[2,0,0],drive:0};}],
+ ['Ship: skim a neutron star','A 1.4 M☉ neutron star; the freighter starts 150,000 km away, where gravity is ~800 g. Only the 10⁴ g torch can climb out.',()=>{
+   addBody('ns',1.4,[0,0,0],[0,0,0],'Neutron star');return{dist:0.004,speed:1/8766/60,ship:[0.001,0,0],drive:3};}],
+ ['Ship: leave Earth orbit for Jupiter','The real Solar System. From 1 AU an ion drive (10⁻⁴ g) can still climb out of the Sun’s pull (6×10⁻⁴ g here), but only slowly.',()=>{
+   const s=addBody('star',1,[0,0,0],[0,0,0],'Sun');[['Earth',1,1,'planet'],['Mars',1.524,0.107,'planet'],['Jupiter',5.203,317.8,'gas']].forEach(([n,a,me,k],i)=>orbitBody(s,k,me*MEARTH,a,i*1.3,n,0));
+   fixCOM();return{dist:8,speed:1/12,ship:[1.05,0,0.05],drive:0};}],
+ ['Ship: fly past Sgr A*','A 4 million M☉ black hole. Start at 200 AU with the 10⁴ g torch and see how close you can pass and still get away.',()=>{
+   addBody('bh',4e6,[0,0,0],[0,0,0],'Sgr A*');return{dist:500,speed:1/365.25,ship:[200,0,0],drive:4};}]];
+SHIPSCEN.forEach(([n,d,f])=>{const b=document.createElement('button');b.className='scen';b.innerHTML='<b></b><span></span>';b.firstChild.textContent=n;b.lastChild.textContent=d;
+  b.addEventListener('click',()=>{clearAll();const o=f();view.tgt.set(0,0,0);view.dist=o.dist;setSpeed(o.speed);if(!SHIP.on)shipToggle(true);SHIP.drive=o.drive;driveUI();shipPlace(o.ship);SHIP.follow=false;
+    msg(n.replace('Ship: ','')+': '+d);if(innerWidth<720)$('sbxScenD').open=false;});$('sbxScen').appendChild(b);});
+
 /* ---------------------------------------------------------------- open / close */
 function open(){if(innerWidth<720){$('sbxScenD').open=false;setMini(true);}document.body.classList.add('sbx');root.hidden=false;if(!R3)initGL();resize();tPrev=performance.now();cancelAnimationFrame(raf);raf=requestAnimationFrame(frame);}
 function close(){cancelAnimationFrame(raf);root.hidden=true;document.body.classList.remove('sbx');}
 $('sbxExit').addEventListener('click',close);
 window.addEventListener('keydown',e=>{if(e.key==='Escape'&&!root.hidden&&!SEL&&!drag)close();});
 const btn=document.getElementById('sbxBtn');if(btn)btn.addEventListener('click',open);
-window.__sbx={open,close,BODIES,SIM,addBody,advance,energy,SCEN,KINDS,setSpeed,view,get dN(){return dN;}};
+window.__shipRot=()=>SHIP.sp?SHIP.sp.material.rotation:0;window.__sbx={open,close,BODIES,SIM,addBody,advance,energy,SCEN,KINDS,setSpeed,view,get dN(){return dN;}};
 })();
 
 </script>

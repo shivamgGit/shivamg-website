@@ -1669,7 +1669,7 @@ snr({id:'velasnr',name:'Vela supernova remnant',ra:128.5,dec:-45.5,d:287,Rpc:19,
   note:'The nearest supernova seen since 1604, in the Large Magellanic Cloud, 51.4 kpc away. About two hours before the light, 24 neutrinos arrived in three underground detectors (Kamiokande-II, IMB, Baksan) on 23 February 1987: the first neutrinos from beyond the Sun, carrying the energy of a forming neutron star. The equatorial ring (0.2 pc radius) was blown by the progenitor 20,000 years before; the ejecta shock now lights it in beads. The outer rings make an hourglass. In 2024 JWST found argon emission that points to a neutron star at the centre (Fransson et al. 2024).'});}
 {const C=skyPos(210.8023,54.349,6.7e6);const mk=(id,name,ra,dec,col,note)=>{const ps=PS();const o={id,name,cat:'Supernovae',ra,dec,d:6.7e6,pa:0,inc:0,R:3000,view:40000,lmin:50,
    objs:[bb({R:400,col,mode:1,add:1,k:1}),beacon(COLX.sn)],mk:XG_MK,note};const e=exo(o);TK.push(now=>{e.objs[0].material.uniforms.uOp.value*=0.75+0.25*Math.sin(now/400);});return e;};
- mk('sn2011fe','SN 2011fe (in M101)',210.7740,54.2737,[.95,.95,1],'A type Ia supernova in the Pinwheel Galaxy, 6.4\u20136.7 Mpc away, caught within hours of explosion: the nearest Ia in decades and a calibrator for the cosmic distance ladder whose standard candles revealed dark energy. Glow size is schematic.');
+ mk('sn2011fe','SN 2011fe (in M101)',210.7740,54.2737,[.95,.95,1],'A type Ia supernova in the Pinwheel Galaxy, 6.4\u20136.7 Mpc away, caught within hours of explosion: the nearest Ia in decades and a calibrator for the cosmic distance ladder whose standard candles revealed dark energy (Ch 12). Glow size is schematic.');
  mk('sn2023ixf','SN 2023ixf (in M101)',210.9107,54.3117,[1,.75,.55],'A core-collapse (type II) supernova in M101 discovered on 19 May 2023, the closest of its kind in a decade; its red-supergiant progenitor was found in archival Hubble and Spitzer images. Glow size is schematic.');}
 /* ---------------- GW170817 in NGC 4993 ---------------- */
 {const d=40e6,gal=elliptical({seed:4993,N:30000,re:2.9,rmax:16,gc:200}),objs=[points(gal),beacon(COLX.gw)];
@@ -1725,7 +1725,7 @@ galaxy({g:1.2,id:'ngc1068',name:'NGC 1068 (M77): a steady neutrino source',ra:40
 /* ---------------- dark matter and lensing ---------------- */
 {const ps=PS(),r=rng(2000);nfw(ps,r,20000,10,16000,[.62,.42,1],6000,0.16);
  exo({side:1,id:'mwhalo',name:'Milky Way dark-matter halo',cat:'Dark matter & lensing',ra:266.41684,dec:-29.00781,d:8178,pa:0,inc:0,R:2e5,view:7.5e5,lmin:2000,objs:[points(ps)],g:1,win:[5.2,5.7,6.6,7.1],
-  note:'The Galaxy\u2019s stars and gas are a small part of its mass. The flat rotation curve (about 230 km/s far beyond the stellar disc) needs a roughly spherical halo of dark matter some 200 kpc in radius and about 10\u00b9\u00b2 solar masses, five to ten times the visible mass. Drawn here as points sampled from an NFW profile (scale radius 20 kpc), the shape found in cold-dark-matter simulations. It is invisible in reality.'});}
+  note:'The Galaxy\u2019s stars and gas are a small part of its mass. The flat rotation curve (about 230 km/s far beyond the stellar disc, Ch 18) needs a roughly spherical halo of dark matter some 200 kpc in radius and about 10\u00b9\u00b2 solar masses, five to ten times the visible mass. Drawn here as points sampled from an NFW profile (scale radius 20 kpc), the shape found in cold-dark-matter simulations. It is invisible in reality.'});}
 {const ps=PS(),r=rng(1933),d=99e6;nfw(ps,r,0.45e6,4.5,16000,[.62,.42,1],1.2e4,0.06);
  const gal=PS(),TP=L.tmrs.pts.geometry.attributes.position.array,C=skyPos(194.9531,27.9807,d);let n=0;
  for(const i of FOG.coma){put(gal,TP[3*i]*1e6-C.x,TP[3*i+1]*1e6-C.y,TP[3*i+2]*1e6-C.z,[1,.85,.6],4e4,1.0);n++;}   // members as placed in the layer
@@ -2267,15 +2267,15 @@ const ORB=[
   note:'China’s modular space station, completed in 2022 and crewed by three taikonauts in rotation.'},
  {id:'hubble',name:'Hubble Space Telescope',a:REK+515,e:0.0003,i:28.47,O:120,w:0,M0:200,col:[0.75,0.88,1],px:4.5,
   facts:['Space telescope',[['Launched','24 April 1990'],['Altitude','~515 km, slowly decaying'],['Inclination','28.5°'],['Period','~95 min'],['Mirror','2.4 m'],['Serviced','five Shuttle missions, 1993–2009']]],
-  note:'Hubble orbits low enough to have been serviced by astronauts five times. Its Key Project measured H₀ = 72 ± 8 km/s/Mpc, and its Cepheids anchor today’s distance ladder.'},
+  note:'Hubble orbits low enough to have been serviced by astronauts five times. Its Key Project measured H₀ = 72 ± 8 km/s/Mpc, and its Cepheids anchor today’s distance ladder (Chapter 25).'},
  {id:'fermi',name:'Fermi Gamma-ray Space Telescope',a:REK+525,e:0.001,i:25.6,O:300,w:0,M0:300,col:[0.85,0.7,1],px:4,
   facts:['Gamma-ray observatory',[['Launched','11 June 2008'],['Altitude','~525 km'],['Inclination','25.6°'],['Band','20 MeV – 300 GeV (LAT)'],['Sky coverage','whole sky every 3 hours']]],
-  note:'Fermi’s Large Area Telescope maps the whole gamma-ray sky every three hours; its Galactic-Centre GeV excess is a long-running dark-matter debate. Its GBM saw GRB 170817A 1.7 s after the neutron-star merger.'},
+  note:'Fermi’s Large Area Telescope maps the whole gamma-ray sky every three hours; its Galactic-Centre GeV excess is a long-running dark-matter debate (Chapter 19). Its GBM saw GRB 170817A 1.7 s after the neutron-star merger.'},
  {id:'chandra',name:'Chandra X-ray Observatory',a:80800,e:0.74,i:28.5,O:60,w:270,M0:40,col:[0.6,0.85,1],px:4,
   facts:['X-ray observatory',[['Launched','23 July 1999'],['Orbit','highly elliptical, ~16,000 × 133,000 km'],['Period','~64 hours'],['Resolution','0.5″, the sharpest X-ray optics flown']]],
   note:'Chandra spends most of each 64-hour orbit far above the radiation belts so it can observe for long stretches. Its X-ray map of the Bullet Cluster’s gas, set against the lensing mass, is one of the clearest pieces of evidence for dark matter.'},
  {id:'gps',name:'GPS satellite (one of 31)',a:26560,e:0.01,i:55,O:0,w:0,M0:80,col:[0.6,1,0.75],px:4,
-  facts:['Navigation satellite',[['Altitude','20,200 km'],['Period','11 h 58 min (half a sidereal day)'],['Planes','6, inclined 55°'],['Relativity','clocks gain +38.5 μs a day net']]],
+  facts:['Navigation satellite',[['Altitude','20,200 km'],['Period','11 h 58 min (half a sidereal day)'],['Planes','6, inclined 55°'],['Relativity','clocks gain +38.5 μs a day net (Chapter 03)']]],
   note:'GPS clocks run fast by 45.7 μs a day from weaker gravity and slow by 7.2 μs a day from their speed. Without the net +38.5 μs correction, positions would drift by about 11 km a day.'},
  {id:'geo',name:'Geostationary satellite',a:42164,e:0,i:0,O:0,w:0,M0:0,col:[1,0.85,0.5],px:4,geo:1,
   facts:['Communications orbit',[['Altitude','35,786 km'],['Period','one sidereal day, 23 h 56 min'],['Inclination','0°'],['Effect','hangs over one point of the equator']]],
@@ -2324,15 +2324,15 @@ const L2D=1.5e6*KM;
 const L2=[
  {id:'jwst',name:'James Webb Space Telescope',ay:800000,az:250000,P:180,ph:0,from:jdOf(2022,1,24),to:1e9,col:[1,0.85,0.45],
   facts:['Infrared space telescope',[['Launched','25 December 2021'],['Orbit','halo around Sun–Earth L2, ~800,000 km'],['Mirror','6.5 m, 18 segments'],['Sunshield','5 layers, keeps the optics near 40 K']]],
-  note:'Webb sits behind the Earth at L2 so its sunshield can block the Sun, Earth and Moon at once. Its Cepheid photometry ruled out crowding as the cause of the Hubble tension.'},
+  note:'Webb sits behind the Earth at L2 so its sunshield can block the Sun, Earth and Moon at once. Its Cepheid photometry ruled out crowding as the cause of the Hubble tension (Chapter 25).'},
  {id:'euclid',name:'Euclid',ay:1000000,az:400000,P:180,ph:120,from:jdOf(2023,8,28),to:1e9,col:[0.7,0.9,1],
-  facts:['Dark-energy survey telescope',[['Launched','1 July 2023'],['Orbit','halo around L2'],['Survey','a third of the sky, billions of galaxies'],['Measures','weak lensing and BAO']]],
+  facts:['Dark-energy survey telescope',[['Launched','1 July 2023'],['Orbit','halo around L2'],['Survey','a third of the sky, billions of galaxies'],['Measures','weak lensing and BAO, Chapter 24']]],
   note:'Euclid maps the shapes and positions of billions of galaxies to measure dark matter through weak lensing and the expansion history through baryon acoustic oscillations.'},
  {id:'gaia',name:'Gaia',ay:340000,az:90000,P:180,ph:240,from:jdOf(2014,1,8),to:jdOf(2025,3,27),col:[0.8,1,0.8],
   facts:['Astrometry mission',[['Launched','19 December 2013'],['Operated','2014 – March 2025, then retired to a heliocentric orbit'],['Catalogue','~1.8 billion stars'],['Parallax precision','~20 μas at 15th mag']]],
   note:'Gaia measured parallaxes for nearly two billion stars, the first rung of every distance ladder. It was switched off in March 2025 and pushed away from L2, so it is shown here only for dates during its mission.'},
  {id:'planck',name:'Planck',ay:400000,az:400000,P:180,ph:60,from:jdOf(2009,7,3),to:jdOf(2013,10,23),col:[1,0.6,0.6],
-  facts:['CMB satellite',[['Launched','14 May 2009'],['Operated','2009 – 23 October 2013, at L2'],['Detectors','cooled to 0.1 K'],['Key result','six ΛCDM parameters to ~1 %']]],
+  facts:['CMB satellite',[['Launched','14 May 2009'],['Operated','2009 – 23 October 2013, at L2'],['Detectors','cooled to 0.1 K'],['Key result','six ΛCDM parameters to ~1 %, Chapter 22']]],
   note:'Planck mapped the CMB temperature and polarisation from L2 in 2009–2013 and fixed ΛCDM’s six parameters to about a per cent. It was retired into a heliocentric orbit in October 2013, so it appears here only for dates during its mission; set the clock to 2010 to see it.'},
  {id:'wmap',name:'WMAP',ay:200000,az:200000,P:180,ph:300,from:jdOf(2001,10,1),to:jdOf(2010,9,8),col:[1,0.75,0.9],
   facts:['CMB satellite',[['Launched','30 June 2001'],['Operated','2001–2010, at L2'],['Key result','the age and flat geometry of the universe to a few per cent']]],
@@ -3394,6 +3394,9 @@ body.hist>*:not(#hist):not(script):not(style){display:none!important}
 #histNote{margin:4px 0 0;font:italic 400 13px/1.4 var(--serif);color:#c9c2b4;text-shadow:0 1px 2px #000,0 0 10px rgba(0,0,0,.9)}
 #histCard{position:absolute;right:22px;top:calc(env(safe-area-inset-top,0px) + 20px);width:min(360px,calc(100vw - 44px));max-height:calc(100% - 170px);overflow:auto;background:rgba(8,8,10,.8);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:14px;padding:13px 16px 12px}
 #histCard .sp{margin:0;font:400 12px/1.3 var(--sans);color:var(--muted)}
+#histCard.epin>#histSpan,#histCard.epin>#histName,#histCard.epin>#histTx,#histCard.epin>#histNow,#histCard.epin>#histChart{animation:epin .7s ease-out}
+@keyframes epin{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){#histCard.epin>*{animation:none}}
 #histCard h2{margin:2px 0 10px;font:400 21px/1.2 var(--serif)}
 #histBud .bar{display:flex;height:6px;border-radius:3px;overflow:hidden;background:rgba(236,230,218,.08)}
 #histBud .bar i{display:block;height:100%}
@@ -4534,7 +4537,7 @@ varying vec3 vC;
 void main(){vec3 r0=place(position,psi);float d0=length(r0);vec3 r=uZo+(r0-uZo)*uScale;vec3 w=uCam+r;
  vec4 mv=modelViewMatrix*vec4(w,1.0);gl_Position=projectionMatrix*mv;float z=max(-mv.z,0.05);float d=length(r);
  float a=uBaseA*uW*seam(d0)*exp(-d/uFadeR)*smoothstep(1.5,6.0,d);
- vec3 c=uBase;if(uSpecOn>0.5){c=rn<uSpec.x?uSp0:rn<uSpec.y?uSp1:rn<uSpec.z?uSp2:rn<uSpec.w?uSp3:uSp4;}
+ vec3 c=uBase;if(uSpecOn>0.001){vec3 cs=rn<uSpec.x?uSp0:rn<uSpec.y?uSp1:rn<uSpec.z?uSp2:rn<uSpec.w?uSp3:uSp4;c=mix(uBase,cs,clamp(uSpecOn,0.0,1.0));}
  float m=1.0+uDelG*dl;
  vec3 wq=uCam+r0;
  if(uShA>0.0){float sh=exp(-pow((length(wq-uSh0)-uRs)/uShW,2.0))+exp(-pow((length(wq-uSh1)-uRs)/uShW,2.0))+exp(-pow((length(wq-uSh2)-uRs)/uShW,2.0))+exp(-pow((length(wq-uSh3)-uRs)/uShW,2.0));
@@ -4551,7 +4554,7 @@ uniform vec4 uSpec;uniform vec3 uSp0,uSp1,uSp2,uSp3,uSp4,uFlashC,uSfC;
 varying vec3 vC;varying float vK;
 void main(){vec3 r=place(position,psi);float d0=length(r);vec3 c=vec3(0.0);float px=0.0;vK=0.0;
  if(uMoveF>0.0&&rn<uMoveF){vec3 dir=hdir(rn*913.0);float ph=fract(uTime*uMoveSpd*(0.6+0.8*hsh(rn*77.0))+hsh(rn*31.0));r+=dir*(ph-0.5)*uMoveLen;
-   c=uSpecOn>0.5?(rn<uSpec.x?uSp0:rn<uSpec.y?uSp1:rn<uSpec.z?uSp2:rn<uSpec.w?uSp3:uSp4):vec3(1.0);c*=uMoveA*sin(3.14159*ph);px=3.2;vK=0.25;}
+   c=mix(vec3(1.0),(rn<uSpec.x?uSp0:rn<uSpec.y?uSp1:rn<uSpec.z?uSp2:rn<uSpec.w?uSp3:uSp4),clamp(uSpecOn,0.0,1.0));c*=uMoveA*sin(3.14159*ph);px=3.2;vK=0.25;}
  if(uFlash>0.0){float th=1.0-0.012*uFlash;float x=fract(hsh(rn*57.0)*13.0+uTime*0.05);
    if(x>th){float f=sin(3.14159*(x-th)/(1.0-th));c+=uFlashC*f*2.2;px=max(px,2.0+f*7.0);vK=max(vK,f*0.7);}}
  if(uFsf>0.0){float t0=1.0-uFsf;float lit=smoothstep(t0,t0+uFsf*0.3,sf)*uSfA;
@@ -4610,7 +4613,7 @@ void main(){vec4 v=uPI*vec4(vU*2.0-1.0,-1.0,1.0);vec3 rd=normalize(uRot*(v.xyz/v
   acc+=(mix(uColA,uColB,smoothstep(-1.4,1.4,mix(nb,d,uCm)))*max(m,0.0)+uColB*sh)*wgt;sP=s1;eP=e1;}
  gl_FragColor=vec4(acc*uI,1.0);}`;
 let volScene,volMat;
-let U=0,speed=1,playing=true,lastU=-1;
+let U=0,Ud=0,speed=1,playing=true,lastU=-1,SNAP=true;   /* U: where the timeline is set; Ud: what is drawn, which glides to U */
 function rtType(){if(R3.capabilities.isWebGL2)return THREE.HalfFloatType;const gl=R3.getContext();return gl.getExtension('OES_texture_half_float')&&gl.getExtension('EXT_color_buffer_half_float')?THREE.HalfFloatType:THREE.UnsignedByteType;}
 function mkRT(w,h){return new THREE.WebGLRenderTarget(w,h,{minFilter:THREE.LinearFilter,magFilter:THREE.LinearFilter,depthBuffer:false,stencilBuffer:false,type:rtType()});}
 let rtScale=0.5,rtW=64,rtH=64;
@@ -4739,7 +4742,7 @@ function apply(s,T){const g=gasMat.uniforms,vu=volMat.uniforms,sp=sharpMat.unifo
   g.uDelG.value=(0.3/sig)*Math.exp(-dv*5)+0.25*dv;ST.exag=dv>0?0:0.3/real;
   /* sound waves: fronts at r_s(t), frozen at the drag epoch, then fading as dark matter dominates */
   const rs=rsv(s.a);g.uRs.value=rs;ST.rs=rs;g.uShW.value=2.4;
-  let shA=0;if(t>1200)shA=U<U_DEC?3*sstep(0,10,rs):3*Math.exp(-(U-U_DEC)*NE*1.4);g.uShA.value=shA>0.01?shA:0;
+  let shA=0;if(t>1200)shA=Ud<U_DEC?3*sstep(0,10,rs):3*Math.exp(-(Ud-U_DEC)*NE*1.4);g.uShA.value=shA>0.01?shA:0;
   /* stars and galaxies: Press-Schechter collapsed fraction, compressed (each particle is ~5e11 Msun of matter) */
   let fs=0,sfA=0,sfc=[0.7,0.8,1];
   if(s.z<32){fs=0.02*Math.sqrt(H.fcoll(1e6,s.a)/0.824)*cl01((s.z-5)/5)+0.035*Math.sqrt(H.fcoll(1e8,s.a)/0.761);sfA=1;
@@ -4753,7 +4756,7 @@ function apply(s,T){const g=gasMat.uniforms,vu=volMat.uniforms,sp=sharpMat.unifo
   /* gas brightness normalised so the mean along a sight line is tgt, whatever the fog depth and sprite size */
   const n=NDRAW/(L*L*L),Ae=0.9416*Math.pow(g.uSize.value/2,2);g.uBaseA.value=tgt>0?tgt/(n*Ae*leff(F)):0;
   /* photons */
-  const trap=U<U_DEC;ph.uTrap.value=trap?1:0;ph.uFree.value=trap?0:(U-U_DEC)*NE*EPS*14;
+  const trap=Ud<U_DEC;ph.uTrap.value=trap?1:0;ph.uFree.value=trap?0:(Ud-U_DEC)*NE*EPS*14;
   V3(ph.uPhC.value,bb(TKc));ph.uPhA.value=id==='inf'?0:(trap?0.5:0.9)*Ipl(s.TK)*(1-wm);
   /* sky: behind the plasma, the last-scattering surface: the CMB pattern, at the plasma's own colour and brightness,
      reddening and fading out of visible light */
@@ -4790,7 +4793,7 @@ function readout(s){$('histT').textContent=fmtT(s.t);
   else{$('histNote').textContent=notes.join(' · ');lg.hidden=true;}
   const[r,m,l]=s.om,bar=$('histBud');bar.querySelector('.r').style.width=(r*100)+'%';bar.querySelector('.m').style.width=(m*100)+'%';bar.querySelector('.l').style.width=(l*100)+'%';
   bar.querySelector('.lg').textContent=`Radiation ${pc(r)} · Matter ${pc(m)} · Dark energy ${pc(l)}`;
-  if(s.ei!==lastE){lastE=s.ei;const e=s.e;$('histName').textContent=e.name;$('histSpan').textContent=`${fmtT(e.t0)} – ${fmtT(e.t1)}`;$('histTx').textContent=TXT[e.id][0];$('histNow').textContent='Today: '+TXT[e.id][1];
+  if(s.ei!==lastE){lastE=s.ei;const e=s.e;{const cd=$('histCard');cd.classList.remove('epin');void cd.offsetWidth;cd.classList.add('epin');}$('histName').textContent=e.name;$('histSpan').textContent=`${fmtT(e.t0)} – ${fmtT(e.t1)}`;$('histTx').textContent=TXT[e.id][0];$('histNow').textContent='Today: '+TXT[e.id][1];
     $('histEp').textContent=`${s.ei+1} of ${NE}: ${e.name.split(':')[0]}`;[...$('histSegs').children].forEach((b,i)=>b.setAttribute('aria-current',String(i===s.ei)));}
   $('histThumb').style.left=(U*100)+'%';$('histTL').setAttribute('aria-valuenow',String(Math.round(U*100)));$('histTL').setAttribute('aria-valuetext',fmtT(s.t));
   chart(s);}
@@ -5173,14 +5176,14 @@ function weights(u){const ei=epochOf(u),f=u*NE-ei,id=EP[ei].id;let wm=0,wc=0,z=1
   if(id==='dark'){wm=1-sstep(0.26,0.48,f);z=1+2.5*sstep(0.26,0.48,f);}
   if(id==='dawn')wc=sstep(0.02,0.1,f)*(1-sstep(0.66,0.78,f));
   return{wm,wc,f,id,zs:z,tau:cl((f-0.08)/0.55)};}
-let lastS=null,lastW=null;
+let lastS=null,lastW=null,miU=-1;
 function frame(s,dt,T,w){if(!pts)init();lastS=s;lastW=w;sim(s,dt,w);
   camM.position.set(0,0,0);camM.quaternion.copy(cam.quaternion);camM.updateMatrixWorld();camM.projectionMatrix.copy(cam.projectionMatrix);camM.projectionMatrixInverse.copy(cam.projectionMatrixInverse);
   pmat.uniforms.uPx.value=Hh*R3.getPixelRatio()/(2*Math.tan(cam.fov*Math.PI/360));
   draw(s.Tm,Math.max(w.wm,w.wc),w.wc>0.001,w.tau);R3.render(scM,camM);labels(w.wc<0.001&&w.wm>0.6);}
 function sim(s,dt,w){clock+=dt;const cloud=w.wc>0.001;const md=cloud?'cloud':'soup';
-  if(md!==mode||Math.abs(U-lastU)>0.012||U<lastU-1e-4){mode=md;if(cloud)buildCloud();else{reset(s);if(w.id==='qgp'&&w.f<0.1)P.forEach(p=>{p.al=0;});}}
-  lastU=U;zs=w.zs;dt=Math.min(dt,0.05);
+  if(md!==mode||(!window.__histGlide&&(Math.abs(Ud-miU)>0.012||Ud<miU-1e-4))){mode=md;if(cloud)buildCloud();else{reset(s);if(w.id==='qgp'&&w.f<0.1)P.forEach(p=>{p.al=0;});}}
+  if(!window.__histGlide)miU=Ud;zs=w.zs;dt=Math.min(dt,0.05);
   if(cloud)updCloud(w.tau,dt);
   else{/* the camera drifts slowly through the box */
     const a=clock*0.05;dd=[Math.cos(a),0.3*Math.sin(a*0.7),Math.sin(a)];mc=mc.map((x,i)=>wr(x+dd[i]*0.25*dt));
@@ -5249,18 +5252,31 @@ tl.addEventListener('pointermove',e=>{if(scrub)setFromX(e.clientX);});tl.addEven
 tl.addEventListener('keydown',e=>{if(e.key==='ArrowRight'){U=Math.min(1,U+0.005);e.preventDefault();}if(e.key==='ArrowLeft'){U=Math.max(0,U-0.005);e.preventDefault();}
   if(e.key==='PageDown'||e.key==='End'){U=Math.min(1,(epochOf(U)+1)/NE+0.001);e.preventDefault();}if(e.key==='PageUp'||e.key==='Home'){U=Math.max(0,(epochOf(U)-1)/NE+0.001);e.preventDefault();}});
 function playUI(){$('histPlay').setAttribute('aria-pressed',String(playing));$('histPlay').textContent=playing?'Pause':(U>=1?'Replay':'Play');}
-$('histPlay').addEventListener('click',()=>{if(U>=1){U=0;playing=true;}else playing=!playing;playUI();});
+$('histPlay').addEventListener('click',()=>{if(U>=1){U=0;Ud=0;SNAP=true;playing=true;}else playing=!playing;playUI();});
 [...root.querySelectorAll('[data-s]')].forEach(b=>b.addEventListener('click',()=>{speed=+b.dataset.s;root.querySelectorAll('[data-s]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));}));
 $('histMore').addEventListener('click',()=>{const o=$('histCard').classList.toggle('open');$('histMore').setAttribute('aria-expanded',String(o));$('histMore').textContent=o?'Less':'More';});
 window.addEventListener('keydown',e=>{if(root.hidden||e.target.tagName==='INPUT')return;if(e.key===' '){playing=!playing;playUI();e.preventDefault();}if(e.key==='Escape')close();});
 /* ---------------------------------------------------------------- frame */
 const EPS=9;   // seconds per epoch at 1x
+/* Every epoch sets its own look (fog depth, plasma colour, particle species and motion, flashes). Those used to switch
+   on the frame the epoch changed. They now ease to their new values over ~0.5 s of wall time, so one epoch melts
+   into the next. Quantities that are already continuous functions of time, and the camera, are left exact. */
+const SMX=new Set(['uTime','uCam','uPx','uStarPx','uL','uAW','uHasTex','uTrap','uFree','uDv','uRs','uPI','uRot','uZs1','uZs2','uZw1','uZw2','uZo','uFlow','uScale','uW','tex','tF','tSharp','tBlur','uDir']);
+const SMS=new WeakMap();
+function smoothU(dt,snap){const k=snap?1:1-Math.exp(-dt/0.5),seen=new Set();
+  [gasMat,volMat,sharpMat,phMat,skyMat,compMat].forEach(m=>{if(!m)return;for(const n in m.uniforms){if(SMX.has(n))continue;const u=m.uniforms[n];if(seen.has(u))continue;seen.add(u);const v=u.value;
+    if(typeof v==='number'){const d=SMS.get(u);if(snap||d===undefined){SMS.set(u,v);continue;}const nd=d+(v-d)*k;SMS.set(u,nd);u.value=nd;}
+    else if(v&&(v.isVector2||v.isVector3||v.isVector4)){let d=SMS.get(u);if(snap||!d){SMS.set(u,v.clone());continue;}d.lerp(v,k);v.copy(d);}}});}
 let raf=0,tp=0;
 function blur(src,dst,dx,dy){blurMat.uniforms.tex.value=src.texture;blurMat.uniforms.uDir.value.set(dx/rtW,dy/rtH);R3.setRenderTarget(dst);R3.render(blurScene,ortho);}
 function frame(now){raf=requestAnimationFrame(frame);const dt=Math.min(0.1,(now-tp)/1000||0);tp=now;const T=now/1000;
-  if(playing&&!scrub){U+=dt*speed/(EPS*NE);if(U>=1){U=1;playing=false;playUI();}}
+  if(playing&&!scrub){const du=dt*speed/(EPS*NE);U+=du;Ud+=du;if(U>=1){U=1;playing=false;playUI();}}
+  /* continuity: a jump on the timeline (drag, click, PageUp/PageDown) is not a cut. The drawn time Ud glides to the
+     new position in about a second, so the camera travels along its path and the universe passes through every
+     state in between, as one continuous shot. */
+  {const gap=U-Ud;if(Math.abs(gap)<2e-5)Ud=U;else Ud+=gap*(1-Math.exp(-dt/0.32));Ud=Math.max(0,Math.min(1,Ud));window.__histGlide=Math.abs(U-Ud)>0.003;}
   /* camera: along the path, with a slow sway so the view is never frozen */
-  camPath(Math.min(U,0.997),CP);camPath(Math.min(U,0.997)+0.003,CP2);FW.subVectors(CP2,CP).normalize();
+  camPath(Math.min(Ud,0.997),CP);camPath(Math.min(Ud,0.997)+0.003,CP2);FW.subVectors(CP2,CP).normalize();
   RG.crossVectors(FW,YUP).normalize();UPV.crossVectors(RG,FW);
   CP.addScaledVector(FW,3*Math.sin(T*0.09)).addScaledVector(RG,2*Math.sin(T*0.07+1)).addScaledVector(UPV,1.5*Math.sin(T*0.053+2));
   const yw=view.yaw+0.1*Math.sin(T*0.041),pt=view.pitch+0.05*Math.sin(T*0.057+1);
@@ -5274,14 +5290,15 @@ function frame(now){raf=requestAnimationFrame(frame);const dt=Math.min(0.1,(now-
     const top=$('histHead').getBoundingClientRect().bottom,ct=cd.getBoundingClientRect().top,mid=(top+ct)/2,oy=Math.round(Hh/2-mid);
     if(!cam.view||cam.view.offsetY!==oy||cam.view.offsetX!==0)cam.setViewOffset(W,Hh,0,oy,W,Hh);}
   cam.updateMatrixWorld();
-  const s=stateAt(U),wts=MI.weights(U);ST.wm=wts.wm;ST.wc=wts.wc;ST.w=wts;apply(s,T);
+  const s=stateAt(Ud),wts=MI.weights(Ud);ST.wm=wts.wm;ST.wc=wts.wc;ST.w=wts;apply(s,T);smoothU(dt,SNAP);SNAP=false;
   const g=gasMat.uniforms,g2=gasMat2.uniforms,th=Math.tan(cam.fov*Math.PI/360);
   g.uCam.value.copy(CP);g.uPx.value=rtH/(2*th);sharpMat.uniforms.uPx.value=R3.getPixelRatio();phMat.uniforms.uPx.value=R3.getPixelRatio();
   sharpMat.uniforms.uTime.value=T;sharpMat.uniforms.uStarPx.value=W<720?3:2.7;
   /* inflation: space stretches out of the centre of view, one e-fold every 2.5 s (slowed ~10^34 times); two copies of
      the self-similar pattern cross-fade so the zoom never ends */
   const vu=volMat.uniforms;vu.uPI.value.copy(cam.projectionMatrixInverse);vu.uRot.value.setFromMatrix4(cam.matrixWorld);
-  if(s.e.id==='inf'){const f=(T*0.4)%1,f2=(f+0.5)%1;vu.uZs1.value=Math.exp(f);vu.uZw1.value=0.5-0.5*Math.cos(2*Math.PI*f);vu.uZs2.value=Math.exp(f2);vu.uZw2.value=0.5-0.5*Math.cos(2*Math.PI*f2);
+  if(s.e.id==='inf'){const f=(T*0.4)%1,f2=(f+0.5)%1,hb=sstep(0.8,1,Ud*NE);   /* hb: hand-over to the soup at the end of inflation */
+    vu.uZs1.value=Math.exp(f)*(1-hb)+hb;vu.uZw1.value=(0.5-0.5*Math.cos(2*Math.PI*f))*(1-hb)+hb;vu.uZs2.value=Math.exp(f2)*(1-hb)+hb;vu.uZw2.value=(0.5-0.5*Math.cos(2*Math.PI*f2))*(1-hb);
     g.uZo.value.copy(DIR).multiplyScalar(22).add(CP);}
   else{vu.uZs1.value=1;vu.uZw1.value=1;vu.uZw2.value=0;}
   g.uScale.value=1;g.uW.value=1;GAS2.visible=false;
@@ -5296,7 +5313,7 @@ function frame(now){raf=requestAnimationFrame(frame);const dt=Math.min(0.1,(now-
   if(wts.wm>0.001||wts.wc>0.001){const t0=performance.now();MI.frame(s,dt,T,wts);ST.miMs=performance.now()-t0;}else MI.hide();}
 /* ---------------------------------------------------------------- open / close */
 function open(){document.body.classList.add('hist');root.hidden=false;if(!R3)initGL();resize();view.yaw=0;view.pitch=0;view.fov=innerWidth<720?70:60;
-  const go=()=>{$('histLoad').hidden=true;if(!GAS1)initPts();U=0;playing=true;playUI();lastE=-1;tp=performance.now();cancelAnimationFrame(raf);raf=requestAnimationFrame(frame);};
+  const go=()=>{$('histLoad').hidden=true;if(!GAS1)initPts();U=0;Ud=0;SNAP=true;playing=true;playUI();lastE=-1;tp=performance.now();cancelAnimationFrame(raf);raf=requestAnimationFrame(frame);};
   if(IC)go();else{$('histLoad').hidden=false;setTimeout(()=>{buildIC();go();},40);}}
 function close(){cancelAnimationFrame(raf);root.hidden=true;document.body.classList.remove('hist');}
 $('histExit').addEventListener('click',close);

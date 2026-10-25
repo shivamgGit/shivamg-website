@@ -158,6 +158,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 #explore[hidden]{display:none}
 #explore h2{margin:0 0 6px;font:400 19px/1.2 var(--serif)}
 #explore h3{margin:12px 0 6px;font:500 11px/1 var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+h3.cgh{margin:2px 0 0!important;padding:0}h3.cgh>button{all:unset;box-sizing:border-box;display:flex;align-items:center;gap:8px;width:100%;padding:9px 4px;cursor:pointer;font:500 11px/1 var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);border-radius:6px}h3.cgh>button:hover,h3.cgh>button:focus-visible{color:#ece6da;background:rgba(236,230,218,.06)}h3.cgh>button .ch{display:inline-block;width:8px;transition:transform .15s}h3.cgh>button[aria-expanded=true] .ch{transform:rotate(90deg)}h3.cgh>button .n{margin-left:auto;letter-spacing:0;text-transform:none;opacity:.7}.cgtools{display:flex;gap:6px;margin:-4px 0 6px}.cgtools button{font:500 11.5px/1 var(--sans);padding:6px 10px;border-radius:999px;border:1px solid rgba(236,230,218,.2);background:none;color:var(--muted);cursor:pointer}.cgtools button:hover{color:#ece6da}.cgbody{padding:2px 0 8px}
 .exrow{display:flex;flex-wrap:wrap;gap:6px}
 .exrow button{font:400 13px/1.2 var(--sans);padding:7px 11px;border:1px solid var(--line);border-radius:999px;color:#ddd6c8}
 .exrow button:hover{border-color:rgba(236,230,218,.45);color:var(--paper)}
@@ -2025,6 +2026,53 @@ nebVol('velasnr',{s:[19,19,19],f:2.2,shell:1,sr:0.85,sw:0.2,c1:[1,.4,.38],c2:[.4
   em+=vec3(1.0,0.42,0.42)*smoothstep(0.85,1.0,h)*(1.0-smoothstep(1.0,1.25,h))*hz*1.4;
   vec3 r2=p-vec3(-1.4,-1.8,0.25);em+=vec3(0.45,0.6,1.0)*exp(-dot(r2,r2)/0.16)*(0.5+0.7*f.r)*1.6;}`,{uGain:{value:1.6}},56,{noNoise:true});
   d.objs.push(v);d.grp.add(v);d.note='A pillar of dark dust (Barnard 33) in silhouette against IC 434, a sheet of hydrogen glowing red behind it, about 422 pc away. The gas is ionised by the hot star \u03c3 Orionis (upper right) and streams off the dark cloud\u2019s surface, which draws the vertical striations; a thin bright rim marks the ionisation front around the head. The blue glow lower left is NGC 2023, dust reflecting a young star\u2019s light. The head outline is a stylised model of the famous shape.';}}
+/* Barnard 68: a starless Bok globule in Ophiuchus, seen only as a hole in the dense star field of the Galactic bulge.
+   Alves, Lada & Lada 2001 (Nature 409, 159) mapped its extinction star by star in the near-infrared and found the profile of a
+   pressure-confined isothermal (Bonnor-Ebert) sphere: d ~ 125 pc, R = 12,500 AU, M = 2.1 Msun, xi_max = 6.9 +/- 0.2, just past
+   the critical 6.45 (marginally unstable), centre A_V ~ 30 mag.  The density is the exact Lane-Emden solution,
+   rho/rho_c = exp(-psi(xi)), fitted as (1+c xi^2)/(1+a xi^2+d xi^4)^b (max error 0.04 % for xi <= 6.9), with a ragged outline
+   (low-order harmonics of the radius) and the south-eastern lobe that Burkert & Alves 2009 read as a small globule merging
+   with it. kappa makes the optical depth through the centre tau_V = A_V/1.0857 = 27.6 (central column = 0.7874 rho_c R).
+   Nothing here emits: every background star is dimmed and reddened by the dust column along its own line of sight
+   (computed per star in the vertex shader from wherever the camera is), with A_R : A_V : A_B = 0.75 : 1 : 1.32 (Cardelli et al.
+   1989, R_V = 3.1). Other bands: K 0.112 A_V (Rieke & Lebofsky 1985); 1 keV X-rays 0.58 A_V, from N_H/A_V = 2.21e21 cm^-2
+   (Guver & Ozel 2009) and sigma(1 keV) = 2.4e-22 cm^2 (Morrison & McCammon 1983). The stars stand in for the bulge, ~8 kpc
+   behind; they sit on a shell 60 pc back, far enough that orbiting the globule at ~0.3 pc barely shifts them (as a real 8 kpc background would not), and they are shown only near the globule. Local axes: x north, y east, z towards the Sun. */
+{const RB=12500/206264.806, KAP=27.6/(0.7874*RB), r=rng(68), st=PS();
+ const RHO=`float b68rho(vec3 q){float rr=length(q.xy);float ph=atan(q.y,q.x);
+   float rf=length(vec3(q.xy/(1.0+0.09*sin(2.0*ph+0.3)+0.06*sin(3.0*ph+0.6)+0.04*sin(5.0*ph+2.1)+0.025*sin(8.0*ph+4.0)),q.z));
+   float x=6.9*min(rf,1.0),x2=x*x;float be=(1.0+0.02689802*x2)/pow(1.0+0.17151934*x2+0.00697078*x2*x2,1.12879238);
+   be*=1.0-smoothstep(0.97,1.1,rf);
+   vec3 s=q-vec3(-0.72,0.72,0.0);be+=0.55*exp(-dot(s,s)/0.1);return be;}`;
+ /* the bulge as a distant sky: stars on a shell 60 pc out, dense in every direction (~25,000 per steradian), so
+    from any side and any distance near B68 the globule moves against a fixed, crowded sky, as it would against the bulge */
+ for(let i=0;i<320000;i++){const th=Math.acos(1-2*r()),a=r()*6.2832,m=Math.pow(r(),4.5),fade=1,D=60*(1+0.08*r());
+   const u=r(),col=u<0.55?mix([1,.8,.58],[1,.92,.78],r()):u<0.85?mix([1,.97,.92],[.9,.93,1],r()):mix([.7,.8,1],[.85,.9,1],r());
+   const q=D*Math.sin(th);put(st,q*Math.cos(a),q*Math.sin(a),-D*Math.cos(th),col.map(x=>x*(0.2+0.8*Math.sqrt(m))*fade),.001,1.51+m*(m>0.93?2.4:0.7));}
+ const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(st.p,3));g.setAttribute('acol',new THREE.Float32BufferAttribute(st.c,3));
+ g.setAttribute('asz',new THREE.Float32BufferAttribute(st.s,1));g.setAttribute('aal',new THREE.Float32BufferAttribute(st.a,1));
+ const su={uScale:{value:1},uPx:{value:1},uOp:{value:1},uMax:{value:PMAX},uCamL:{value:new THREE.Vector3()},uR:{value:RB},uKt:{value:new THREE.Vector3(.75,1,1.32).multiplyScalar(KAP)}};
+ const sp=new THREE.Points(g,new THREE.ShaderMaterial({uniforms:su,transparent:true,depthTest:false,depthWrite:false,blending:THREE.AdditiveBlending,fragmentShader:CLFS,
+  vertexShader:`attribute vec3 acol;attribute float asz;attribute float aal;uniform float uScale,uPx,uOp,uMax,uR;uniform vec3 uCamL,uKt;varying vec3 vC;varying float vA;
+  ${RHO}
+  void main(){vec4 mv=modelViewMatrix*vec4(position,1.0);gl_Position=projectionMatrix*mv;float L=max(length(mv.xyz),1e-12);
+   float px=asz*uScale/L*uPx;float a=aal*uOp;
+   if(aal>1.5){px=max(px,1.6+(aal-1.5)*3.0);a=uOp;}else if(px<1.2){a*=px*px/1.44;px=1.2;}
+   a*=1.0-smoothstep(60.0,200.0,px);gl_PointSize=min(px,uMax);
+   vec3 d=position-uCamL;float len=length(d);d/=len;float tc=-dot(uCamL,d);float tau=0.0;
+   vec3 cp=uCamL+d*tc;
+   if(tc>0.0&&tc<len&&length(cp)<1.6*uR){const int N=40;float h=2.6*uR/float(N);
+     for(int i=0;i<N;i++){float t=tc-1.3*uR+(float(i)+0.5)*h;tau+=b68rho((uCamL+d*t)/uR)*h;}}
+   vC=acol*exp(-uKt*tau);vA=a;}`}));
+ sp.frustumCulled=false;sp.renderOrder=3;
+ sp.onBeforeRender=(rr,sc,cam)=>{sp.updateMatrixWorld();su.uCamL.value.copy(cam.position);sp.worldToLocal(su.uCamL.value);};
+ /* the same dust also darkens whatever else lies behind it (the Milky Way glow, catalogue stars) */
+ const v=volume([RB*1.75,RB*1.75,RB*1.1],`uniform float uR,uK;${RHO}
+  void field(vec3 p,inout vec3 em,inout float ab){ab+=uK*b68rho(p/uR);}`,{uR:{value:RB},uK:{value:KAP}},64,{noNoise:true,ro:2});
+ const TB=[0,0,0.112,1,0.58,0], SW=[0.01,0,1,1,0.02,0], KC=[[0,0,0],[0,0,0],[.1,.112,.13],[.75,1,1.32],[.58,.58,.58],[0,0,0]];
+ dso({g:1,dg:1,id:'b68',name:'Barnard 68 (Bok globule)',cat:'Nebulae',ra:260.6592,dec:-23.8261,d:125,pa:0,inc:0,R:0.6,view:0.3,lmin:0.09,objs:[v,sp],
+  tick(now,op){const b=BAND.i;v.material.uniforms.uOp.value=op;v.material.uniforms.uK.value=KAP*TB[b];let near=1;try{near=1-smooth(3,12,this.C.distanceTo(camPc));}catch(e){}su.uOp.value=op*SW[b]*near;su.uKt.value.set(...KC[b]).multiplyScalar(KAP);},
+  note:'A cold, starless cloud of gas and dust 125 pc away, about 2 solar masses inside 12,500 AU. It shines not at all: it is a hole in the dense star field of the Galactic bulge behind it, where the dust dims the stars by about 30 magnitudes at its centre. Towards its edge the dust thins, and the stars seen through it are fainter and redder, because dust scatters blue light more than red. Counting how much it dims and reddens those stars shows the density profile of an isothermal sphere held in by outside pressure (a Bonnor–Ebert sphere), just past the point where it can no longer support itself; the lobe to the lower left (south-east) may be a smaller globule merging with it. Switch to the infrared band and the dust thins out: at 2.2 μm the extinction is about nine times smaller, and stars appear through it.'});}
 /* The Pillars of Creation: three columns of cold molecular gas, opaque to visible light, whose surfaces facing the
    cluster NGC 6611 (above) are being photo-evaporated: a thin, bright ionised skin, brightest at the tips, in front of
    a glowing ionised cavity ([O III] teal-blue, H-alpha and [S II] gold as in the Hubble palette). */
@@ -2504,9 +2552,20 @@ const list=document.getElementById('exList');
 ['Overviews','Solar System','Comets & spacecraft','Satellites & observatories','Galactic Centre','Stars','Neutron stars & pulsars','Binaries & gravitational waves','Supernovae','Black holes','Nebulae','Galaxies','Dark matter & lensing','Large-scale structure'].forEach(c=>{const h=document.createElement('h3');h.textContent=c;list.appendChild(h);
   const w=document.createElement('div');w.className='exrow';list.appendChild(w);
   T.filter(t=>t.cat===c).forEach(t=>{const b=document.createElement('button');b.textContent=t.name;b.addEventListener('click',()=>{flyTo(t);if(innerWidth<720)closeMenu();});w.appendChild(b);t.btn=b;});});
+/* collapsible groups: each h3 heading folds the items under it; open/closed state is remembered per list */
+function collapsible(box,key,openByDefault){ if(!box||box._cg) return; const kids=[...box.children]; if(!kids.some(e=>e.tagName==='H3')) return; box._cg=true;
+  let st={}; try{ st=JSON.parse(localStorage.getItem('cg:'+key)||'{}'); }catch(e){}
+  const save=()=>{ try{ localStorage.setItem('cg:'+key,JSON.stringify(st)); }catch(e){} }, heads=[];
+  kids.forEach(h=>{ if(h.tagName!=='H3') return; const body=document.createElement('div'); body.className='cgbody'; let n=h.nextElementSibling; while(n&&n.tagName!=='H3'){ const nx=n.nextElementSibling; body.appendChild(n); n=nx; } h.after(body);
+    const name=h.textContent, cnt=body.querySelectorAll('button').length, b=document.createElement('button'); b.type='button'; b.innerHTML='<span class="ch">▸</span><span></span><span class="n">'+cnt+'</span>'; b.children[1].textContent=name; h.textContent=''; h.className='cgh'; h.appendChild(b);
+    const set=o=>{ body.hidden=!o; b.setAttribute('aria-expanded',String(o)); }; set(st[name]!=null?st[name]:openByDefault(name)); b.addEventListener('click',()=>{ const o=body.hidden; set(o); st[name]=o; save(); }); heads.push([name,set,body]); });
+  const tl=document.createElement('div'); tl.className='cgtools'; [['Expand all',true],['Collapse all',false]].forEach(([t,o])=>{ const b=document.createElement('button'); b.type='button'; b.textContent=t; b.addEventListener('click',()=>{ heads.forEach(([n,set])=>{ set(o); st[n]=o; }); save(); }); tl.appendChild(b); }); box.before(tl);
+  box._reveal=el=>{ heads.forEach(([n,set,body])=>{ if(body.contains(el)&&body.hidden) set(true); }); }; }
+collapsible(list,'explore',n=>n==='Overviews');
+{ const eb=document.getElementById('eventsBtn'), el=document.getElementById('evList'); if(eb&&el) eb.addEventListener('click',()=>setTimeout(()=>{ if(el._cg&&!el.querySelector('h3.cgh')){ el._cg=false; const t=el.previousElementSibling; if(t&&t.className==='cgtools') t.remove(); } collapsible(el,'events',n=>/coming up/i.test(n)); },0)); }
 const exBtn=document.getElementById('exploreBtn'),exP=document.getElementById('explore');
 function closeMenu(){exP.hidden=true;exBtn.setAttribute('aria-expanded','false');}
-exBtn.addEventListener('click',()=>{const o=exP.hidden;exP.hidden=!o;exBtn.setAttribute('aria-expanded',String(o));
+exBtn.addEventListener('click',()=>{const o=exP.hidden;exP.hidden=!o;exBtn.setAttribute('aria-expanded',String(o));if(o&&list._reveal){const cur=list.querySelector('button[aria-pressed="true"],button.on,button[aria-current]');if(cur)list._reveal(cur);}
   if(o){document.getElementById('panel').hidden=true;document.getElementById('layersBtn').setAttribute('aria-expanded','false');}});
 document.getElementById('layersBtn').addEventListener('click',closeMenu);
 
@@ -2606,6 +2665,7 @@ const FACTS={
  sgrah:['Supermassive black hole',[['Mass','4.3 million M☉'],['Schwarzschild radius','12.7 million km'],['Photon sphere','19 million km (3 M)'],['Shadow diameter','66 million km (2√27 M)'],['Seen from Earth','~50 microarcseconds'],['Imaged','Event Horizon Telescope, 2022']]],
  m42:['Emission nebula (H II region)',[['Distance','412 pc (1,340 ly)'],['Size','~7 pc (24 ly)'],['Young stars','~2,000 in the Orion Nebula Cluster'],['Main ionising star','θ¹ Orionis C, ~33 M☉'],['Naked eye','yes, magnitude 4']]],
  b33:['Dark nebula (dust pillar)',[['Distance','422 pc'],['Seen against','IC 434, glowing hydrogen'],['Lit by','σ Orionis'],['Part of','the Orion B molecular cloud'],['Discovered','1888, Williamina Fleming']]],
+ b68:['Bok globule (starless dark cloud)',[['Distance','~125 pc (410 ly), in Ophiuchus'],['Radius','12,500 AU (0.06 pc); 100″ on the sky'],['Mass','2.1 M☉'],['Gas temperature','~7–11 K (Bergin et al. 2006)'],['Extinction at the centre','A_V ≈ 30 mag'],['Profile','Bonnor–Ebert sphere, ξ_max = 6.9 (critical 6.45)'],['Mapped by','Alves, Lada & Lada 2001 (Nature 409, 159)']]],
  m16:['Star-forming pillars in the Eagle Nebula',[['Distance','1.74 kpc (5,700 ly)'],['Tallest pillar','~1.3 pc (4 ly)'],['Eroded by','the young cluster NGC 6611'],['Famous images','Hubble 1995 and 2014, JWST 2022']]],
  m1:['Supernova remnant (pulsar wind nebula)',[['Distance','2 kpc (6,500 ly)'],['Supernova','seen in July 1054'],['Size','~3.4 pc (11 ly)'],['Expanding','~1,500 km/s'],['Powered by','the Crab pulsar, 4.5 × 10³¹ W']]],
  ngc7293:['Planetary nebula',[['Distance','200 pc (650 ly)'],['Age','~10,000 years'],['Central star','white dwarf, ~100,000 K'],['Cometary knots','thousands']]],
@@ -2709,7 +2769,7 @@ const BCATW={'Stars':[0.04,0.01,1.2,1,0.06,0.01],'Neutron stars & pulsars':[1.8,
   'Binaries & gravitational waves':[0.8,0.1,0.8,1,1.0,0.6],'Supernovae':[1.6,0.3,1.1,1,1.6,0.8],'Black holes':[1.5,0.4,1.0,1,1.4,1.2],
   'Nebulae':[0.7,0.3,1.6,1,0.12,0.02],'Galaxies':[0.35,0.1,1.0,1,0.2,0.05],'Dark matter & lensing':[0.3,0.05,0.9,1,0.5,0.1],
   'Large-scale structure':[0.3,0.05,1.0,1,1.0,0.1],'Galactic Centre':[1.3,0.4,1.6,0.35,0.7,0.6],'Comets & spacecraft':[0.3,0.05,0.9,1,0.3,0.02],'Satellites & observatories':[0.3,0.05,0.9,1,0.3,0.02]};
-const BOBJ={m1:[1.6,0.4,1.1,1,1.8,1.7],ngc3372:[0.7,0.3,1.6,1,0.6,0.05],b33:[0.3,0.2,1.5,1,0.05,0.01],
+const BOBJ={b68:[1,1,1,1,1,1],m1:[1.6,0.4,1.1,1,1.8,1.7],ngc3372:[0.7,0.3,1.6,1,0.6,0.05],b33:[0.3,0.2,1.5,1,0.05,0.01],
   cena:[1.9,0.4,1,1,1.0,0.6],m87:[1.9,0.3,1,1,1.1,0.5],m51:[0.6,0.1,1,1,0.25,0.05],m31:[0.35,0.1,1.1,1,0.2,0.05],
   cygx1:[0.9,0.1,0.7,1,1.9,0.5],gaiabh1:[0.02,0.01,1,1,0.03,0],gaiabh3:[0.02,0.01,1,1,0.03,0],
   hulse:[1.8,0.2,0.2,0.5,0.4,0.6],dpsr:[1.8,0.2,0.2,0.5,0.4,0.6],gw170817:[0.9,0.1,1.2,1,0.9,1.9],
@@ -3415,11 +3475,20 @@ body.hist>*:not(#hist):not(script):not(style){display:none!important}
 #histBar{position:absolute;left:22px;right:22px;bottom:calc(env(safe-area-inset-bottom,0px) + 14px)}
 #histTL{position:relative;height:44px;cursor:pointer;touch-action:none}
 #histSegs{position:absolute;left:0;right:0;top:0;bottom:0;display:flex;gap:2px}
-.seg{flex:1;position:relative;border-top:2px solid rgba(236,230,218,.25);padding:6px 2px 0;text-align:left;overflow:hidden}
+.seg{flex:1;position:relative;border:0;border-top:5px solid var(--c,rgba(236,230,218,.25));padding:6px 2px 0;text-align:left;overflow:hidden;background:none;opacity:.62;transition:opacity .3s}
+.seg:hover{opacity:.9}
 .seg span{display:block;font:400 11px/1.2 var(--sans);color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.seg[aria-current="true"]{border-top-color:var(--paper)}
-.seg[aria-current="true"] span{color:var(--paper)}
-#histThumb{position:absolute;top:-6px;width:2px;height:14px;margin-left:-1px;background:var(--paper);box-shadow:0 0 8px rgba(236,230,218,.8);pointer-events:none}
+.seg em{display:block;margin-top:2px;font:italic 400 10.5px/1.2 var(--sans);color:rgba(236,230,218,.5);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-variant-numeric:tabular-nums}
+.seg[aria-current="true"]{opacity:1;box-shadow:0 -6px 14px -6px var(--c)}
+.seg[aria-current="true"] span{color:var(--paper);font-weight:500}
+.seg[aria-current="true"] em{color:rgba(236,230,218,.8)}
+#histTL{height:70px}
+#histBar::before{content:'';position:absolute;left:-22px;right:-22px;top:-34px;bottom:-14px;z-index:-1;pointer-events:none;background:linear-gradient(rgba(0,0,0,0),rgba(0,0,0,.62) 45%,rgba(0,0,0,.78))}
+#histThumb{position:absolute;top:-9px;width:3px;height:18px;margin-left:-1.5px;border-radius:2px;background:#fff;box-shadow:0 0 10px rgba(255,255,255,.9);pointer-events:none}
+#histTint{position:absolute;inset:0;z-index:1;pointer-events:none;background:radial-gradient(120% 95% at 50% 45%,rgba(0,0,0,0) 52%,var(--era,#1b1c4a) 135%);opacity:.75;transition:background 1.2s}
+#histCard{border-top:3px solid var(--era,var(--line))!important;transition:border-color 1.2s}
+#histCard h2{color:#fff}
+@media (max-width:720px){.seg em{display:none}}
 .hrow{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:4px;flex-wrap:wrap}
 #histEp{margin:0;font:italic 400 14px/1.2 var(--serif);color:#ddd6c8}
 #hist .hb{display:flex;gap:6px;flex-wrap:wrap}
@@ -4629,7 +4698,7 @@ const TXT={
 /* ---------------------------------------------------------------- DOM */
 const root=document.createElement('div');root.id='hist';root.hidden=true;
 root.innerHTML=`<canvas id="histGl" aria-label="The comoving box of matter through cosmic history. Drag to turn, scroll or pinch to zoom."></canvas>
-<header id="histHead"><p class="ttl">Cosmic history</p><p id="histT" aria-live="off"></p><p id="histSub"></p><p id="histNote"></p><div id="histLeg" aria-label="What the symbols are"></div></header>
+<div id="histTint"></div><header id="histHead"><p class="ttl">Cosmic history</p><p id="histT" aria-live="off"></p><p id="histSub"></p><p id="histNote"></p><div id="histLeg" aria-label="What the symbols are"></div></header>
 <section id="histCard" aria-live="polite"><p class="sp" id="histSpan"></p><h2 id="histName"></h2>
  <div id="histBud" aria-label="Energy budget"><div class="bar"><i class="r"></i><i class="m"></i><i class="l"></i></div><p class="lg"></p></div>
  <p id="histTx"></p><p id="histNow"></p><div id="histChart"><canvas id="histCv"></canvas><div id="histChips"></div></div>
@@ -4640,7 +4709,11 @@ root.innerHTML=`<canvas id="histGl" aria-label="The comoving box of matter throu
 <div id="histLoad">Building the initial conditions…</div>`;
 document.body.appendChild(root);
 const $=id=>document.getElementById(id);
-EP.forEach((e,i)=>{const s=document.createElement('button');s.className='seg';s.title=e.name;s.innerHTML='<span></span>';s.firstChild.textContent=e.name.split(':')[0];
+/* era colours after the "History of the Universe" posters (NASA/STScI; Particle Data Group): white-gold Big Bang, the orange-red
+   primordial plasma, the CMB's glow, the black dark ages, crimson first galaxies and hydrogen reionisation, the blue-violet
+   quasar era, the dark present */
+const ERAC={inf:'#ffe7a3',qgp:'#ffa04a',had:'#ff7a3c',lep:'#f4553f',bbn:'#e0405a',rad:'#c93c6c',mat:'#ad3d7e',rec:'#ffad66',dark:'#5e5068',dawn:'#b8384a',reion:'#962f55',gal:'#5b5fd8',de:'#2b3170'};
+EP.forEach((e,i)=>{const s=document.createElement('button');s.className='seg';s.title=e.name;s.style.setProperty('--c',ERAC[e.id]||'#888');s.innerHTML='<span></span><em></em><em></em>';s.firstChild.textContent=e.name.split(':')[0];
   s.addEventListener('click',ev=>{ev.stopPropagation();U=(i+0.02)/NE;});$('histSegs').appendChild(s);});
 /* ---------------------------------------------------------------- FFT and initial conditions */
 function fft1(re,im,inv){const n=re.length;for(let i=1,j=0;i<n;i++){let b=n>>1;for(;j&b;b>>=1)j^=b;j^=b;if(i<j){let t=re[i];re[i]=re[j];re[j]=t;t=im[i];im[i]=im[j];im[j]=t;}}
@@ -4878,8 +4951,8 @@ function apply(s,T){const g=gasMat.uniforms,vu=volMat.uniforms,sp=sharpMat.unifo
   /* ---- the volumetric medium (inflaton field, then the plasma) */
   const lamC=s.mfp/3.0857e22/s.a;   /* photon mean free path, comoving Mpc */
   let Fv=14+2.5*lamC,vI=0.75,amp=0.8,cm=0,cA=hot,cB=hot;
-  if(id==='inf'){Fv=24;vI=0.62;amp=0.75;cm=1;cA=[0.2,0.1,0.55];cB=[0.8,0.6,1];real=5e-5;g.uWave.value=0.04;
-    sp.uFlash.value=0.6;V3(sp.uFlashC.value,[0.75,0.6,1]);}
+  if(id==='inf'){Fv=24;vI=0.62;amp=0.75;cm=1;cA=[0.75,0.3,0.05];cB=[1,0.82,0.42];real=5e-5;g.uWave.value=0.04;
+    sp.uFlash.value=0.6;V3(sp.uFlashC.value,[1,0.88,0.6]);}
   else if(t<1200){   /* the primordial soup */
     let a1,b1;
     if(id==='qgp'){a1=[1,0.35,0.3];b1=[0.4,0.55,1];g.uSpecOn.value=1;SPg(g,[0.25,0.25,0.25,0.15],[[1,0.3,0.3],[0.35,1,0.4],[0.35,0.5,1],[1,0.8,0.3],[1,1,1]]);}
@@ -4960,7 +5033,9 @@ function readout(s){$('histT').textContent=fmtT(s.t);
   const[r,m,l]=s.om,bar=$('histBud');bar.querySelector('.r').style.width=(r*100)+'%';bar.querySelector('.m').style.width=(m*100)+'%';bar.querySelector('.l').style.width=(l*100)+'%';
   bar.querySelector('.lg').textContent=`Radiation ${pc(r)} · Matter ${pc(m)} · Dark energy ${pc(l)}`;
   if(s.ei!==lastE){lastE=s.ei;const e=s.e;{const cd=$('histCard');if(!window.__histGlide){cd.classList.remove('epin');void cd.offsetWidth;cd.classList.add('epin');}else cd.classList.remove('epin');}$('histName').textContent=e.name;$('histSpan').textContent=`${fmtT(e.t0)} – ${fmtT(e.t1)}`;$('histTx').textContent=TXT[e.id][0];$('histNow').textContent='Today: '+TXT[e.id][1];
-    $('histEp').textContent=`${s.ei+1} of ${NE}: ${e.name.split(':')[0]}`;[...$('histSegs').children].forEach((b,i)=>b.setAttribute('aria-current',String(i===s.ei)));}
+    $('histEp').textContent=`${s.ei+1} of ${NE}: ${e.name.split(':')[0]}`;root.style.setProperty('--era',(ERAC[e.id]||'#1b1c4a')+'cc');
+    if(!window.__histScale){window.__histScale=1;const fK=TK=>{const e=Math.floor(Math.log10(TK));return TK>=1e5?(TK/Math.pow(10,e)).toFixed(1).replace(/\.0$/,'')+'×10'+String(e).replace(/[0-9]/g,d=>'⁰¹²³⁴⁵⁶⁷⁸⁹'[d])+' K':Math.round(TK).toLocaleString()+' K';};
+      [...$('histSegs').children].forEach((b,i)=>{try{const q=stateAt(i/NE+1e-7);b.children[1].textContent=fmtT(q.t);b.children[2].textContent=i?fK(q.TK):'no temperature yet';}catch(err){}});}[...$('histSegs').children].forEach((b,i)=>b.setAttribute('aria-current',String(i===s.ei)));}
   $('histThumb').style.left=(U*100)+'%';$('histTL').setAttribute('aria-valuenow',String(Math.round(U*100)));$('histTL').setAttribute('aria-valuetext',fmtT(s.t));
   chart(s);}
 const pc=x=>x<0.0005?'<0.1%':x>0.9995?'>99.9%':(x*100).toFixed(x<0.1||x>0.9?1:0)+'%';
@@ -5485,7 +5560,7 @@ function open(){document.body.classList.add('hist');root.hidden=false;if(!R3)ini
 function close(){cancelAnimationFrame(raf);root.hidden=true;document.body.classList.remove('hist');}
 $('histExit').addEventListener('click',close);
 const btn=document.getElementById('histBtn');if(btn)btn.addEventListener('click',open);
-window.__hist={open,close,get U(){return U;},set U(v){U=v;},get playing(){return playing;},set playing(v){playing=v;playUI();},stateAt,get IC(){return IC;},EP,MI,get ST(){return ST;},view};
+window.__hist={TXT,open,close,get U(){return U;},set U(v){U=v;},get playing(){return playing;},set playing(v){playing=v;playUI();},stateAt,get IC(){return IC;},EP,MI,get ST(){return ST;},view};
 })();
 
 </script>
@@ -10393,14 +10468,14 @@ S.add({key:'star',name:'The life of a star',blurb:'From cloud to white dwarf, ne
 (function(){
 const S=window.__SBK, K=S.K, CC=K.CC, sig=K.sig, sci=K.sci;
 const MSUN_KM=1.476625, MSUN_S=4.925491e-6, C2=8.98755e16, G0=9.80665;
-const P={ro:15, inc:4, M:1e8, disk:true, dop:true, lens:true, rout:22, Td:5200, exp:1.0, fov:62, ann:false};
+const P={ro:15, inc:4, M:1e8, disk:true, dop:true, lens:true, rout:22, Td:4000, exp:1.0, fov:62, ann:false, spin:true, thr:0.02};
 const QL={levels:[1.25,1,0.8,0.64,0.5,0.4,0.32,0.25],i:3,t:0,ema:null};
 let BQ=0.5, lastMove=0, refineT=0, scene=null, cam=null, mat=null, R=null, SL={}, look={yaw:0,pitch:0}, tDisk=0, probe=null, CH=null;
 
 const VS='varying vec2 vUv; void main(){ vUv=uv; gl_Position=vec4(position.xy,0.0,1.0); }';
 const FS=`precision highp float;
 varying vec2 vUv;
-uniform vec2 uRes; uniform float uCx; uniform float uRo, uInc, uYaw, uPitch, uFov, uDisk, uDop, uLens, uRout, uTd, uT, uExp;
+uniform vec2 uRes; uniform float uCx; uniform vec3 uC, uF, uU, uR; uniform float uRo, uInc, uYaw, uPitch, uFov, uDisk, uDop, uLens, uRout, uTd, uT, uExp;
 uniform vec4 uProbe; uniform float uProbeOn, uProbeE, uProbeS;
 const float PI=3.14159265;
 float h21(vec2 p){ p=fract(p*vec2(123.34,456.21)); p+=dot(p,p+45.32); return fract(p.x*p.y); }
@@ -10419,26 +10494,34 @@ vec3 sky(vec3 d, float shift){ vec3 col=vec3(0.0); float th=acos(clamp(d.y,-1.0,
   col+=bbc(4300.0*shift)*mw*0.10*pow(shift,4.0);
   col+=vec3(0.010,0.012,0.020)*vnoise(vec2(ph*3.0,th*4.0));
   return col; }
+/* value noise periodic in x with period n (n cells around the disc), so the gas has no seam */
+float h21p(vec2 i, float n){ i.x=mod(i.x,n); return h21(i); }
+float vnp(vec2 p, float n){ vec2 i=floor(p), f=fract(p); f=f*f*(3.0-2.0*f); return mix(mix(h21p(i,n),h21p(i+vec2(1,0),n),f.x),mix(h21p(i+vec2(0,1),n),h21p(i+vec2(1,1),n),f.x),f.y); }
 vec3 disk(vec3 p, float r, float g){ float x=6.0/r; float prof=pow(x,0.75)*pow(max(0.0,1.0-sqrt(x)),0.25)/0.488;   /* T(r)/T_peak, zero torque at the ISCO */
-  float om=pow(r,-1.5), az=atan(p.z,p.x)+om*uT; float tex=0.55+0.45*vnoise(vec2(az*7.0/PI,r*1.3))*0.9+0.25*vnoise(vec2(az*40.0/PI,r*6.0));
+  /* every ring of gas turns at its own Keplerian rate, dphi/dt = (GM/r^3)^(1/2) in the distant clock: the clumps and
+     filaments are carried round and sheared into arcs, inner rings lapping outer ones */
+  float om=pow(r,-1.5), s=(atan(p.z,p.x)+om*uT)/(2.0*PI);
+  float n1=vnp(vec2(s*20.0+r*0.15, r*1.1),20.0), n2=vnp(vec2(s*64.0, r*4.5+7.0),64.0), n3=vnp(vec2(s*160.0, r*11.0+3.0),160.0);
+  float tex=0.30+0.95*n1*n1+0.45*n2*n2+0.20*n3; tex*=0.8+0.4*smoothstep(0.35,0.75,vnp(vec2(s*8.0, r*0.45),8.0));
   float edge=smoothstep(uRout,uRout*0.8,r)*smoothstep(5.9,6.4,r);
   float Tob=uTd*prof*g; float I=pow(prof,4.0)*pow(g,4.0);
-  return bbc(Tob)*I*tex*edge*1.1; }
+  /* blackbody colour, saturated ×1.8 so the 2,000–6,000 K gas reads as the red-to-yellow glow it is (tone mapping washes it out) */
+  vec3 c=bbc(Tob); float lc=dot(c,vec3(0.3,0.55,0.15)); c=max(mix(vec3(lc),c,1.8),0.0);
+  return c*I*tex*edge*1.25; }
 vec3 tone(vec3 c){ c*=uExp; float l=max(max(c.r,c.g),c.b); if(l<1e-6) return vec3(0.0); float m=1.0-exp(-l); vec3 o=c/l*m; return pow(o,vec3(1.0/2.2)); }
 void main(){
   vec2 sc=vec2((vUv.x*uRes.x-uCx)/(0.5*uRes.y), vUv.y*2.0-1.0); float tf=tan(uFov*0.5);
-  vec3 C=uRo*vec3(0.0,sin(uInc),cos(uInc)); vec3 er=normalize(C);
-  vec3 f0=-er, u0=normalize(vec3(0.0,1.0,0.0)-dot(vec3(0.0,1.0,0.0),f0)*f0), r0=normalize(cross(f0,u0));
-  vec3 f1=normalize(cos(uYaw)*f0+sin(uYaw)*r0), r1=normalize(cross(f1,u0));
-  vec3 fw=normalize(cos(uPitch)*f1+sin(uPitch)*u0), up=normalize(cross(r1,fw));
+  /* a static observer anywhere outside the horizon (your hovering position, or the chase camera behind the ship) */
+  vec3 C=uC; float Ro=length(C); vec3 er=C/Ro;
+  vec3 fw=uF, r1=uR, up=uU;
   vec3 d=normalize(fw+sc.x*tf*r1+sc.y*tf*up);
-  float fo=1.0-2.0/uRo; float sfo=sqrt(fo);
+  float fo=1.0-2.0/Ro; float sfo=sqrt(fo);
   float ca=dot(d,er); vec3 N=cross(er,d); float sa=length(N);
   vec3 col=vec3(0.0); float alpha=1.0;
   vec3 e1=er, e2=sa>1e-6?normalize(cross(N/sa,er)):vec3(0.0); vec3 Nn=sa>1e-6?N/sa:vec3(0.0,1.0,0.0);
-  float b=uRo*sa/sfo;   /* impact parameter of the photon */
-  float u=1.0/uRo, w=sa>1e-6?-(ca/sa)*sfo/uRo:0.0, phi=0.0;
-  float rEsc=max(1.6*uRo,90.0);
+  float b=Ro*sa/sfo;   /* impact parameter of the photon */
+  float u=1.0/Ro, w=sa>1e-6?-(ca/sa)*sfo/Ro:0.0, phi=0.0;
+  float rEsc=max(1.6*Ro,90.0);
   vec3 pPrev=C; float sPrev=dot(C,vec3(0,1,0));
   bool done=false; vec3 escDir=d; bool esc=false;
   if(uLens<0.5){
@@ -10488,106 +10571,179 @@ function Q(){ const r=P.ro, f=1-2/r, Rg=P.M*MSUN_KM*1000, ag=C2/Rg; return {r,f,
 const fmtT=s=>{ if(!isFinite(s)) return '∞'; const a=Math.abs(s); if(a<1e-3) return sig(s*1e6,3)+' µs'; if(a<1) return sig(s*1e3,3)+' ms'; if(a<120) return sig(s,3)+' s'; if(a<7200) return sig(s/60,3)+' min'; if(a<2*86400) return sig(s/3600,3)+' h'; if(a<3.156e7*2) return sig(s/86400,3)+' days'; return sig(s/3.156e7,3)+' yr'; };
 const fmtL=m=>{ const a=Math.abs(m); if(a<1e3) return sig(m,3)+' m'; if(a<1.496e10) return sig(m/1e3,3)+' km'; return sig(m/1.496e11,3)+' AU'; };
 
-/* ---- the probe: radial free fall from rest at r0 (E = sqrt(1-2/r0)) */
-/* the probe is the ship from Relativistic flight, drawn in its own scene over the ray-traced view. It falls along the radial line
-   from you to the hole, and radial light rays are not bent, so its image sits exactly where straight lines put it; its light is
-   shifted by g = (1 − 2GM/c²r_obs)^(−1/2) / ν_emit with ν_emit = (E + √(E² − f))/f for a radially outgoing photon, so it reddens and
-   darkens as it nears the horizon; tides stretch it along the radius (drawn exaggerated for the stellar-mass hole). */
-let SH=null;
-function shipScene(){ if(SH) return SH; const sc=new THREE.Scene(), cm=new THREE.PerspectiveCamera(60,1,0.001,500); const amb=new THREE.AmbientLight(0xffffff,0.5), key=new THREE.DirectionalLight(0xffffff,1.1); key.position.set(0,1,0.3); sc.add(amb,key);
+/* ---- the ship: a free particle in Schwarzschild spacetime with an engine (units G = c = M = 1).
+   State: position x (Schwarzschild r and angles as a 3-vector) and u = dx/dtau. Free fall: x'' = -x (1 + 3 h^2/r^2) / r^3,
+   h = |x × u|; this gives r'' = -1/r^2 + h^2/r^3 - 3h^2/r^4 and conserved h, i.e. exact timelike geodesics. Energy per unit
+   mass E^2 = r'^2 + (1 - 2/r)(1 + h^2/r^2). The integration runs in the distant clock t (dt = E/(1 - 2/r) dtau), so the
+   ship slows and freezes at the horizon as seen from outside, while its own clock tau reaches it in finite time.
+   Engine: proper acceleration a along the heading. The static observer at the ship measures w = gamma v with
+   w_r = r'/sqrt(1 - 2/r), w_perp = u_perp; under thrust dw = a dtau (gamma (h.w^) w^ + h_perp) (exact for thrust along or
+   across the motion). Hovering needs a = 1/(r^2 sqrt(1 - 2/r)), the "thrust to hover" in the card. */
+const V3=(x,y,z)=>new THREE.Vector3(x,y,z);
+let ship=null; const CAM={mode:'hover'}; const FLY={keys:new Set(),hold:0,hd:'pro'};
+function shipE(x,u){ const r=x.length(), f=1-2/r, rd=x.dot(u)/r, h2=new THREE.Vector3().crossVectors(x,u).lengthSq(); return Math.sqrt(Math.max(0,rd*rd+f*(1+h2/(r*r)))); }
+function gravAcc(x,u,out){ const r=x.length(), h2=_c.crossVectors(x,u).lengthSq(); return out.copy(x).multiplyScalar(-(1+3*h2/(r*r))/(r*r*r)); }
+const _c=new THREE.Vector3(), _a=new THREE.Vector3(), _k=[0,1,2,3].map(()=>[new THREE.Vector3(),new THREE.Vector3()]);
+/* static-frame velocity w = gamma v of the ship */
+function wOf(x,u){ const r=x.length(), f=1-2/r, xh=x.clone().divideScalar(r), rd=u.dot(xh); return u.clone().addScaledVector(xh,-rd).addScaledVector(xh,rd/Math.sqrt(f)); }
+function uOfW(x,w){ const r=x.length(), f=1-2/r, xh=x.clone().divideScalar(r), wr=w.dot(xh); return w.clone().addScaledVector(xh,-wr).addScaledVector(xh,wr*Math.sqrt(f)); }
+function heading(){ if(!ship) return; const x=ship.x, w=wOf(x,ship.u), xh=x.clone().normalize();
+  if(FLY.hd==='pro'&&w.lengthSq()>1e-8) ship.h.copy(w).normalize(); else if(FLY.hd==='retro'&&w.lengthSq()>1e-8) ship.h.copy(w).normalize().negate(); else if(FLY.hd==='out') ship.h.copy(xh); else if(FLY.hd==='in') ship.h.copy(xh).negate(); }
+function shipStep(dtc,thr){ if(!ship||ship.gone) return; let rem=dtc, n=0;
+  while(rem>1e-9&&n<6000){ n++; const x=ship.x, u=ship.u, r=x.length(); if(r<=2+1e-7){ ship.gone=true; break; } if(r>400){ ship.gone=true; ship.esc=true; break; }
+    const f=1-2/r, E=shipE(x,u); let dtau=Math.min(0.02*Math.pow(r,1.5), 0.04*(r-2)/(Math.abs(u.dot(x)/r)+0.02), 0.6);
+    let dt=dtau*E/f; if(dt>rem){ dt=rem; dtau=dt*f/E; }
+    /* RK4 in proper time for the geodesic */
+    const X=[x], Uv=[u]; const kx=[], ku=[];
+    const ev=(xx,uu,i)=>{ _k[i][0].copy(uu); gravAcc(xx,uu,_k[i][1]); kx[i]=_k[i][0].clone(); ku[i]=_k[i][1].clone(); };
+    ev(x,u,0); ev(x.clone().addScaledVector(kx[0],dtau/2),u.clone().addScaledVector(ku[0],dtau/2),1);
+    ev(x.clone().addScaledVector(kx[1],dtau/2),u.clone().addScaledVector(ku[1],dtau/2),2); ev(x.clone().addScaledVector(kx[2],dtau),u.clone().addScaledVector(ku[2],dtau),3);
+    x.addScaledVector(kx[0],dtau/6).addScaledVector(kx[1],dtau/3).addScaledVector(kx[2],dtau/3).addScaledVector(kx[3],dtau/6);
+    u.addScaledVector(ku[0],dtau/6).addScaledVector(ku[1],dtau/3).addScaledVector(ku[2],dtau/3).addScaledVector(ku[3],dtau/6);
+    if(thr&&x.length()>2.0001){ heading(); const w=wOf(x,u), g=Math.sqrt(1+w.lengthSq()), h=ship.h.clone().multiplyScalar(thr), wl=w.length();
+      if(wl>1e-9){ const wh=w.clone().divideScalar(wl), hp=h.dot(wh); w.addScaledVector(wh,hp*g*dtau).addScaledVector(h.clone().addScaledVector(wh,-hp),dtau); } else w.addScaledVector(h,dtau);
+      ship.u.copy(uOfW(x,w)); ship.burned=true; }
+    ship.t+=dt; ship.tau+=dtau; rem-=dt; }
+  const r=ship.x.length(), last=ship.hist[ship.hist.length-1]; if(ship.t-last[0]>0.5) ship.hist.push([ship.t,r,ship.tau]);
+  const tl=ship.trail[ship.trail.length-1]; if(!tl||tl.distanceTo(ship.x)>0.04*Math.max(1,r/4)){ ship.trail.push(ship.x.clone()); if(ship.trail.length>TRN) ship.trail.shift(); } }
+function launch(kind){ const er=V3(0,Math.sin(P.inc*K.D2R),Math.cos(P.inc*K.D2R)); let r0, u0;
+  if(kind==='orbit'&&P.ro>3.3){ r0=P.ro-Math.min(1.5,(P.ro-3.2)*0.3); const t=new THREE.Vector3().crossVectors(V3(0,1,0),er).normalize(); u0=t.multiplyScalar(0.94/Math.sqrt(r0-3)); FLY.hd='pro'; }
+  else { r0=P.ro>6?P.ro-3:Math.max(2.3,(P.ro+2)/2); u0=V3(0,0,0); FLY.hd='free'; kind='drop'; }
+  const x0=er.clone().multiplyScalar(r0); ship={kind,x:x0,u:u0,h:er.clone().negate(),t:0,tau:0,r0,hist:[[0,r0,0]],trail:[x0.clone()],gone:false,esc:false,burned:false};
+  if(kind==='orbit') heading();
+  CAM.mode='chase'; if(SL.cam) SL.cam.set('chase'); look.yaw=0; look.pitch=0; K.playing=true;
+  K.msg(kind==='orbit'?'Ship launched at 94 % of the circular-orbit speed. W / ▲ fires the engine along the nose, S / ▼ against it; A/D and R/F turn the nose. Watch it swing round the hole.':'Ship released from rest. Its own clock reaches the horizon in finite time; in yours it slows, reddens and freezes. Fire the engine (W / ▲) to climb back out.',5200); }
+/* ---- drawing the ship, its engines and its track in a 3D scene over the ray-traced view */
+let SH=null; const TRN=900;
+function shipScene(){ if(SH) return SH; const sc=new THREE.Scene(), cm=new THREE.PerspectiveCamera(60,1,0.001,2000); const amb=new THREE.AmbientLight(0xffffff,0.5), key=new THREE.DirectionalLight(0xffffff,1.1), disc=new THREE.PointLight(0xffa860,1.2,0,0); key.position.set(0,1,0.3); sc.add(amb,key,disc);
  let g=null; try{ if(window.__relShip) g=window.__relShip(); }catch(e){} if(!g){ g=new THREE.Group(); const m=new THREE.Mesh(new THREE.ConeGeometry(1.6,10,8),new THREE.MeshStandardMaterial({color:0xaab4c0,metalness:0.5,roughness:0.5})); m.rotation.x=-Math.PI/2; g.add(m); }
- const mats=[]; g.traverse(o=>{ if(o.material){ if(o.material.blending===THREE.AdditiveBlending){ o.visible=false; return; } o.material=o.material.clone(); mats.push([o.material,o.material.color?o.material.color.clone():null]); } });
- const holder=new THREE.Group(); holder.add(g); g.scale.setScalar(0.035); sc.add(holder); SH={sc,cm,holder,g,amb,key,mats}; return SH; }
-function drawShip(r,K){ const S2=shipScene(), inc=P.inc*K.D2R, C=new THREE.Vector3(0,Math.sin(inc),Math.cos(inc)).multiplyScalar(P.ro), er=C.clone().normalize();
- const f0=er.clone().negate(), y=new THREE.Vector3(0,1,0), u0=y.clone().addScaledVector(f0,-y.dot(f0)).normalize(), r0=new THREE.Vector3().crossVectors(f0,u0).normalize();
- const f1=f0.clone().multiplyScalar(Math.cos(look.yaw)).addScaledVector(r0,Math.sin(look.yaw)).normalize(), r1=new THREE.Vector3().crossVectors(f1,u0).normalize(), fw=f1.clone().multiplyScalar(Math.cos(look.pitch)).addScaledVector(u0,Math.sin(look.pitch)).normalize(), up=new THREE.Vector3().crossVectors(r1,fw).normalize();
- const cm=S2.cm; cm.fov=P.fov; cm.aspect=K.W/K.H; const vw=Math.min(K.W,K.viewW||K.W); if(vw<K.W) cm.setViewOffset(K.W,K.H,(K.W-vw)/2,0,K.W,K.H); else cm.clearViewOffset(); cm.updateProjectionMatrix(); cm.position.copy(C); cm.up.copy(up); cm.lookAt(C.clone().add(fw));
- const p=er.clone().multiplyScalar(probe.r); S2.holder.position.copy(p); S2.holder.lookAt(p.clone().multiplyScalar(2)); /* +z outward, so the nose (−z) points at the hole */
- const f=1-2/probe.r, E=probe.E, nu=(E+Math.sqrt(Math.max(0,E*E-f)))/Math.max(f,1e-9), gp=Math.max(0,1/(Math.sqrt(1-2/P.ro)*nu));
- const Q0=Q(), tid=2*C2*10/(Math.pow(probe.r,3)*Q0.Rg*Q0.Rg)/G0, s=1+Math.min(6,Math.max(0,Math.log10(Math.max(1,tid))*0.8)); S2.holder.scale.set(1/Math.sqrt(s),1/Math.sqrt(s),s);
- const c=K.bb(Math.max(800,5800*gp)), k=Math.min(1.4,Math.pow(gp,2)); S2.key.color.setRGB(c[0],c[1],c[2]); S2.key.intensity=1.1*k; S2.amb.color.setRGB(c[0],c[1],c[2]); S2.amb.intensity=0.5*k;
+ const mats=[], main=[], retro=[]; g.traverse(o=>{ if(!o.material) return; if(o.material.blending===THREE.AdditiveBlending){ o.visible=false; if(!o.isSprite){ (Math.abs(Math.abs(o.rotation.y)-Math.PI)<0.1?retro:main).push(o); } return; } o.material=o.material.clone(); mats.push([o.material,o.material.color?o.material.color.clone():null]); });
+ const holder=new THREE.Group(); holder.add(g); g.updateMatrixWorld(true); const bx=new THREE.Box3().setFromObject(g), sz=bx.getSize(new THREE.Vector3()); g.scale.multiplyScalar(0.55/Math.max(sz.x,sz.y,sz.z,1e-6)); sc.add(holder);
+ const tg=new THREE.BufferGeometry(); tg.setAttribute('position',new THREE.Float32BufferAttribute(new Float32Array(TRN*3),3)); tg.setAttribute('color',new THREE.Float32BufferAttribute(new Float32Array(TRN*3),3));
+ const trail=new THREE.Line(tg,new THREE.LineBasicMaterial({vertexColors:true,transparent:true,opacity:0.9,depthTest:false,blending:THREE.AdditiveBlending})); trail.frustumCulled=false; sc.add(trail);
+ SH={sc,cm,holder,g,amb,key,disc,mats,main,retro,trail}; return SH; }
+/* the camera: a static observer, either at your hovering position (looking with yaw/pitch) or just behind the ship */
+function camBasis(){ let C, f0, u0;
+  if(CAM.mode==='chase'&&ship){ const x=ship.x, r=x.length(), w=wOf(x,ship.u), xh=x.clone().divideScalar(r);
+    let back=(ship.gone&&!ship.esc)?xh.clone():(w.length()>0.02?w.clone().normalize().negate():ship.h.clone().negate());
+    let nrm=new THREE.Vector3().crossVectors(x,ship.u); if(nrm.lengthSq()<1e-10) nrm=Math.abs(xh.y)>0.9?V3(1,0,0):V3(0,1,0); nrm.normalize();
+    C=x.clone().addScaledVector(back,1.5).addScaledVector(nrm,0.5).addScaledVector(xh,0.7); const rc=C.length(); if(rc<Math.max(2.6,r+0.2)) C.multiplyScalar(Math.max(2.6,r+0.2)/rc);
+    f0=x.clone().addScaledVector(back,-0.6).sub(C).normalize(); u0=nrm.clone().addScaledVector(f0,-nrm.dot(f0)).normalize(); }
+  else { const inc=P.inc*K.D2R; C=V3(0,Math.sin(inc),Math.cos(inc)).multiplyScalar(P.ro); f0=C.clone().normalize().negate(); const y=V3(0,1,0); u0=y.clone().addScaledVector(f0,-y.dot(f0)).normalize(); }
+  const r0=new THREE.Vector3().crossVectors(f0,u0).normalize(), f1=f0.clone().multiplyScalar(Math.cos(look.yaw)).addScaledVector(r0,Math.sin(look.yaw)).normalize(), r1=new THREE.Vector3().crossVectors(f1,u0).normalize(),
+    fw=f1.clone().multiplyScalar(Math.cos(look.pitch)).addScaledVector(u0,Math.sin(look.pitch)).normalize(), up=new THREE.Vector3().crossVectors(r1,fw).normalize();
+  return {C,fw,up,rt:r1}; }
+function shipShift(Cb){ const x=ship.x, r=x.length(), fs=Math.max(0,1-2/r), fo=1-2/Cb.C.length(), w=wOf(x,ship.u), g=Math.sqrt(1+w.lengthSq()), n=Cb.C.clone().sub(x).normalize();
+  return Math.sqrt(fs)/(Math.sqrt(fo)*g*(1-w.dot(n)/g)); }
+function drawShip(r,K,Cb,thr){ const S2=shipScene(), cm=S2.cm; cm.fov=P.fov; cm.aspect=K.W/K.H; const vw=Math.min(K.W,K.viewW||K.W); if(vw<K.W) cm.setViewOffset(K.W,K.H,(K.W-vw)/2,0,K.W,K.H); else cm.clearViewOffset(); cm.updateProjectionMatrix();
+ cm.position.copy(Cb.C); cm.up.copy(Cb.up); cm.lookAt(Cb.C.clone().add(Cb.fw));
+ const x=ship.x; S2.holder.position.copy(x); let nrm=new THREE.Vector3().crossVectors(x,ship.u); if(nrm.lengthSq()<1e-10) nrm=V3(0,1,0); S2.holder.up.copy(nrm.normalize()); S2.holder.lookAt(x.clone().sub(ship.h));   /* nose (−z) along the heading */
+ const gp=Math.max(0,shipShift(Cb)), c=K.bb(Math.max(800,5800*gp)), k=Math.min(1.6,Math.pow(gp,2));
+ S2.key.color.setRGB(c[0],c[1],c[2]); S2.key.intensity=1.1*k; S2.amb.color.setRGB(c[0],c[1],c[2]); S2.amb.intensity=0.45*k; S2.disc.position.set(0,0,0); S2.disc.intensity=P.disk?1.4*k:0;
  S2.mats.forEach(([m,c0])=>{ if(m.isMeshBasicMaterial&&c0) m.color.setRGB(c0.r*c[0]*k,c0.g*c[1]*k,c0.b*c[2]*k); });
+ S2.main.forEach(o=>{ o.visible=thr>0&&!ship.gone; }); S2.retro.forEach(o=>{ o.visible=thr<0&&!ship.gone; });
+ /* the track, coloured by age; points hidden behind the horizon (straight-line test) are dropped */
+ const pa=S2.trail.geometry.attributes.position.array, ca=S2.trail.geometry.attributes.color.array, n=ship.trail.length;
+ for(let i=0;i<TRN;i++){ const p=ship.trail[Math.min(i,n-1)]; pa[3*i]=p.x; pa[3*i+1]=p.y; pa[3*i+2]=p.z; let a=i<n?Math.pow(i/Math.max(1,n-1),1.5):0;
+   const d=p.clone().sub(Cb.C), tb=-Cb.C.dot(d)/d.lengthSq(); if(tb>0&&tb<1&&Cb.C.clone().addScaledVector(d,tb).length()<2.05) a=0;
+   ca[3*i]=0.55*a; ca[3*i+1]=0.8*a; ca[3*i+2]=1.0*a; }
+ S2.trail.geometry.attributes.position.needsUpdate=true; S2.trail.geometry.attributes.color.needsUpdate=true; S2.trail.geometry.setDrawRange(0,TRN);
  r.autoClear=false; r.clearDepth(); r.render(S2.sc,cm); r.autoClear=true;
- const v=p.clone().project(cm); if(v.z<1&&Math.abs(v.x)<1&&Math.abs(v.y)<1) K.label('probe · light stretched ×'+sig(1/Math.max(gp,1e-9),3),(v.x*0.5+0.5)*K.W+14,(-v.y*0.5+0.5)*K.H-18); }
-function dropProbe(){ const r0=P.ro>6?P.ro-3:Math.max(2.3,(P.ro+2)/2); probe={r0,r:r0,E:Math.sqrt(1-2/r0),t:0,tau:0,hist:[[0,r0,0]],gone:false}; K.playing=true; K.msg('Probe released from rest ahead of you. Its own clock reaches the horizon in a finite time; in yours it slows, reddens and freezes.',4200); }
-function probeStep(dtObs){ if(!probe||probe.gone) return; const fo=Math.sqrt(1-2/P.ro); let dt=dtObs/fo; /* coordinate time to advance */
-  const E=probe.E; let n=0;
-  while(dt>0&&n<4000){ n++; const r=probe.r, f=1-2/r; if(f<=1e-9){ probe.gone=true; break; } const vr=f*Math.sqrt(Math.max(0,E*E-f))/E; /* |dr/dt| */
-    const h=Math.min(dt,Math.max(1e-4,0.02*(r-2)/Math.max(vr,1e-12)),0.5); probe.r=Math.max(2+1e-9,r-vr*h); probe.t+=h; probe.tau+=h*f/E; dt-=h; }
-  if(!probe.gone){ /* the proper time to reach r = 2 is finite: finish its clock analytically once the coordinate clock has frozen it */ }
-  const last=probe.hist[probe.hist.length-1]; if(probe.t*fo-last[0]>0.4) probe.hist.push([probe.t*fo,probe.r,probe.tau]); }
-/* proper time from rest at r0 down to r (exact cycloid, M = 1) */
-function tauFall(r0,r){ const eta=x=>Math.acos(Math.max(-1,Math.min(1,2*x/r0-1))); const e=eta(r); return Math.sqrt(r0*r0*r0/8)*(e+Math.sin(e)); }
+ const v=x.clone().project(cm); if(v.z<1&&Math.abs(v.x)<1&&Math.abs(v.y)<1){ const w=wOf(x,ship.u), g=Math.sqrt(1+w.lengthSq());
+   K.label(ship.gone&&!ship.esc?'ship frozen on the horizon (in your clock)':'ship · '+sig(w.length()/g,3)+' c · light ×'+sig(gp,3),(v.x*0.5+0.5)*K.W+16,(-v.y*0.5+0.5)*K.H-22); } }
+function thrustNow(){ const k=q=>FLY.keys.has(q); const t=(k('w')||k('arrowup')||FLY.hold>0)?1:(k('s')||k('arrowdown')||FLY.hold<0)?-1:0; return t*P.thr*(k('shift')?5:1); }
+function steer(raw){ if(!ship) return; const k=q=>FLY.keys.has(q); const ty=(k('a')||k('arrowleft')?1:0)-(k('d')||k('arrowright')?1:0), tp=(k('r')||k('q')?1:0)-(k('f')||k('e')?1:0); if(!ty&&!tp) return;
+  FLY.hd='free'; if(SL.hd) SL.hd.set('free'); let nrm=new THREE.Vector3().crossVectors(ship.x,ship.u); if(nrm.lengthSq()<1e-10) nrm=V3(0,1,0); nrm.normalize(); const rt=new THREE.Vector3().crossVectors(ship.h,nrm).normalize();
+  ship.h.applyAxisAngle(nrm,ty*1.6*raw).applyAxisAngle(rt,tp*1.6*raw).normalize(); }
+window.addEventListener('keydown',e=>{ if(S.cur!=='bh'||!ship) return; const t=e.target; if(t&&(t.tagName==='TEXTAREA'||t.tagName==='SELECT'||(t.tagName==='INPUT'&&!/checkbox|button/.test(t.type)))) return; const q=e.key.toLowerCase();
+  if(['w','a','s','d','r','f','q','e','shift','arrowup','arrowdown','arrowleft','arrowright'].includes(q)){ FLY.keys.add(q); if(['w','s','arrowup','arrowdown'].includes(q)&&!K.playing) K.playing=true; K.mark(2); e.preventDefault(); } });
+window.addEventListener('keyup',e=>{ FLY.keys.delete(e.key.toLowerCase()); });
+window.addEventListener('blur',()=>FLY.keys.clear());
 
-S.add({key:'bh',name:'Near a black hole',blurb:'Hover by a black hole: shadow, lensed disc, time dilation, a probe falling in',gl:true,
- ui(cd,K){ cd.append(K.el('h2',null,'Near a black hole'),K.el('p','lede','You hover outside a non-spinning black hole with a glowing disc of gas around it. Every pixel is a ray of light traced backwards along its exact path in curved spacetime, so the warped disc, the black shadow, the thin photon ring and the blueshifted sky are what a camera would really record.'));
-  SL.r=K.slider(cd,{label:'Your distance from the centre',min:Math.log10(2.1),max:Math.log10(100),step:0.001,value:Math.log10(P.ro),fmt:v=>sig(Math.pow(10,v)/2,3)+' r<sub>s</sub> ('+sig(Math.pow(10,v),3)+' GM/c²)',onInput:v=>{ P.ro=Math.pow(10,v); if(probe) probe=null; upd(); }});
+S.add({key:'bh',name:'Near a black hole',blurb:'Hover by a black hole: shadow, lensed spinning disc, time dilation, fly a ship around it',gl:true,
+ ui(cd,K){ cd.append(K.el('h2',null,'Near a black hole'),K.el('p','lede','You hover outside a non-spinning black hole with a disc of hot gas swirling around it. Every pixel is a ray of light traced backwards along its exact path in curved spacetime, so the warped disc, the black shadow, the thin photon ring and the blueshifted sky are what a camera would really record. Launch the ship and fly it: gravity bends its path, and its engine is all that can pull it back out.'));
+  cd.append(K.el('h3',null,'The ship'));
+  { const s0=K.el('div'); s0.style.cssText='display:flex;gap:6px;flex-wrap:wrap;margin:0 0 8px';
+    [['Launch into orbit','orbit'],['Drop from rest','drop']].forEach(([n,k])=>{ const b=K.el('button','sk-btn',n); b.type='button'; b.addEventListener('click',()=>{ launch(k); upd(); }); s0.append(b); }); cd.append(s0); }
+  SL.cam=K.seg(cd,[['hover','View from your position'],['chase','Chase the ship']],CAM.mode,v=>{ CAM.mode=v; look.yaw=0; look.pitch=0; K.mark(3); });
+  SL.hd=K.seg(cd,[['pro','Nose prograde'],['retro','Retrograde'],['out','Away from hole'],['free','Free']],FLY.hd,v=>{ FLY.hd=v; heading(); K.mark(2); });
+  SL.th=K.slider(cd,{label:'Engine thrust (proper acceleration)',min:-3,max:-0.3,step:0.01,value:Math.log10(P.thr),fmt:v=>{ const a=Math.pow(10,v); return sig(a,2)+' c⁴/GM = '+sig(a*C2/(P.M*MSUN_KM*1000)/G0,3)+' g'; },onInput:v=>{ P.thr=Math.pow(10,v); upd(); }});
+  cd.append(K.el('p','xm','Keys: W/↑ thrust along the nose · S/↓ thrust backwards · A/D or ←/→ turn · R/F pitch · Shift for 5× thrust. To hover, point the nose away from the hole and thrust at least the “thrust to hover” below.'));
+  cd.append(K.el('h3',null,'You and the hole'));
+  SL.r=K.slider(cd,{label:'Your distance from the centre',min:Math.log10(2.1),max:Math.log10(100),step:0.001,value:Math.log10(P.ro),fmt:v=>sig(Math.pow(10,v)/2,3)+' r<sub>s</sub> ('+sig(Math.pow(10,v),3)+' GM/c²)',onInput:v=>{ P.ro=Math.pow(10,v); upd(); }});
   SL.i=K.slider(cd,{label:'Height above the disc',min:0,max:80,step:0.5,value:P.inc,fmt:v=>v.toFixed(1)+'°',onInput:v=>{ P.inc=v; upd(); }});
   SL.M=K.slider(cd,{label:'Mass of the black hole',min:0,max:10.5,step:0.01,value:Math.log10(P.M),fmt:v=>sci(Math.pow(10,v),2)+' M☉',onInput:v=>{ P.M=Math.pow(10,v); upd(); }});
   SL.ro=K.slider(cd,{label:'Outer edge of the disc',min:8,max:40,step:0.5,value:P.rout,fmt:v=>sig(v/2,3)+' r<sub>s</sub>',onInput:v=>{ P.rout=v; upd(); }});
   SL.T=K.slider(cd,{label:'Disc temperature (peak, emitted)',min:2500,max:30000,step:100,value:P.Td,fmt:v=>sig(v,3)+' K',onInput:v=>{ P.Td=v; upd(); }});
   SL.e=K.slider(cd,{label:'Exposure',min:-2,max:3,step:0.05,value:0,fmt:v=>(v>0?'+':'')+v.toFixed(1)+' stops',onInput:v=>{ P.exp=Math.pow(2,v); upd(); }});
   K.chk(cd,'Accretion disc',P.disk,v=>{ P.disk=v; upd(); });
+  K.chk(cd,'Spin the disc (every ring at its own orbital speed)',P.spin,v=>{ P.spin=v; upd(); });
   K.chk(cd,'Doppler and gravitational shift of the disc light',P.dop,v=>{ P.dop=v; upd(); });
   K.chk(cd,'Bend light (switch off to see the same scene with straight rays)',P.lens,v=>{ P.lens=v; upd(); });
   K.chk(cd,'Mark the shadow edge',P.ann,v=>{ P.ann=v; upd(); });
-  R=K.ro(cd,[['rs','Horizon radius r<sub>s</sub>'],['d','Your distance'],['clk','Your clock vs a distant one',CC.am],['hr','One hour here is, far away,',CC.am],['blue','Starlight arrives blueshifted ×',CC.bl],['sh','Shadow diameter on your sky'],['hov','Thrust to hover',CC.ro],['tid','Tidal stretch on a 2 m body',CC.ro],['orb','Clock in a circular orbit here'],['per','Orbital period here'],['pr','Probe',CC.vi,true]]);
-  cd.append(K.el('h3',null,'The falling probe'));
-  CH=K.chart(cd,170,(g,w,h)=>{ const Pl=K.Plot(g,{x:0,y:0,w,h},{xr:[0,Math.max(10,probe?probe.hist[probe.hist.length-1][0]*1.05:60)],yr:[0,Math.max(4,(probe?probe.r0:P.ro))*1.05],pad:{l:42,r:8,t:10,b:28}});
-    Pl.axes(K.linTicks(0,Pl.xr[1],5,v=>sig(v,3)),K.linTicks(0,Pl.yr[1],4,v=>sig(v/2,2)),'your clock (GM/c³)','r / r<sub>s</sub>'.replace(/<[^>]+>/g,''));
-    Pl.clip(()=>{ Pl.hline(2,CC.ro,'horizon',[4,3]); if(probe){ Pl.line(probe.hist.map(q=>q[0]),probe.hist.map(q=>q[1]),CC.vi,2);
-      /* the same fall in the probe's own clock */ const tf=tauFall(probe.r0,2); const xs=[],ys=[]; for(let i=0;i<=60;i++){ const r=probe.r0-(probe.r0-2)*i/60; xs.push(tauFall(probe.r0,r)); ys.push(r); } Pl.line(xs,ys,CC.am,1.6,[5,3]); Pl.vline(tf,CC.am,'probe’s clock: horizon',[2,3]); } });
-    Pl.key([['in your clock',CC.vi],['in the probe’s clock',CC.am,[5,3]]],null,null,true); },true);
-  cd.append(K.el('p','src xm','Exact Schwarzschild optics: each pixel integrates d²u/dφ² = 3GMu²/c² − u (u = 1/r) with fourth-order Runge–Kutta, about 500 steps per ray, from a static observer whose local sky is undistorted; rays that reach r = 2GM/c² are captured. Disc: geometrically thin, opaque, from the innermost stable orbit (6GM/c²) outwards, emitted temperature T ∝ r<sup>−3/4</sup>(1 − √(6GM/c²r))<sup>1/4</sup> (zero torque at the inner edge), Keplerian with u<sup>t</sup> = (1 − 3GM/c²r)<sup>−1/2</sup>; the frequency ratio g = (1 − 2GM/c²r<sub>obs</sub>)<sup>−1/2</sup>/[u<sup>t</sup>(1 − Ωλ)] with the photon’s conserved λ = L<sub>z</sub>/E sets both the colour (T<sub>seen</sub> = gT) and the brightness (∝ g⁴). Starlight from infinity is blueshifted by (1 − 2GM/c²r)<sup>−1/2</sup>. The probe falls radially from rest; its light is shifted by g = (1 − 2GM/c²r<sub>obs</sub>)<sup>−1/2</sup>/(−p·u). Interstellar’s Gargantua spins at nearly the maximum rate, which a Schwarzschild hole cannot reproduce: its Miller’s planet (1 hour = 7 years) needs a near-extremal Kerr hole. Here the slowest clock on a stable orbit runs at √½ of the distant rate.'));
+  R=K.ro(cd,[['rs','Horizon radius r<sub>s</sub>'],['d','Your distance'],['clk','Your clock vs a distant one',CC.am],['hr','One hour here is, far away,',CC.am],['blue','Starlight arrives blueshifted ×',CC.bl],['sh','Shadow diameter on your sky'],['hov','Thrust to hover here',CC.ro],['tid','Tidal stretch on a 2 m body',CC.ro],['orb','Clock in a circular orbit here'],['per','Orbital period here'],['pr','Ship',CC.vi,true]]);
+  cd.append(K.el('h3',null,'The ship’s fall'));
+  CH=K.chart(cd,170,(g,w,h)=>{ const H0=ship?ship.hist:[]; const tmax=Math.max(10,H0.length?H0[H0.length-1][0]*1.05:60), rmax=Math.max(4,...H0.map(q=>q[1]),ship?ship.r0:P.ro)*1.05;
+    const Pl=K.Plot(g,{x:0,y:0,w,h},{xr:[0,tmax],yr:[0,rmax],pad:{l:42,r:8,t:10,b:28}});
+    Pl.axes(K.linTicks(0,Pl.xr[1],5,v=>sig(v,3)),K.linTicks(0,Pl.yr[1],4,v=>sig(v/2,2)),'time (GM/c³)','r / r<sub>s</sub>'.replace(/<[^>]+>/g,''));
+    Pl.clip(()=>{ Pl.hline(2,CC.ro,'horizon',[4,3]); Pl.hline(6,'rgba(236,230,218,0.35)','ISCO',[2,4]); if(H0.length>1){ Pl.line(H0.map(q=>q[0]),H0.map(q=>q[1]),CC.vi,2); Pl.line(H0.map(q=>q[2]),H0.map(q=>q[1]),CC.am,1.6,[5,3]); } });
+    Pl.key([['against the distant clock',CC.vi],['against the ship’s clock',CC.am,[5,3]]],null,null,true); },true);
+  cd.append(K.el('p','src xm','Exact Schwarzschild optics: each pixel integrates d²u/dφ² = 3GMu²/c² − u (u = 1/r) with fourth-order Runge–Kutta, about 500 steps per ray, from a static observer whose local sky is undistorted; rays that reach r = 2GM/c² are captured. Disc: geometrically thin, opaque, from the innermost stable orbit (6GM/c²) outwards, emitted temperature T ∝ r<sup>−3/4</sup>(1 − √(6GM/c²r))<sup>1/4</sup> (zero torque at the inner edge), Keplerian with u<sup>t</sup> = (1 − 3GM/c²r)<sup>−1/2</sup>; the frequency ratio g = (1 − 2GM/c²r<sub>obs</sub>)<sup>−1/2</sup>/[u<sup>t</sup>(1 − Ωλ)] with the photon’s conserved λ = L<sub>z</sub>/E sets both the colour (T<sub>seen</sub> = gT) and the brightness (∝ g⁴). Starlight from infinity is blueshifted by (1 − 2GM/c²r)<sup>−1/2</sup>. The ship moves on an exact Schwarzschild geodesic, written in proper time τ as d²<b>x</b>/dτ² = −GM<b>x</b>/r³ · (1 + 3h²/c²r²) with h = |<b>x</b> × d<b>x</b>/dτ| (this reproduces the radial equation and the conserved angular momentum exactly), advanced in the distant observer’s clock, dt/dτ = E/(1 − 2GM/c²r), which is why it freezes at the horizon. Thrust is a proper acceleration a: the velocity w = γ<b>v</b> measured by a static observer changes by dw = a dτ (γ along the motion, 1 across it). Its light is shifted by g = √(1 − 2GM/c²r<sub>ship</sub>) / [√(1 − 2GM/c²r<sub>cam</sub>) γ(1 − <b>v</b>·<b>n</b>)], with <b>n</b> the straight-line direction to the camera (good while the camera is close; the ship itself is drawn with straight rays and hugely enlarged). Interstellar’s Gargantua spins at nearly the maximum rate, which a Schwarzschild hole cannot reproduce: its Miller’s planet (1 hour = 7 years) needs a near-extremal Kerr hole. Here the slowest clock on a stable orbit runs at √½ of the distant rate.'));
  },
  enter(K){ if(!scene){ scene=new THREE.Scene(); cam=new THREE.OrthographicCamera(-1,1,1,-1,0,1);
-    mat=new THREE.ShaderMaterial({vertexShader:VS,fragmentShader:FS,depthTest:false,depthWrite:false,uniforms:{uRes:{value:new THREE.Vector2(1,1)},uCx:{value:0.5},uRo:{value:P.ro},uInc:{value:0},uYaw:{value:0},uPitch:{value:0},uFov:{value:1},uDisk:{value:1},uDop:{value:1},uLens:{value:1},uRout:{value:P.rout},uTd:{value:P.Td},uT:{value:0},uExp:{value:1},
+    mat=new THREE.ShaderMaterial({vertexShader:VS,fragmentShader:FS,depthTest:false,depthWrite:false,uniforms:{uRes:{value:new THREE.Vector2(1,1)},uCx:{value:0.5},uC:{value:new THREE.Vector3(0,0,15)},uF:{value:new THREE.Vector3(0,0,-1)},uU:{value:new THREE.Vector3(0,1,0)},uR:{value:new THREE.Vector3(1,0,0)},uRo:{value:P.ro},uInc:{value:0},uYaw:{value:0},uPitch:{value:0},uFov:{value:1},uDisk:{value:1},uDop:{value:1},uLens:{value:1},uRout:{value:P.rout},uTd:{value:P.Td},uT:{value:0},uExp:{value:1},
       uProbe:{value:new THREE.Vector4(0,0,0,0.25)},uProbeOn:{value:0},uProbeE:{value:1},uProbeS:{value:1}}});
     const q=new THREE.Mesh(new THREE.PlaneGeometry(2,2),mat); q.frustumCulled=false; scene.add(q); }
   K.presets([{name:'Far away (25 rₛ)'},{name:'Endurance’s view (7.5 rₛ)'},{name:'Edge-on, like the film'},{name:'From above'},{name:'At the photon sphere (1.5 rₛ)'},{name:'Hovering just outside (1.05 rₛ)'},{name:'Stellar black hole (10 M☉)'},{name:'Sgr A* (4.3 million M☉)'},{name:'M87* (6.5 billion M☉)'}],(p,i)=>{
-    const set=(ro,inc,M,yaw,fov)=>{ if(ro!=null){ P.ro=ro; SL.r.set(Math.log10(ro),true); } if(inc!=null){ P.inc=inc; SL.i.set(inc,true); } if(M!=null){ P.M=M; SL.M.set(Math.log10(M),true); } look.yaw=yaw||0; look.pitch=0; P.fov=fov||62; probe=null; upd(); K.mark(3); };
+    const set=(ro,inc,M,yaw,fov)=>{ if(ro!=null){ P.ro=ro; SL.r.set(Math.log10(ro),true); } if(inc!=null){ P.inc=inc; SL.i.set(inc,true); } if(M!=null){ P.M=M; SL.M.set(Math.log10(M),true); } look.yaw=yaw||0; look.pitch=0; P.fov=fov||62; ship=null; CAM.mode='hover'; SL.cam&&SL.cam.set('hover'); upd(); K.mark(3); };
     /* close in, the shadow fills the forward sky (exactly half of it at the photon sphere, 3M), so those views look sideways or back */
     [()=>set(50,10),()=>set(15,4),()=>set(15,1.2),()=>set(15,62),()=>set(3.05,8,null,Math.PI/2,100),()=>set(2.1,8,null,Math.PI,80),()=>set(15,4,10),()=>set(15,4,4.3e6),()=>set(15,4,6.5e9)][i](); },1);
-  const s=K.slot(); const b1=K.el('button','sk-btn','Drop a probe'); b1.type='button'; b1.addEventListener('click',()=>{ dropProbe(); upd(); }); s.append(b1);
-  [['Look at the hole',0],['Look away',Math.PI]].forEach(([n,y])=>{ const b=K.el('button','sk-btn',n); b.type='button'; b.addEventListener('click',()=>{ look.yaw=y; look.pitch=0; K.mark(3); }); s.append(b); });
+  const s=K.slot(); s.innerHTML='';
+  [['▲ Thrust',1],['▼ Reverse',-1]].forEach(([n,v])=>{ const b=K.el('button','sk-btn',n); b.type='button'; const go=e=>{ e.preventDefault(); if(!ship) launch('orbit'); FLY.hold=v; if(!K.playing) K.playing=true; K.mark(3); }, stop=()=>{ FLY.hold=0; };
+    b.addEventListener('pointerdown',go); b.addEventListener('pointerup',stop); b.addEventListener('pointerleave',stop); b.addEventListener('pointercancel',stop); s.append(b); });
+  [['Launch ship',()=>launch('orbit')],['Look at the hole',()=>{ CAM.mode='hover'; SL.cam&&SL.cam.set('hover'); look.yaw=0; look.pitch=0; K.mark(3); }]].forEach(([n,fn])=>{ const b=K.el('button','sk-btn',n); b.type='button'; b.addEventListener('click',()=>{ fn(); upd(); }); s.append(b); });
   upd(); },
- leave(K){ try{ K.gl.setPixelRatio(K.DPR); K.gl.setSize(K.W,K.H,false); }catch(e){} },
+ leave(K){ FLY.keys.clear(); FLY.hold=0; try{ K.gl.setPixelRatio(K.DPR); K.gl.setSize(K.W,K.H,false); }catch(e){} },
+ busy(){ return (P.disk&&P.spin)||FLY.keys.size>0||FLY.hold!==0; },
  drag(dx,dy){ lastMove=performance.now(); look.yaw-=dx*0.0035*(P.fov/62); look.pitch=Math.max(-1.45,Math.min(1.45,look.pitch+dy*0.0035*(P.fov/62))); return true; },
  zoom(f){ lastMove=performance.now(); P.fov=Math.max(8,Math.min(120,P.fov*f)); return true; },
- frame(dt,raw,K){ if(!mat) return; tDisk+=dt*12;
-  /* the probe runs on the wall clock, so it falls at the same pace however slowly the ray tracer draws */
-  { const now=performance.now(); if(probe&&K.playing&&!probe.gone){ const d=Math.min(2,(now-(probe.wall||now))/1000)*K.speed; probeStep(d*10); } if(probe) probe.wall=now; if(probe&&!probe.gone) K.mark(2); }
+ frame(dt,raw,K){ if(!mat) return; const RATE=12, rw=Math.min(0.1,raw);
+  /* the gas turns in the distant clock: always when spinning is on, at the play speed while playing */
+  if(P.spin) tDisk+=rw*RATE*(K.playing?K.speed:1); else tDisk+=dt*RATE;
+  steer(rw); const thr=ship&&!ship.gone?thrustNow():0;
+  if(ship&&K.playing&&!ship.gone) shipStep(rw*RATE*K.speed,thr);
   /* resolution in a few fixed steps, changed rarely: resizing the drawing buffer is what stalls a GPU,
      so it is never done per frame. A slow frame rate steps it down, a sustained fast one steps it back up. */
   const r=K.gl; { const now=performance.now(); QL.ema=QL.ema==null?raw:QL.ema*0.9+raw*0.1;
     const lv=QL.levels.filter(x=>x<=Math.min(1.25,K.DPR)+1e-6); if(QL.i>=lv.length) QL.i=lv.length-1;
     if(now-QL.t>1500&&raw>0){ if(QL.ema>0.05&&QL.i<lv.length-1){ QL.i++; QL.t=now; } else if(QL.ema<0.018&&QL.i>0&&now-QL.t>4000){ QL.i--; QL.t=now; } }
     const q=lv[QL.i]; if(Math.abs(r.getPixelRatio()-q)>1e-3){ r.setPixelRatio(q); r.setSize(K.W,K.H,false); } }
-  const U=mat.uniforms; U.uRes.value.set(K.W,K.H); U.uCx.value=Math.min(K.W,K.viewW||K.W)/2; U.uRo.value=P.ro; U.uInc.value=P.inc*K.D2R; U.uYaw.value=look.yaw; U.uPitch.value=look.pitch; U.uFov.value=P.fov*K.D2R;
-  U.uDisk.value=P.disk?1:0; U.uDop.value=P.dop?1:0; U.uLens.value=P.lens?1:0; U.uRout.value=P.rout; U.uTd.value=P.Td; U.uT.value=tDisk; U.uExp.value=P.exp;
-  if(probe&&!probe.gone){ const er=new THREE.Vector3(0,Math.sin(P.inc*K.D2R),Math.cos(P.inc*K.D2R)); U.uProbe.value.set(er.x*probe.r,er.y*probe.r,er.z*probe.r,0.35); U.uProbeOn.value=0; U.uProbeE.value=probe.E;
-    const Q0=Q(), tid=2*C2*10/(Math.pow(probe.r,3)*Q0.Rg*Q0.Rg)/G0; U.uProbeS.value=1+Math.min(6,Math.max(0,Math.log10(Math.max(1,tid))*0.8)); } else U.uProbeOn.value=0;
+  const Cb=camBasis(), U=mat.uniforms; U.uRes.value.set(K.W,K.H); U.uCx.value=Math.min(K.W,K.viewW||K.W)/2; U.uC.value.copy(Cb.C); U.uF.value.copy(Cb.fw); U.uU.value.copy(Cb.up); U.uR.value.copy(Cb.rt); U.uRo.value=Cb.C.length(); U.uFov.value=P.fov*K.D2R;
+  U.uDisk.value=P.disk?1:0; U.uDop.value=P.dop?1:0; U.uLens.value=P.lens?1:0; U.uRout.value=P.rout; U.uTd.value=P.Td; U.uT.value=tDisk; U.uExp.value=P.exp; U.uProbeOn.value=0;
   r.render(scene,cam);
-  if(probe&&!probe.gone) drawShip(r,K);
+  if(ship) drawShip(r,K,Cb,thr);
   const og=K.clear();
-  if(P.ann&&P.lens){ const Q0=Q(); /* the shadow edge seen by a static observer: sin α = 3√3 √f / r */ const a=Q0.shadow/2, H=K.H, f=(H/2)/Math.tan(P.fov*K.D2R/2), R0=Math.tan(a)*f;
+  if(P.ann&&P.lens&&CAM.mode==='hover'){ const Q0=Q(); /* the shadow edge seen by a static observer: sin α = 3√3 √f / r */ const a=Q0.shadow/2, H=K.H, f=(H/2)/Math.tan(P.fov*K.D2R/2), R0=Math.tan(a)*f;
     const cy=look.yaw, cp=look.pitch; if(Math.abs(cy)<0.6&&Math.abs(cp)<0.6&&a<Math.PI/2){ const cx=Math.min(K.W,K.viewW||K.W)/2-Math.tan(cy)*f, cyy=H/2+Math.tan(cp)*f; og.strokeStyle='rgba(255,197,138,0.8)'; og.setLineDash([5,5]); og.lineWidth=1.2; og.beginPath(); og.arc(cx,cyy,R0,0,2*Math.PI); og.stroke(); og.setLineDash([]); K.label('shadow edge = photon sphere seen from here',cx+R0*0.72,cyy-R0*0.72-14); } }
-  if(probe){ readouts(); K.chartsDirty(); }
-  const Q0=Q(); K.head('Near a black hole · '+sci(P.M,2)+' M☉',`${sig(P.ro/2,3)} <small>r<sub>s</sub> from the centre</small>`,'Your clock runs at '+sig(Q0.clock,3)+' × the distant rate · '+(P.lens?'every pixel is an exact light ray in curved spacetime':'light bending switched off: straight rays'));
-  K.legend([['disc approaching: bluer, brighter','rgb(170,200,255)'],['receding: redder, fainter','rgb(255,160,110)'],['shadow: rays that end in the hole','#000'],...(probe?[['probe','rgb(255,220,180)']]:[])]);
-  K.ep('Drag to look around, scroll to zoom. '+(probe?(probe.gone||probe.r<2.02?'The probe has frozen on the horizon in your view: its light is now redshifted beyond detection. ':'Probe falling: Play keeps time running. '):'Press “Drop a probe” to watch something fall in. ')+(P.ro<3.7?(P.ro<3?'Inside the photon sphere the shadow fills more than half your sky: look away from the hole to see the sky crowded behind you. ':'At the photon sphere the shadow fills exactly half the sky, so looking straight at the hole shows only black: look sideways to see the edge. '):'')); },
+  if(thr&&!ship.gone){ /* engine indicator */ og.fillStyle=thr>0?'rgba(255,170,90,0.9)':'rgba(140,190,255,0.9)'; og.font='600 12px Figtree,system-ui,sans-serif'; og.textAlign='left'; og.fillText(thr>0?'ENGINE · '+sig(thr,2)+' c⁴/GM':'REVERSE · '+sig(-thr,2)+' c⁴/GM',24,K.H-120); }
+  if(ship){ readouts(); K.chartsDirty(); }
+  const Q0=Q();
+  if(ship&&CAM.mode==='chase'){ const rr=ship.x.length(), w=wOf(ship.x,ship.u), g=Math.sqrt(1+w.lengthSq()), E=shipE(ship.x,ship.u);
+    K.head('Near a black hole · '+sci(P.M,2)+' M☉ · chasing the ship',`${sig(rr/2,3)} <small>r<sub>s</sub> from the centre</small>`,ship.gone?(ship.esc?'The ship has escaped to infinity.':'Frozen on the horizon in the distant clock; its own clock crossed long ago.'):`Speed ${sig(w.length()/g,3)} c (to a hovering observer) · ship clock ${sig((1-2/rr)/E,3)} × the distant rate · ${E<1?'bound':'unbound'} (E = ${sig(E,4)})`); }
+  else K.head('Near a black hole · '+sci(P.M,2)+' M☉',`${sig(P.ro/2,3)} <small>r<sub>s</sub> from the centre</small>`,'Your clock runs at '+sig(Q0.clock,3)+' × the distant rate · '+(P.lens?'every pixel is an exact light ray in curved spacetime':'light bending switched off: straight rays'));
+  K.legend([['disc approaching: bluer, brighter','rgb(255,225,170)'],['receding: redder, fainter','rgb(200,70,40)'],['shadow: rays that end in the hole','#000'],...(ship?[['ship’s track','rgb(140,200,255)',1]]:[])]);
+  K.ep(ship?('W/▲ thrust · S/▼ reverse · A/D, R/F turn · Shift 5×. '+(ship.gone?(ship.esc?'Escaped. ':'Frozen on the horizon: launch again. '):!K.playing?'Paused: press Play. ':'')+'Drag to look around, scroll to zoom.'):('Drag to look around, scroll to zoom. Press “Launch ship” to fly around the hole. '+(P.ro<3.7?(P.ro<3?'Inside the photon sphere the shadow fills more than half your sky: look away from the hole to see the sky crowded behind you. ':'At the photon sphere the shadow fills exactly half the sky, so looking straight at the hole shows only black: look sideways to see the edge. '):''))); },
 });
 function upd(){ readouts(); K.chartsDirty(); K.mark(3); }
 function readouts(){ if(!R) return; const q=Q();
   R.set('rs',fmtL(2*q.Rg)); R.set('d',sig(P.ro/2,3)+' r<sub>s</sub> = '+fmtL(P.ro*q.Rg)); R.set('clk',sig(q.clock,4)+'×'); R.set('hr',fmtT(3600/q.clock)); R.set('blue',sig(q.blue,3));
-  R.set('sh',sig(q.shadow/K.D2R,3)+'°'); R.set('hov',sig(q.hover,3)+' g'); R.set('tid',q.tidal<1e-6?sci(q.tidal,2)+' g':sig(q.tidal,3)+' g'+(q.tidal>100?' (fatal)':''));
+  R.set('sh',sig(q.shadow/K.D2R,3)+'°'); R.set('hov',sig(q.hover,3)+' g = '+sig(1/(P.ro*P.ro*Math.sqrt(1-2/P.ro)),3)+' c⁴/GM'); R.set('tid',q.tidal<1e-6?sci(q.tidal,2)+' g':sig(q.tidal,3)+' g'+(q.tidal>100?' (fatal)':''));
   R.set('orb',P.ro>6?sig(q.orb,4)+'× (stable)':P.ro>3?sig(q.orb,4)+'× (unstable)':'no orbit: inside 1.5 r<sub>s</sub>'); R.set('per',P.ro>3?fmtT(q.period)+' (distant clock)':'—');
-  if(probe){ const Rg=q.Rg, tObs=probe.t*Math.sqrt(1-2/P.ro)*P.M*MSUN_S; const tau=Math.min(tauFall(probe.r0,Math.max(2,probe.r)),tauFall(probe.r0,2))*P.M*MSUN_S;
-    const f=1-2/Math.max(2.0000001,probe.r), E=probe.E, nu=(E+Math.sqrt(Math.max(0,E*E-f)))/f, z=nu*Math.sqrt(1-2/P.ro);
-    R.set('pr',`at ${sig(probe.r/2,4)} r<sub>s</sub> · your clock ${fmtT(tObs)} · its clock ${fmtT(tau)} (reaches the horizon at ${fmtT(tauFall(probe.r0,2)*P.M*MSUN_S)}) · its light stretched ×${sig(z,3)}`); }
-  else R.set('pr','not released'); }
+  if(ship){ const T=P.M*MSUN_S, rr=ship.x.length(), w=wOf(ship.x,ship.u), g=Math.sqrt(1+w.lengthSq()), E=shipE(ship.x,ship.u), h=new THREE.Vector3().crossVectors(ship.x,ship.u).length();
+    const fate=ship.gone?(ship.esc?'escaped':'frozen on the horizon'):E>=1?'unbound: will escape unless captured':h<4*Math.sqrt(1-0)&&E>=0.9?'heading for capture':h*h<12?'no stable orbit at this angular momentum: plunging':'bound orbit';
+    R.set('pr',`at ${sig(rr/2,4)} r<sub>s</sub> · ${sig(w.length()/g,3)} c · distant clock ${fmtT(ship.t*T)} · its clock ${fmtT(ship.tau*T)} · E = ${sig(E,4)}, L = ${sig(h,3)} GM/c · ${fate}`); }
+  else R.set('pr','not launched'); }
 })();
-
 
 /* ===================================================================== 10. EARTH'S JOURNEY
    4.567 billion years in one play-through: the solar nebula, the Moon-forming impact, the magma ocean, the first oceans
@@ -10648,7 +10804,7 @@ function vn(x,y,z){ const xi=Math.floor(x), yi=Math.floor(y), zi=Math.floor(z), 
 const fbm=(x,y,z)=>0.5*vn(x,y,z)+0.25*vn(2.03*x,2.03*y,2.03*z)+0.125*vn(4.1*x,4.1*y,4.1*z)+0.0625*vn(8.3*x,8.3*y,8.3*z);
 /* ---- the globe */
 let IMG=null, CV=null;
-function globe(N,t,spinA){ if(!CV){ CV=document.createElement('canvas'); } if(CV.width!==N){ CV.width=CV.height=N; IMG=CV.getContext('2d').createImageData(N,N); } const D=IMG.data;
+function globe(N,t,spinA){ if(!CV){ CV=document.createElement('canvas'); } if(!IMG||CV.width!==N){ CV.width=CV.height=N; IMG=CV.getContext('2d').createImageData(N,N); } const D=IMG.data;
  const tilt=23.4*K.D2R, ct=Math.cos(tilt), st=Math.sin(tilt), Lx=-0.55, Ly=0.35, Lz=0.76, ln=Math.hypot(Lx,Ly,Lz);
  const magma=t>4.45, impact=t<=4.512&&t>4.49, snow=(t<=0.717&&t>=0.635)?1:(t<=2.4&&t>=2.2)?0.55:0, icehouse=(t<0.034)||(t<0.36&&t>0.26)?1:0;
  const thr=t>4.0?0.70:t>2.5?0.655:t>0.539?0.615:0.585, green=t<0.47?Math.min(1,(0.47-t)/0.12):0, oxy=t<2.43;

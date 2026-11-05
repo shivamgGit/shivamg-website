@@ -3073,7 +3073,7 @@ const lm=$id('locmap'),lg=lm.getContext('2d');
 const LMK=[['Sun',()=>ZERO,1e-9],...['mercury','venus','earth','mars','jupiter','saturn','uranus','neptune'].map(k=>[B[k].name,()=>B[k].pos,1e-9]),
   ...[['proxima','Proxima Centauri'],['betelgeuse','Betelgeuse'],['m42','Orion Nebula'],['lmc','LMC'],['smc','SMC'],['m31','Andromeda'],['m33','M33'],['cena','Centaurus A'],['virgo','Virgo Cluster'],['laniakea','Great Attractor'],['coma','Coma Cluster']]
    .map(([id,n])=>{const o=DSO.find(x=>x.id===id);return o?[n,()=>o.C,0]:null;}).filter(Boolean),['Galactic Centre',()=>GC.C,0]];
-HOOKS.push(D=>{const off=!OV.map||['explore','panel','events'].some(id=>!$id(id).hidden);lm.hidden=off;if(off)return;/* steps aside for the side panels */const r=window.devicePixelRatio||1,W=lm.clientWidth,H=lm.clientHeight;if(lm.width!==Math.round(W*r)){lm.width=Math.round(W*r);lm.height=Math.round(H*r);}
+const lmDraw=D=>{const off=!OV.map||['explore','panel','events'].some(id=>!$id(id).hidden);lm.hidden=off;if(off)return;/* steps aside for the side panels */const r=window.devicePixelRatio||1,W=lm.clientWidth,H=lm.clientHeight;if(lm.width!==Math.round(W*r)){lm.width=Math.round(W*r);lm.height=Math.round(H*r);}
   lg.setTransform(r,0,0,r,0,0);lg.clearRect(0,0,W,H);const S=Math.max(D*5,1e-9),F=state.F,cx=W/2,cy=H/2+6,k=(W/2-8)/S;
   const P=p=>({x:cx+(p.x-F.x)*k,y:cy+(p.z-F.z)*k});const inb=q=>q.x>-4&&q.x<W+4&&q.y>12&&q.y<H+4;
   lg.strokeStyle='rgba(236,230,218,.2)';lg.lineWidth=1;
@@ -3085,7 +3085,8 @@ HOOKS.push(D=>{const off=!OV.map||['explore','panel','events'].some(id=>!$id(id)
     const tw=lg.measureText(n).width,bx={x:q.x+4,y:q.y-9,w:tw,h:11};if(bx.x+tw>W-2)bx.x=q.x-4-tw;if(placed.some(p=>bx.x<p.x+p.w&&bx.x+bx.w>p.x&&bx.y<p.y+p.h&&bx.y+bx.h>p.y))return;placed.push(bx);lg.fillStyle='rgba(236,230,218,.75)';lg.fillText(n,bx.x,bx.y+9);});
   const cam=P(camPc);lg.strokeStyle='#a9c8ff';lg.fillStyle='#a9c8ff';const fq=P(F);lg.beginPath();lg.moveTo(cam.x,cam.y);lg.lineTo(fq.x,fq.y);lg.globalAlpha=.5;lg.stroke();lg.globalAlpha=1;
   lg.beginPath();lg.arc(cam.x,cam.y,3,0,7);lg.fill();lg.fillStyle='#8f8a80';lg.fillText('You are here (top view)',6,11);
-  lg.textAlign='right';lg.fillText('width '+fmtLen(2*S),W-6,H-6);lg.textAlign='left';});
+  lg.textAlign='right';lg.fillText('width '+fmtLen(2*S),W-6,H-6);lg.textAlign='left';};
+HOOKS.push(lmDraw); window.__lmDraw=()=>{ if(typeof Dcur!=='undefined'&&Dcur) lmDraw(Dcur); else lm.hidden=!OV.map; }; document.addEventListener('click',()=>setTimeout(()=>{ try{ window.__lmDraw(); }catch(e){} },0));   /* panels opening or closing move it too */   /* the view only redraws when something moves: the Map button must not wait for that */
 
 /* ---------- 7. sky events: computed from this page's own ephemeris (oppositions, Jupiter-Saturn conjunction, Halley),
    eclipses and the Mercury transit from NASA's canon (times of greatest eclipse / transit, UT) ---------- */
@@ -3321,7 +3322,7 @@ HOOKS.push(D=>{const on=state.logD>6.4&&state.logD<10.9;MMG.visible=on;if(!on)re
 
 /* locator map: its own button */
 function mapUI(){$id('mapBtn').setAttribute('aria-pressed',String(OV.map));}
-$id('mapBtn').addEventListener('click',()=>{OV.map=!OV.map;mapUI();});
+$id('mapBtn').addEventListener('click',()=>{OV.map=!OV.map;mapUI();try{window.__lmDraw();}catch(e){}});
 /* events panel */
 let evBuilt=false;
 function buildEvents(){if(evBuilt)return;evBuilt=true;const box=$id('evList');box.innerHTML='';

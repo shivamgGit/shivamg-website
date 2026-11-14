@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dr. Shivam Gola — Theoretical Particle Physics</title>
+  <title>Dr. Shivam Gola — Theoretical Particle Physics (3D grid test)</title>
   <meta name="description" content="Dr. Shivam Gola — Postdoctoral Fellow in theoretical particle physics at IIT Bombay. Research on dark matter, axions, neutrino masses and BSM physics.">
   <meta name="author" content="Shivam Gola">
   <meta property="og:type" content="profile">
@@ -28,9 +28,9 @@
           },
           colors: {
             cosmic: {
-              void: '#06070B',       
-              dust: '#0F111A',       
-              nebula: '#1A1D2B',     
+              void: '#080B13',       
+              dust: '#0E121D',       
+              nebula: '#191E2C',     
             },
             glowred: {
               DEFAULT: '#FF334B',    
@@ -40,9 +40,9 @@
               darkred: '#7B1F1F'
             },
             cream: {
-              DEFAULT: '#F7F4EE',
-              50: '#F2EFE8',
-              100: '#EAE5DC',
+              DEFAULT: '#F8F5EB',
+              50: '#F3EFE3',
+              100: '#EBE5D6',
             },
             darkred: {
               50: '#fcf0f0',
@@ -151,10 +151,10 @@
     body.modal-open { overflow: hidden; }
 
     ::-webkit-scrollbar { width: 8px; }
-    ::-webkit-scrollbar-track { background: #06070B; }
-    :root.light-mode ::-webkit-scrollbar-track { background: #F7F4EE; }
-    ::-webkit-scrollbar-thumb { background: #1A1D2B; border-radius: 4px; border: 2px solid #06070B; }
-    :root.light-mode ::-webkit-scrollbar-thumb { background: #EAE5DC; border: 2px solid #F7F4EE; }
+    ::-webkit-scrollbar-track { background: #080B13; }
+    :root.light-mode ::-webkit-scrollbar-track { background: #F8F5EB; }
+    ::-webkit-scrollbar-thumb { background: #191E2C; border-radius: 4px; border: 2px solid #080B13; }
+    :root.light-mode ::-webkit-scrollbar-thumb { background: #EBE5D6; border: 2px solid #F8F5EB; }
     ::-webkit-scrollbar-thumb:hover { background: var(--theme-primary); }
   </style>
 </head>
@@ -188,9 +188,10 @@
     const computationalTools = ['Mathematica', 'FeynRules', 'SARAH & SPheno', 'MicrOmega', 'MadGraph', 'FeynArts & FeynCalc', 'CalcHEP'];
 
     const publications = [
+      { title: "Constraining U(1)Lμ−Lτ Model with Dark Matter Using Relic Density and Neff Bounds", journal: "arXiv:2611.07031", authors: "Shivam Gola", link: "https://arxiv.org/abs/2611.07031" },
+      { title: "Hunting Sterile Neutrino Dark Matter in the MeV Gap", journal: "arXiv:2604.18674", authors: "Shivam Gola, Akash Kumar Saha, Manibrata Sen", link: "https://arxiv.org/abs/2604.18674" },
       { title: "Dark Matter from Axions and Small Neutrino Masses", journal: "Phys. Rev. D 112 (2025) 3, 035006", authors: "Shivam Gola", link: "https://journals.aps.org/prd/abstract/10.1103/PhysRevD.112.035006" },
       { title: "Pseudo-scalar Dark Matter in a Generic U(1)X Model", journal: "Phys. Lett. B 842 (2023) 137982", authors: "Shivam Gola", link: "https://doi.org/10.1016/j.physletb.2023.137982" },
-      { title: "Two-Component Scalar and Fermionic Dark Matter Candidates in a Generic U(1)X Model", journal: "Phys. Lett. B 2022, 137117", authors: "Arindam Das, Shivam Gola, Sanjoy Mondal, Nita Sinha", link: "https://doi.org/10.1016/j.physletb.2022.137117" }
     ];
 
     const conferencesList = [
@@ -268,6 +269,7 @@
           { title: "Seeing Theory", by: "Brown University", note: "A visual introduction to probability and statistics", url: "https://seeing-theory.brown.edu/index.html#firstPage" },
           { title: "Legacy Surveys Sky Viewer", by: "DESI Legacy Imaging Surveys", note: "An interactive sky map", url: "https://www.legacysurvey.org/viewer#NGC%205443" },
           { title: "Universe Explorer", by: "Built using Claude", note: "An interactive explorer", url: "universe.html" },
+          { title: "Particles and the Cosmos", by: "Built using Claude", note: "An interactive explorer of particle physics and cosmology", url: "https://cosmic-frontier.shivamg-phy.workers.dev" },
           { title: "Planck CMB Simulator", by: "GitHub repo", note: "An interactive CMB map simulator", url: "https://chrisnorth.github.io/planckapps/Simulator/" }
         ]
       }
@@ -286,7 +288,9 @@
 
     const blogPosts = [
       { id: 1, type: "Photo", title: "Maharashtra", date: "2026", images: ["./mumbai.jpg","./mumbai2.jpg","./kalsubai.jpg","./kalsubai2.jpg","./kalsubai3.jpg"] },
-      { id: 2, type: "Photo", title: "Unakoti (Tripura)", date: "2024", images: ["./unakoti.jpg"], content: " " },
+      { id: 5, type: "Photo", title: "Agra", date: "2025", images: ["./taj1.jpg","./taj2.jpg","./taj3.jpg"] },
+      { id: 2, type: "Photo", title: "Unakoti, Tripura", date: "2024", images: ["./unakoti.jpg"], content: " " },
+      { id: 6, type: "Photo", title: "IMSc, Chennai", date: "2023", images: ["./chennai1.jpg"], content: " " },
       { id: 3, type: "Photo", title: "Thiruvananthapuram", date: "2023", images: ["./shivam.jpg"], content: " " },
       { id: 4, type: "Photo", title: "Delhi", date: "2021", images: ["./shivam1.jpg"], content: " " }
     ];
@@ -474,7 +478,7 @@
         let renderer = null;
         try {
           renderer = new THREE.WebGLRenderer({ canvas: canvas3D, alpha: true, antialias: false, powerPreference: 'high-performance' });
-          renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.25));
+          renderer.setPixelRatio(1);
           renderer.setClearColor(0x000000, 0);
         } catch (err) { renderer = null; }
 
@@ -543,6 +547,7 @@ float sn3(vec3 v){const vec2 C=vec2(1.0/6.0,1.0/3.0);const vec4 D=vec4(0.0,0.5,1
               if(uResolution.x<uResolution.y) uv.y*=uResolution.y/uResolution.x;
               else uv.x*=uResolution.x/uResolution.y;
               uv/=max(0.001,uScale);
+              if(length(uv)>1.15){gl_FragColor=vec4(0.0);return;}
 
               // Camera orbiting the hole; disc normal is +y. Default ~70° inclination, mouse tilts/turns.
               float elev=0.35+(uMouse.y-0.5)*0.9;
@@ -587,8 +592,7 @@ float sn3(vec3 v){const vec2 C=vec2(1.0/6.0,1.0/3.0);const vec4 D=vec4(0.0,0.5,1
               }
               float fireAlpha=smoothstep(0.0,0.08,dot(col,vec3(0.333)));
               float finalAlpha=max(fireAlpha,captured);
-              float edgeDist=length((vUv-uCenter)*2.0);
-              finalAlpha*=1.0-smoothstep(0.7,1.2,edgeDist*uScale);
+              finalAlpha*=1.0-smoothstep(0.8,1.15,length(uv));
               gl_FragColor=vec4(col,finalAlpha*uOpacity);
             }
         `;
@@ -621,7 +625,10 @@ float sn3(vec3 v){const vec2 C=vec2(1.0/6.0,1.0/3.0);const vec4 D=vec4(0.0,0.5,1
         const targetMouse = new THREE.Vector2(0.5, 0.5);
         const currentMouse = new THREE.Vector2(0.5, 0.5);
 
-        const setPhase = (next) => { phase = next; phaseFrame = 0; };
+        const setPhase = (next) => {
+          phase = next; phaseFrame = 0;
+          if (next === 'run' || next === 'collapse') particles.forEach(p => { p.bh = null; });
+        };
 
         // Off wipes both canvases and stops the loop outright — a genuinely clean
         // background, not a frozen frame. On replays the sequence from frame zero.
@@ -652,11 +659,14 @@ float sn3(vec3 v){const vec2 C=vec2(1.0/6.0,1.0/3.0);const vec4 D=vec4(0.0,0.5,1
             if (clientX === undefined || clientY === undefined) return;
             cx = clientX - rect.left;
             cy = clientY - rect.top;
+            // Desktop: only the right half (where the collision lives) accepts a black hole.
+            if (rect.width >= 768 && cx < rect.width * 0.5) return;
           } else {
             cx = rect.width * 0.78;
             cy = rect.height * 0.72;
           }
-          blackHole = { x: cx, y: cy, spin: Math.random() > 0.5 ? 1 : -1 };
+          // Physical state of the hole: mass in units of its seed mass, galaxies swallowed so far.
+          blackHole = { x: cx, y: cy, t: 0, mass: 1, eaten: 0, total: 0, feed: 0, doneT: 0, fade: 0 };
           uniforms.uCenter.value.set(cx / rect.width, 1.0 - cy / rect.height);
           setPhase('collapse');
         };
@@ -679,7 +689,7 @@ float sn3(vec3 v){const vec2 C=vec2(1.0/6.0,1.0/3.0);const vec4 D=vec4(0.0,0.5,1
         };
 
         const resizeCanvas = () => {
-          const dpr = Math.min(window.devicePixelRatio || 1, 2);
+          const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
           const host = canvas2D.parentElement;
           const rect = host ? host.getBoundingClientRect() : { width: window.innerWidth, height: window.innerHeight };
           if (!rect.width || !rect.height) return;
@@ -708,7 +718,7 @@ float sn3(vec3 v){const vec2 C=vec2(1.0/6.0,1.0/3.0);const vec4 D=vec4(0.0,0.5,1
         }
 
         const darkTheme  = { base: [255, 255, 255], well: [110, 160, 255], alphaBase: 0.075, alphaGlow: 0.72, particleColor: '255, 255, 255' };
-        const lightTheme = { base: [0, 0, 0],       well: [30, 70, 190],   alphaBase: 0.055, alphaGlow: 0.52, particleColor: '123, 31, 31' };
+        const lightTheme = { base: [120, 95, 60],   well: [150, 50, 50],   alphaBase: 0.04,  alphaGlow: 0.32, particleColor: '123, 31, 31' };
 
         // ── Spacetime sheet ──────────────────────────────────────────────────
         const xSteps = 52, zSteps = 40, spacingX = 104, spacingZ = 108;
@@ -757,18 +767,29 @@ float sn3(vec3 v){const vec2 C=vec2(1.0/6.0,1.0/3.0);const vec4 D=vec4(0.0,0.5,1
         }
 
         // Member galaxies are effectively collisionless too: they ride with the DM.
+        // Realism: morphology–density relation (red ellipticals dominate the core,
+        // blue spirals the outskirts), a steep luminosity function (few bright,
+        // many faint), and one giant brightest-cluster galaxy (BCG) per halo.
+        const galCols = (ell) => ell
+          ? ['245, 166, 54', '235, 150, 45']   // 70% yellow + 30% red
+          : ['150, 186, 255', '120, 165, 245'];  // 60% blue + 40% white
         for (let i = 0; i < numGalaxies; i++) {
           const haloIdx = Math.random() < 0.3 ? 0 : 1;   // most galaxies belong to the main cluster
-          const rFactor = Math.pow(Math.random(), 1.5);
+          const bcg = i < 2;
+          const rFactor = bcg ? 0.03 : Math.pow(Math.random(), 1.5);
           const [e1, e2] = randPlane();
+          const ell = bcg || Math.random() < 0.3;
+          const [cD, cL] = galCols(ell);
           particles.push({
-            type: 'galaxy', haloIdx, rFactor, e1, e2,
+            type: 'galaxy', haloIdx: bcg ? i : haloIdx, rFactor, e1, e2,
             theta: Math.random() * Math.PI * 2,
             speed: 0.004 / (rFactor + 0.25),
-            size: Math.random() * 4.0 + 5.0,
+            size: bcg ? (i === 1 ? 17 : 13) : 2.6 + 7.5 * Math.pow(Math.random(), 2.6),
             tilt: Math.random() * Math.PI,
-            aspect: Math.random() * 0.55 + 0.35,
-            baseAlpha: Math.random() * 0.25 + 0.75
+            aspect: ell ? Math.random() * 0.35 + 0.6 : Math.random() * 0.6 + 0.25,
+            morph: ell ? 3 : Math.floor(Math.random() * 3),
+            colD: cD, colL: cL,
+            baseAlpha: bcg ? 1 : Math.random() * 0.35 + 0.6
           });
         }
 
@@ -797,6 +818,52 @@ float sn3(vec3 v){const vec2 C=vec2(1.0/6.0,1.0/3.0);const vec4 D=vec4(0.0,0.5,1
           });
         }
 
+        const spriteCache = {};
+        const galaxySprite = (core, rim, morph = 0) => {
+          // morph 0–2: spirals (2-arm, barred, loose 3-arm); 3: elliptical.
+          const key = core + '|' + rim + '|' + morph;
+          if (spriteCache[key]) return spriteCache[key];
+          const S = 96, C = S / 2;
+          const c = document.createElement('canvas'); c.width = c.height = S;
+          const g2 = c.getContext('2d');
+          let seed = 17 + morph * 101;
+          const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+          const blob = (x, y, r, col, a) => {
+            const g = g2.createRadialGradient(x, y, 0, x, y, r);
+            g.addColorStop(0, `rgba(${col}, ${a})`); g.addColorStop(1, `rgba(${col}, 0)`);
+            g2.fillStyle = g; g2.fillRect(x - r, y - r, r * 2, r * 2);
+          };
+          if (morph === 3) {
+            // Elliptical: smooth, centrally concentrated (Sérsic-like) light, no arms.
+            const g = g2.createRadialGradient(C, C, 0, C, C, C);
+            g.addColorStop(0, `rgba(${core}, 1)`); g.addColorStop(0.06, `rgba(${core}, 0.85)`);
+            g.addColorStop(0.2, `rgba(${rim}, 0.45)`); g.addColorStop(0.45, `rgba(${rim}, 0.14)`);
+            g.addColorStop(0.75, `rgba(${rim}, 0.04)`); g.addColorStop(1, `rgba(${rim}, 0)`);
+            g2.fillStyle = g; g2.fillRect(0, 0, S, S);
+            return (spriteCache[key] = c);
+          }
+          blob(C, C, C * 0.95, rim, 0.18);                       // faint disk
+          const arms = morph === 2 ? 3 : 2, pitch = morph === 2 ? 0.32 : 0.24;
+          const r0 = morph === 1 ? C * 0.26 : C * 0.1;
+          if (morph === 1) for (let i = -1; i <= 1; i += 0.08) blob(C + i * r0, C, C * 0.1, core, 0.22);   // bar
+          for (let a = 0; a < arms; a++) {
+            const off = (a / arms) * Math.PI * 2;
+            for (let th = 0; th < Math.PI * 2.4; th += 0.05) {
+              const r = r0 * Math.exp(pitch * th);
+              if (r > C * 0.9) break;
+              const fall = 1 - r / (C * 0.92);
+              const j = (rnd() - 0.5) * r * 0.12;
+              const x = C + Math.cos(th + off) * (r + j), y = C + Math.sin(th + off) * (r + j);
+              blob(x, y, C * (0.06 + 0.07 * fall), rim, 0.32 * fall + 0.05);
+              if (rnd() < 0.14) blob(x, y, C * 0.035, core, 0.7 * fall + 0.2);   // star-forming knots
+            }
+          }
+          const b = g2.createRadialGradient(C, C, 0, C, C, C * 0.3);      // bulge
+          b.addColorStop(0, `rgba(${core}, 1)`); b.addColorStop(0.4, `rgba(${core}, 0.6)`); b.addColorStop(1, `rgba(${rim}, 0)`);
+          g2.fillStyle = b; g2.fillRect(0, 0, S, S);
+          return (spriteCache[key] = c);
+        };
+
         const drawFrame = (step) => {
           const rect = canvas2D.getBoundingClientRect();
           const w = rect.width, h = rect.height;
@@ -812,21 +879,34 @@ float sn3(vec3 v){const vec2 C=vec2(1.0/6.0,1.0/3.0);const vec4 D=vec4(0.0,0.5,1
             // The observed configuration holds, then fades out and the loop restarts.
             if (phaseFrame >= F_HOLD) setPhase('void');
           } else if (phase === 'collapse') {
-            if (phaseFrame >= F_COLLAPSE) { blackHole = null; setPhase('void'); }
+            // The hole only leaves once every galaxy has crossed the horizon.
+            if (blackHole) blackHole.t += step / 60;
+            if (!blackHole || blackHole.fade >= 1) { blackHole = null; setPhase('void'); }
           } else if (phase === 'void') {
             if (phaseFrame >= F_VOID) { simFrame = 0; setPhase('run'); }
           }
 
           const isDarkNow = isDarkRef.current;
           const theme = isDarkNow ? darkTheme : lightTheme;
-          const collapseProgress = phase === 'collapse' ? Math.min(1, phaseFrame / F_COLLAPSE) : 0;
-          const blackHoleRadius = blackHole ? Math.max(28, Math.min(52, Math.min(w, h) * 0.075)) : 0;
+          // ── Black hole (Schwarzschild, G = 1) ──────────────────────────────
+          // The shader draws a hole with r_s = 2M and camera at r = 70M; its shadow
+          // (b = 3√3 M) subtends 0.0742·min(w,h)·uScale px, so r_s = shadow / 2.598.
+          // Geometry is self-similar in M, so uScale ∝ M as the hole feeds.
+          const bh = blackHole;
+          const minDim = Math.min(w, h);
+          const bhIntro = bh ? 1 - Math.pow(1 - Math.min(1, bh.t / 1.3), 3) : 0;
+          const bhScale = bh ? Math.max(0.01, bh.mass * bhIntro) : 0;
+          const rsPhys = bh ? 0.02857 * minDim * bh.mass : 0;
+          const blackHoleRadius = rsPhys * 2.598 * bhIntro;
+          const cPx = 2.6 * minDim;                       // speed of light in px/s
+          const GM = 0.5 * rsPhys * cPx * cPx * 2.4;            // r_s = 2GM/c²
+          const collapseProgress = bh ? bh.feed : 0;
 
           // Re-emerge instead of dying: the sheet fades back in every cycle.
           const sceneAlpha = phase === 'void' ? 0
             : phase === 'run' ? Math.min(1, simFrame / F_FADE)
             : phase === 'hold' && !blackHole ? Math.max(0, Math.min(1, (F_HOLD - phaseFrame) / F_FADE))
-            : 1;
+            : bh ? 1 - bh.fade : 1;
 
           ctx.clearRect(0, 0, w, h);
           ctx.globalCompositeOperation = 'source-over';
@@ -844,8 +924,10 @@ float sn3(vec3 v){const vec2 C=vec2(1.0/6.0,1.0/3.0);const vec4 D=vec4(0.0,0.5,1
           // stopped — after the pass it lags its halo but still moves with it,
           // ending between the two DM peaks (as observed in 1E 0657-56).
           // The light bullet moves fast; the massive main cluster barely recoils.
-          const primaryX = u * 1900;
-          const secondaryX = -u * 750;
+          // Path compressed on desktop so the clusters enter and leave inside the right half.
+          const pathK = w < 768 ? 1 : 0.5;
+          const primaryX = u * 1900 * pathK;
+          const secondaryX = -u * 750 * pathK;
           const gasPos1 = primaryX * (1 - 0.55 * S);
           const gasPos2 = secondaryX * (1 - 0.55 * S);
           const z1 = -85 + deflection;
@@ -858,51 +940,61 @@ float sn3(vec3 v){const vec2 C=vec2(1.0/6.0,1.0/3.0);const vec4 D=vec4(0.0,0.5,1
             { kind: 'gas', x: gasPos2,    z: z2, r: 420, mass: GAS2_MASS }
           ];
 
+          const yaw = Math.sin(elapsed * 0.09) * 0.2, yawC = Math.cos(yaw), yawS = Math.sin(yaw);
           const project = (x, y, z) => {
             const fov = 900;
+            { const ZC = 900, xr = x * yawC - (z - ZC) * yawS; z = x * yawS + (z - ZC) * yawC + ZC; x = xr; }
             if (z < -800) return null;
             const sceneScale = w < 768 ? Math.min(0.5, w / 1200) : Math.min(0.29, w / 4300, h / 2500);
             const scale = (fov / (fov + z)) * sceneScale;
-            return { sx: w / 2 + x * scale, sy: h * 0.52 - (z * 0.22) * scale + y * scale, scale, z };
+            return { sx: w * (w < 768 ? 0.5 : 0.72) + x * scale, sy: h * 0.52 - (z * 0.22) * scale + y * scale, scale, z };
           };
 
+          const thetaE = bh ? blackHoleRadius * 1.45 * (1 - bh.fade) : 0;
           const lens = (proj) => {
-            if (!blackHole) return;
-            const dx = blackHole.x - proj.sx, dy = blackHole.y - proj.sy;
-            const distance = Math.hypot(dx, dy);
-            const lensRange = Math.max(blackHoleRadius * 4, Math.hypot(w, h) * (0.12 + collapseProgress * 1.3));
-            const local = Math.max(0, 1 - distance / lensRange) * Math.pow(collapseProgress, 1.35) * 0.94;
-            const amount = Math.min(0.96, local + Math.pow(collapseProgress, 3) * 0.96);
-            proj.sx += dx * amount - dy * amount * 0.22 * blackHole.spin;
-            proj.sy += dy * amount + dx * amount * 0.22 * blackHole.spin;
+            // Point-mass lens, primary image: θ = (β + √(β² + 4θ_E²)) / 2. Background
+            // lines are pushed outward and pile up on the Einstein ring.
+            if (!bh || thetaE <= 0) return;
+            const dx = proj.sx - bh.x, dy = proj.sy - bh.y, beta = Math.hypot(dx, dy) || 1e-3;
+            const k = 0.5 * (beta + Math.sqrt(beta * beta + 4 * thetaE * thetaE)) / beta;
+            proj.sx = bh.x + dx * k; proj.sy = bh.y + dy * k;
           };
 
+          // 3D lattice: every node is pulled toward the dark-matter halos (not the gas),
+          // so the lines pinch around the lensing peaks like a curved volume.
+          // Box sized from the viewport so even the back plane spans the whole hero.
+          const sceneScaleG = w < 768 ? Math.min(0.5, w / 1200) : Math.min(0.29, w / 4300, h / 2500);
+          const Z0 = -560, Z1 = 1500;
+          const farScale = sceneScaleG * 900 / (900 + Z1);
+          const halfX = (w * (w < 768 ? 0.5 : 0.72) / farScale) * 1.18, halfY = (h * 0.62 / farScale);
+          const SX = Math.max(240, (2 * halfX) / 26), SY = Math.max(240, (2 * halfY) / 15), SZ = 206;
+          const LX = Math.ceil(2 * halfX / SX) + 1, LY = Math.ceil(2 * halfY / SY) + 1, LZ = Math.round((Z1 - Z0) / SZ) + 1;
+          const pullers = activeHalos.map(hl => ({ x: hl.x, z: hl.z, R2: Math.pow(hl.r * (hl.kind === 'dm' ? 1.7 : 1.2), 2), k: 0.62 * hl.mass / DM2_MASS }));
           const points = [];
-          for (let xi = 0; xi < xSteps; xi++) {
+          for (let xi = 0; xi < LX; xi++) {
             points[xi] = [];
-            for (let zi = 0; zi < zSteps; zi++) {
-              const x = (xi - xSteps / 2) * spacingX;
-              const z = -600 + zi * spacingZ;
-              let y = 0;
-              for (let k = 0; k < activeHalos.length; k++) {
-                const halo = activeHalos[k];
-                const dx = x - halo.x, dz = z - halo.z;
-                y += halo.mass * Math.exp(-(dx * dx + dz * dz) / (halo.r * halo.r));
-              }
-              const proj = project(x, y, z);
-              if (proj) {
-                lens(proj);
-                // Glow tracks actual curvature depth, so the grid shows the
-                // lensing peaks sitting on the DM, offset from the red gas.
-                proj.intensity = Math.min(1, y / MASS_NORM);
-                points[xi][zi] = proj;
+            for (let yi = 0; yi < LY; yi++) {
+              points[xi][yi] = [];
+              for (let zi = 0; zi < LZ; zi++) {
+                let x = (xi - (LX - 1) / 2) * SX, y = (yi - (LY - 1) / 2) * SY, z = Z0 + zi * SZ;
+                let dx = 0, dy = 0, dz = 0, depth = 0;
+                for (let k = 0; k < pullers.length; k++) {
+                  const P = pullers[k], ex = P.x - x, ey = -y, ez = P.z - z;
+                  const d2 = ex * ex + ey * ey + ez * ez;
+                  if (d2 > P.R2 * 9) continue;
+                  const a = P.k * Math.exp(-d2 / P.R2);
+                  dx += ex * a; dy += ey * a; dz += ez * a; depth += a;
+                }
+                const proj = project(x + dx, y + dy, z + dz);
+                if (proj) { lens(proj); proj.intensity = Math.min(1, depth * 1.6); }
+                points[xi][yi][zi] = proj;
               }
             }
           }
 
           ctx.globalCompositeOperation = isDarkNow ? 'screen' : 'multiply';
           activeHalos.filter(hl => hl.kind === 'dm').sort((a, b) => b.z - a.z).forEach(halo => {
-            const proj = project(halo.x, halo.mass * 0.5, halo.z);
+            const proj = project(halo.x, 0, halo.z);
             if (!proj) return;
             let radius = halo.r * proj.scale * 1.8;
             if (radius <= 0) return;
@@ -927,30 +1019,34 @@ float sn3(vec3 v){const vec2 C=vec2(1.0/6.0,1.0/3.0);const vec4 D=vec4(0.0,0.5,1
           ctx.globalCompositeOperation = 'source-over';
           ctx.lineWidth = 1;
 
-          const drawSeg = (p1, p2) => {
+          // Segments are bucketed by colour/alpha so ~15k lines cost a few dozen strokes.
+          const buckets = new Map();
+          const addSeg = (p1, p2) => {
             if (!p1 || !p2) return;
-            const avgScale = (p1.scale + p2.scale) / 2;
-            if (avgScale < 0.1) return;
-            const alphaDepth = Math.max(0, Math.min(1, (avgScale - 0.15) * 2));
-            if (alphaDepth <= 0.01) return;
-            const t = (p1.intensity + p2.intensity) / 2;
+            if ((p1.sx < -40 && p2.sx < -40) || (p1.sx > w + 40 && p2.sx > w + 40) || (p1.sy < -40 && p2.sy < -40) || (p1.sy > h + 40 && p2.sy > h + 40)) return;
+            const ratio = (p1.scale + p2.scale) / 2 / sceneScaleG;
+            const alphaDepth = Math.max(0.3, Math.min(1, 0.3 + (ratio - 0.37) * 0.45));
+            const key = Math.round(((p1.intensity + p2.intensity) / 2) * 9) * 16 + Math.round(alphaDepth * 9);
+            let arr = buckets.get(key); if (!arr) buckets.set(key, arr = []);
+            arr.push(p1.sx, p1.sy, p2.sx, p2.sy);
+          };
+          for (let xi = 0; xi < LX; xi++) for (let yi = 0; yi < LY; yi++) for (let zi = 0; zi < LZ; zi++) {
+            const p = points[xi][yi][zi];
+            if (xi < LX - 1) addSeg(p, points[xi + 1][yi][zi]);
+            if (yi < LY - 1) addSeg(p, points[xi][yi + 1][zi]);
+            if (zi < LZ - 1) addSeg(p, points[xi][yi][zi + 1]);
+          }
+          buckets.forEach((arr, key) => {
+            const t = Math.floor(key / 16) / 9, d = (key % 16) / 9;
             const r = Math.round(theme.base[0] + (theme.well[0] - theme.base[0]) * t);
             const g = Math.round(theme.base[1] + (theme.well[1] - theme.base[1]) * t);
             const b = Math.round(theme.base[2] + (theme.well[2] - theme.base[2]) * t);
-            const a = (theme.alphaBase + (theme.alphaGlow - theme.alphaBase) * t) * alphaDepth;
+            const a = (theme.alphaBase * 0.75 + (theme.alphaGlow - theme.alphaBase) * t) * d;
             ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${a.toFixed(3)})`;
             ctx.beginPath();
-            ctx.moveTo(p1.sx, p1.sy);
-            ctx.lineTo(p2.sx, p2.sy);
+            for (let i = 0; i < arr.length; i += 4) { ctx.moveTo(arr[i], arr[i + 1]); ctx.lineTo(arr[i + 2], arr[i + 3]); }
             ctx.stroke();
-          };
-
-          for (let zi = zSteps - 2; zi >= 0; zi--) {
-            for (let xi = 0; xi < xSteps; xi++) {
-              if (xi < xSteps - 1) drawSeg(points[xi][zi], points[xi + 1][zi]);
-              drawSeg(points[xi][zi], points[xi][zi + 1]);
-            }
-          }
+          });
 
           ctx.globalCompositeOperation = isDarkNow ? 'screen' : 'source-over';
 
@@ -982,7 +1078,7 @@ float sn3(vec3 v){const vec2 C=vec2(1.0/6.0,1.0/3.0);const vec4 D=vec4(0.0,0.5,1
           });
           blobs.forEach((b, bi) => {
             if (b.a <= 0.005) return;
-            const proj = project(b.x, wellY(b.x, b.z) * 0.6, b.z);
+            const proj = project(b.x, 0, b.z);
             if (!proj) return;
             let rx = b.r * proj.scale * 1.6, a = b.a;
             if (blackHole) {
@@ -1020,7 +1116,7 @@ float sn3(vec3 v){const vec2 C=vec2(1.0/6.0,1.0/3.0);const vec4 D=vec4(0.0,0.5,1
           // DM core pass, drawn over the gas: before the collision the gas sits
           // inside its halo and would otherwise hide the blue completely.
           activeHalos.filter(hl => hl.kind === 'dm').forEach(halo => {
-            const proj = project(halo.x, halo.mass * 0.5, halo.z);
+            const proj = project(halo.x, 0, halo.z);
             if (!proj) return;
             let radius = halo.r * proj.scale * 0.95;
             let a = halo.color.a * 0.6;
@@ -1084,10 +1180,10 @@ float sn3(vec3 v){const vec2 C=vec2(1.0/6.0,1.0/3.0);const vec4 D=vec4(0.0,0.5,1
               worldX = halo.x + r * (c * p.e1[0] + s * p.e2[0]);
               // Keep galaxies on the sheet: a large vertical offset makes them look
               // detached from the spacetime grid.
-              worldY = r * (c * p.e1[1] + s * p.e2[1]) * (p.type === 'galaxy' ? 0.05 : 0.55);
+              worldY = r * (c * p.e1[1] + s * p.e2[1]) * (p.type === 'galaxy' ? 0.45 : 0.55);
               worldZ = halo.z + r * (c * p.e1[2] + s * p.e2[2]);
               if (p.type === 'galaxy') {
-                customColor = isDarkNow ? '225, 235, 255' : '40, 60, 120';
+                customColor = isDarkNow ? p.colD : p.colL;
               } else {
                 customColor = isDarkNow ? '130, 175, 255' : '30, 70, 190';
               }
@@ -1124,44 +1220,65 @@ float sn3(vec3 v){const vec2 C=vec2(1.0/6.0,1.0/3.0);const vec4 D=vec4(0.0,0.5,1
               customColor = isDarkNow ? '210, 140, 255' : '120, 55, 160';
             }
 
-            for (let k = 0; k < activeHalos.length; k++) {
-              const halo = activeHalos[k];
-              const dx = worldX - halo.x, dz = worldZ - halo.z;
-              worldY += halo.mass * Math.exp(-(dx * dx + dz * dz) / (halo.r * halo.r));
+            let proj = project(worldX, worldY, worldZ);
+            let tidal = null, redshift = 1;
+            if (bh && p.type === 'galaxy') {
+              // Geodesic infall in the Paczyński–Wiita potential Φ = −GM/(r − r_s): it reproduces
+              // the Schwarzschild ISCO (3 r_s) and marginally-bound orbit (2 r_s), so anything
+              // inside ~3 r_s plunges. Dynamical friction bleeds off angular momentum.
+              if (!p.bh) {
+                bh.total++;
+                if (!proj || proj.scale <= 0.05) { p.bh = { eaten: true }; bh.eaten++; return; }
+                const rx = proj.sx - bh.x, ry = proj.sy - bh.y, r = Math.max(rsPhys * 3, Math.hypot(rx, ry));
+                const vc = Math.sqrt(GM * r) / (r - rsPhys), vt = 0.25 * vc * (Math.random() * 0.6 + 0.7);
+                p.bh = { x: rx, y: ry, vx: -ry / r * vt, vy: rx / r * vt, scale: proj.scale, depth: Math.max(0, Math.min(1, (proj.scale - 0.1) * 2.5)) };
+              }
+              const st = p.bh;
+              if (st.eaten) return;
+              const gamma = 1.2 + Math.max(0, bh.t - 7) * 0.56;
+              const dtF = step / 60 * 0.504;
+              const r0 = Math.hypot(st.x, st.y);
+              const n = Math.min(60, Math.max(1, Math.ceil(dtF * Math.hypot(st.vx, st.vy) / Math.max(1.5, 0.12 * (r0 - rsPhys)))));
+              const hs = dtF / n;
+              for (let i = 0; i < n; i++) {
+                const r = Math.hypot(st.x, st.y);
+                if (r <= rsPhys * 1.02) { st.eaten = true; break; }
+                const a = GM / ((r - rsPhys) * (r - rsPhys));
+                st.vx -= a * st.x / r * hs; st.vy -= a * st.y / r * hs;
+                const vr = (st.vx * st.x + st.vy * st.y) / r, fr = Math.min(1, gamma * hs);
+                st.vx -= (st.vx - vr * st.x / r) * fr; st.vy -= (st.vy - vr * st.y / r) * fr;
+                const v = Math.hypot(st.vx, st.vy);
+                if (v > cPx) { st.vx *= cPx / v; st.vy *= cPx / v; }
+                st.x += st.vx * hs; st.y += st.vy * hs;
+              }
+              if (st.eaten) { bh.eaten++; return; }
+              const r = Math.hypot(st.x, st.y);
+              // Gravitational redshift g = √(1 − r_s/r) dims and reddens; tides ∝ r⁻³ stretch radially.
+              redshift = Math.sqrt(Math.max(0, 1 - rsPhys / r));
+              const e = Math.min(4.5, 1 + 10 * Math.pow(rsPhys / r, 2));
+              if (e > 1.03) tidal = { ang: Math.atan2(st.y, st.x), e };
+              proj = { sx: bh.x + st.x, sy: bh.y + st.y, scale: st.scale };
             }
-
-            const proj = project(worldX, worldY, worldZ);
             if (!proj || proj.scale <= 0.05) return;
 
             const depthAlpha = Math.max(0, Math.min(1, (proj.scale - 0.1) * 2.5));
             let finalAlpha = p.baseAlpha * depthAlpha;
             if (p.type === 'stripped_gas') finalAlpha *= S * (1 - p.progress * 0.65);
 
-            if (blackHole) {
-              const dx = blackHole.x - proj.sx, dy = blackHole.y - proj.sy;
-              const pull = Math.pow(collapseProgress, 1.6) * 0.96;
-              const spiral = Math.sin(collapseProgress * Math.PI) * 0.12 * blackHole.spin;
-              proj.sx += dx * pull - dy * spiral;
-              proj.sy += dy * pull + dx * spiral;
-              const d = Math.hypot(blackHole.x - proj.sx, blackHole.y - proj.sy);
-              finalAlpha *= Math.max(0, Math.min(1, (d - blackHoleRadius) / 26));
-            }
-
             if (finalAlpha > 0.01 && p.type === 'galaxy') {
               // Tiny tilted elliptical galaxy: bright core fading into a soft glow.
-              const gr = Math.max(0.6, p.size * proj.scale * 1.6);
+              // Per-morphology factor so every type reads ~10% larger than the old blob.
+              const gr = Math.max(0.7, p.size * proj.scale * 2.2 * [1.02, 0.77, 0.75, 1.08][p.morph ?? 0] * (isDarkNow ? 1 : 1.3));
               ctx.save();
               ctx.translate(proj.sx, proj.sy);
-              ctx.rotate(p.tilt);
-              ctx.scale(1, p.aspect);
-              const g = ctx.createRadialGradient(0, 0, 0, 0, 0, gr);
-              g.addColorStop(0, `rgba(${isDarkNow ? '255, 255, 255' : '20, 30, 70'}, ${finalAlpha.toFixed(3)})`);
-              g.addColorStop(0.25, `rgba(${customColor}, ${(finalAlpha * 0.8).toFixed(3)})`);
-              g.addColorStop(1, `rgba(${customColor}, 0)`);
-              ctx.fillStyle = g;
-              ctx.beginPath();
-              ctx.arc(0, 0, gr, 0, Math.PI * 2);
-              ctx.fill();
+              if (tidal) { ctx.rotate(tidal.ang); ctx.scale(tidal.e, p.aspect / Math.sqrt(tidal.e)); }
+              else { ctx.rotate(p.tilt); ctx.scale(1, p.aspect); }
+              ctx.globalAlpha = Math.min(1, sceneAlpha * finalAlpha * redshift * (isDarkNow ? 1 : 1.6));
+              ctx.drawImage(galaxySprite(isDarkNow ? (p.morph === 3 ? '255, 245, 225' : '245, 248, 255') : (p.morph === 3 ? '255, 225, 40' : '255, 255, 255'), customColor, p.morph), -gr, -gr, gr * 2, gr * 2);
+              if (redshift < 0.97) {
+                ctx.globalAlpha = sceneAlpha * finalAlpha * (1 - redshift) * 0.9;
+                ctx.drawImage(galaxySprite(isDarkNow ? '255, 150, 90' : '170, 40, 20', isDarkNow ? '255, 70, 40' : '150, 30, 20', p.morph), -gr, -gr, gr * 2, gr * 2);
+              }
               ctx.restore();
             } else if (finalAlpha > 0.01) {
               ctx.fillStyle = `rgba(${customColor || theme.particleColor}, ${finalAlpha.toFixed(3)})`;
@@ -1180,14 +1297,17 @@ float sn3(vec3 v){const vec2 C=vec2(1.0/6.0,1.0/3.0);const vec4 D=vec4(0.0,0.5,1
           uniforms.uTime.value = diskClock;
 
           let opacity = 0;
-          if (phase === 'collapse') {
-            const fadeIn = Math.min(1, phaseFrame / 45);
-            const fadeOut = 1 - Math.pow(Math.max(0, (collapseProgress - 0.8) / 0.2), 2);
-            opacity = fadeIn * fadeOut;
-            let s = 1;
-            if (collapseProgress < 0.15) s = 0.01 + 0.99 * Math.pow(collapseProgress / 0.15, 0.5);
-            else if (collapseProgress > 0.8) s = 1 + 8 * Math.pow((collapseProgress - 0.8) / 0.2, 2);
-            uniforms.uScale.value = s;
+          if (bh) {
+            // Accreted galaxies add mass: M grows smoothly toward 1 + 1.6·(fraction eaten).
+            const frac = bh.total ? bh.eaten / bh.total : 0;
+            const ease = 1 - Math.exp(-step / 57);
+            bh.feed += (frac - bh.feed) * ease;
+            bh.mass += (1 + 1.6 * frac - bh.mass) * ease;
+            if (bh.total && bh.eaten >= bh.total) bh.doneT += step / 60;
+            if (bh.doneT > 1.0) bh.fade = Math.min(1, bh.fade + step / 100);
+            const f = bh.fade * bh.fade * (3 - 2 * bh.fade);
+            opacity = Math.min(1, bh.t / 0.6) * (1 - f);
+            uniforms.uScale.value = bhScale;
           }
           uniforms.uOpacity.value = opacity;
 
@@ -1236,20 +1356,64 @@ float sn3(vec3 v){const vec2 C=vec2(1.0/6.0,1.0/3.0);const vec4 D=vec4(0.0,0.5,1
 
       return (
         <div className="absolute inset-0 w-full h-full z-0 overflow-hidden">
+          <div className="absolute inset-0" style={{ WebkitMaskImage: 'linear-gradient(to bottom, transparent 0, transparent 96px, #000 200px)', maskImage: 'linear-gradient(to bottom, transparent 0, transparent 96px, #000 200px)' }}>
+          <div className="absolute inset-0" style={{ WebkitMaskImage: 'linear-gradient(to right, transparent 0%, transparent 22%, #000 52%)', maskImage: 'linear-gradient(to right, transparent 0%, transparent 22%, #000 52%)' }}>
           <canvas ref={canvas2DRef} className="absolute inset-0 w-full h-full z-0 cursor-crosshair" style={{ display: simOn ? 'block' : 'none' }} />
           <canvas ref={canvas3DRef} className="absolute inset-0 w-full h-full z-10 pointer-events-none" style={{ display: simOn ? 'block' : 'none' }} />
+          </div>
+          </div>
           <button
             type="button"
             onClick={() => { const next = !simOn; setSimOn(next); if (simRef.current) simRef.current(next); }}
             aria-label={simOn ? 'Hide the background simulation' : 'Show the background simulation'}
             title={simOn ? 'Hide simulation' : 'Show simulation'}
-            className={`absolute bottom-6 right-6 z-30 flex h-9 w-9 items-center justify-center rounded-full border backdrop-blur-md transition-colors ${isDark ? 'border-white/[0.12] bg-white/[0.04] text-zinc-400 hover:border-glowred/40 hover:text-glowred' : 'border-stone-300 bg-cream-50/80 text-stone-500 hover:border-darkred-700/40 hover:text-darkred-700'}`}
+            className={`absolute bottom-6 right-6 z-30 flex h-9 w-9 items-center justify-center rounded-full border backdrop-blur-md transition-colors ${isDark ? 'border-white/[0.14] bg-white/[0.035] text-zinc-400 hover:border-glowred/50 hover:text-glowred' : 'border-stone-300 bg-[#FDFBF5]/85 text-stone-500 hover:border-darkred-300 hover:text-darkred-800'}`}
           >
             <i className={`fa-solid ${simOn ? 'fa-eye-slash' : 'fa-eye'} text-[11px]`}></i>
           </button>
         </div>
       );
     };
+
+    // Album row: one horizontal line of photos, scroll-snap + arrow buttons.
+    function PhotoSlider({ images, title, isDark, onOpen }) {
+      const ref = useRef(null);
+      const [edge, setEdge] = useState({ start: true, end: false });
+      const update = () => {
+        const el = ref.current; if (!el || el.clientWidth === 0) return;
+        setEdge({ start: el.scrollLeft < 4, end: el.scrollLeft + el.clientWidth >= el.scrollWidth - 4 });
+      };
+      useEffect(() => {
+        // Re-measure whenever the row or its content changes size (fonts, images, reveal).
+        const el = ref.current; if (!el) return;
+        const ro = new ResizeObserver(update);
+        ro.observe(el); Array.from(el.children).forEach(c => ro.observe(c));
+        requestAnimationFrame(update);
+        return () => ro.disconnect();
+      }, []);
+      const go = (dir) => { const el = ref.current; if (el) el.scrollBy({ left: dir * el.clientWidth * 0.8, behavior: 'smooth' }); };
+      const btn = (dir, hidden) => (
+        <button aria-label={dir < 0 ? 'Previous photos' : 'Next photos'} onClick={() => go(dir)}
+          className={`absolute top-1/2 -translate-y-1/2 ${dir < 0 ? 'left-2' : 'right-2'} z-10 w-9 h-9 rounded-full border flex items-center justify-center backdrop-blur-md transition-all duration-300 ${hidden ? 'opacity-0 pointer-events-none' : 'opacity-100'} ${isDark ? 'bg-cosmic-void/70 border-white/[0.14] text-zinc-300 hover:border-glowred/50 hover:text-glowred' : 'bg-[#FDFBF5]/90 border-stone-300 text-stone-600 hover:border-darkred-300 hover:text-darkred-800'}`}>
+          <i className={`fa-solid ${dir < 0 ? 'fa-chevron-left' : 'fa-chevron-right'} text-[11px]`}></i>
+        </button>
+      );
+      return (
+        <div className="relative">
+          {btn(-1, edge.start)}
+          <div ref={ref} onScroll={update} className="flex gap-4 overflow-x-auto snap-x snap-mandatory scroll-smooth py-1" style={{ scrollbarWidth: 'none' }}>
+            {images.map((imgUrl, index) => (
+              <div key={index} onClick={() => onOpen(imgUrl)}
+                className={`relative shrink-0 snap-start h-64 md:h-80 min-w-[8rem] max-w-[85%] overflow-hidden rounded-lg shadow-md cursor-pointer group/img border-2 ${isDark ? 'bg-zinc-900 border-white/10' : 'bg-[#EBE5D6] border-[#FDFBF5]'}`}>
+                <img src={imgUrl} alt={`${title} ${index + 1}`} loading="lazy" onLoad={update} className="h-full w-auto max-w-none object-cover transition-transform duration-500 group-hover/img:scale-105" onError={(e) => { if (!e.target.dataset.fallbackTriggered) { e.target.dataset.fallbackTriggered = "true"; e.target.src = "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80"; }}} />
+                <div className="absolute inset-0 bg-cosmic-void/0 group-hover/img:bg-cosmic-void/30 transition-all duration-300 flex items-center justify-center"><div className={`w-8 h-8 rounded-full backdrop-blur-md flex items-center justify-center opacity-0 group-hover/img:opacity-100 transition-all duration-300 ${isDark ? 'bg-white/10' : 'bg-white/20'}`}><i className="fa-solid fa-expand text-white text-xs drop-shadow"></i></div></div>
+              </div>
+            ))}
+          </div>
+          {btn(1, edge.end)}
+        </div>
+      );
+    }
 
     function App() {
       // Theme: remember the visitor's choice, otherwise follow the OS setting.
@@ -1268,7 +1432,17 @@ float sn3(vec3 v){const vec2 C=vec2(1.0/6.0,1.0/3.0);const vec4 D=vec4(0.0,0.5,1
       const [activeTab, setActiveTab] = useState('experience');
       const [showAllPubs, setShowAllPubs] = useState(false);
       const [activeActivityTab, setActiveActivityTab] = useState('conferences');
-      const [currentPage, setCurrentPage] = useState('home');
+      // Page lives in the URL hash (#gallery, #activities…) so refresh and back/forward keep it.
+      // Hash name → internal page id (the Gallery page is 'blog' internally).
+      const HASH_TO_PAGE = { activities: 'activities', resources: 'resources', gallery: 'blog', blog: 'blog' };
+      const PAGE_TO_HASH = { activities: 'activities', resources: 'resources', blog: 'gallery' };
+      const pageFromHash = () => HASH_TO_PAGE[(location.hash || '').slice(1)] || 'home';
+      const [currentPage, setCurrentPage] = useState(pageFromHash);
+      useEffect(() => {
+        const onPop = () => { setCurrentPage(pageFromHash()); window.scrollTo({ top: 0, behavior: 'auto' }); };
+        window.addEventListener('popstate', onPop);
+        return () => window.removeEventListener('popstate', onPop);
+      }, []);
       const [selectedImage, setSelectedImage] = useState(null);
       const [isMenuOpen, setIsMenuOpen] = useState(false);
       const [activeSection, setActiveSection] = useState('');
@@ -1335,6 +1509,7 @@ float sn3(vec3 v){const vec2 C=vec2(1.0/6.0,1.0/3.0);const vec4 D=vec4(0.0,0.5,1
         // section links glide.
         if (!samePage) window.scrollTo({ top: 0, behavior: 'auto' });
         setCurrentPage(page);
+        if (!samePage) history.pushState(null, '', PAGE_TO_HASH[page] ? '#' + PAGE_TO_HASH[page] : location.pathname + location.search);
         if (sectionId) requestAnimationFrame(() => requestAnimationFrame(() => scrollToSection(sectionId, samePage)));
       };
 
@@ -1343,12 +1518,10 @@ float sn3(vec3 v){const vec2 C=vec2(1.0/6.0,1.0/3.0);const vec4 D=vec4(0.0,0.5,1
 
       const navItems = [
         { label: 'About', page: 'home', section: 'about' },
-        { label: 'Research', page: 'home', section: 'research' },
-        { label: 'Education', page: 'home', section: 'experience' },
         { label: 'Publications', page: 'home', section: 'publications' },
         { label: 'Activities', page: 'activities', section: null },
-        { label: 'Gallery', page: 'blog', section: null },
         { label: 'Resources', page: 'resources', section: null },
+        { label: 'Gallery', page: 'blog', section: null },
         { label: 'Contact', page: null, section: 'contact' }
       ];
 
@@ -1363,24 +1536,24 @@ float sn3(vec3 v){const vec2 C=vec2(1.0/6.0,1.0/3.0);const vec4 D=vec4(0.0,0.5,1
       );
 
       const TabBtn = ({ label, icon, value, state, setState }) => (
-        <button onClick={() => setState(value)} className={`tab-underline flex items-center gap-2 text-sm font-medium transition-all ${state === value ? (isDark ? 'is-active text-glowred' : 'is-active text-darkred-800') : (isDark ? 'text-zinc-500 hover:text-zinc-300' : 'text-stone-400 hover:text-stone-700')}`}>
+        <button onClick={() => setState(value)} className={`tab-underline flex items-center gap-2 text-sm font-medium transition-all ${state === value ? (isDark ? 'is-active text-glowred' : 'is-active text-darkred-800') : (isDark ? 'text-zinc-500 hover:text-zinc-300' : 'text-stone-500 hover:text-stone-700')}`}>
           <i className={`fa-solid ${icon} text-xs`}></i> {label}
         </button>
       );
 
       const ActivityCard = ({ item, index }) => (
         <Reveal instant>
-          <article className={`group card-lift rounded-xl border p-5 ${isDark ? 'bg-white/[0.015] border-white/[0.06] hover:bg-white/[0.03] hover:border-glowred/30' : 'bg-cream-50 border-stone-200 hover:border-darkred-300 hover:translate-x-1'}`}>
+          <article className={`group card-lift rounded-xl border p-5 ${isDark ? 'bg-white/[0.035] border-white/[0.08] hover:bg-white/[0.05] hover:border-glowred/30' : 'bg-[#FDFBF5]/85 border-stone-200 hover:border-darkred-300'}`}>
             <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
               <div className="min-w-0">
-                <p className={`eyebrow mb-2 ${isDark ? 'text-glowred' : 'text-darkred-600'}`}>{item.type}</p>
+                <p className={`eyebrow mb-2 ${isDark ? 'text-glowred' : 'text-darkred-700'}`}>{item.type}</p>
                 <h3 className={`text-base font-semibold leading-snug transition-colors ${isDark ? 'text-white group-hover:text-glowred' : 'text-stone-900 group-hover:text-darkred-800'}`}>{item.title}</h3>
               </div>
-              <span className={`shrink-0 text-xs font-medium ${isDark ? 'text-zinc-500' : 'text-stone-400'}`}>{item.date}</span>
+              <span className={`shrink-0 text-xs font-medium ${isDark ? 'text-zinc-500' : 'text-stone-500'}`}>{item.date}</span>
             </div>
             <p className={`mt-3 border-t pt-3 text-sm leading-relaxed ${isDark ? 'border-white/[0.06] text-zinc-400' : 'border-stone-100 text-stone-500'}`}>{item.details}</p>
             {item.link && (
-              <a href={item.link} target="_blank" rel="noopener noreferrer" className={`mt-4 inline-flex w-fit items-center gap-2 whitespace-nowrap rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors ${isDark ? 'bg-glowred/15 text-glowred ring-1 ring-glowred/30 hover:bg-glowred hover:text-white' : 'bg-darkred-50 text-darkred-800 ring-1 ring-darkred-200 hover:bg-darkred-700 hover:text-white'}`}>
+              <a href={item.link} target="_blank" rel="noopener noreferrer" className={`mt-4 inline-flex w-fit items-center gap-2 whitespace-nowrap rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors ${isDark ? 'bg-glowred/15 text-glowred ring-1 ring-glowred/30 hover:ring-glowred/60' : 'bg-darkred-50 text-darkred-800 ring-1 ring-darkred-200 hover:ring-darkred-400'}`}>
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
                 {item.linkLabel || 'View'}
               </a>
@@ -1393,24 +1566,24 @@ float sn3(vec3 v){const vec2 C=vec2(1.0/6.0,1.0/3.0);const vec4 D=vec4(0.0,0.5,1
         <div className={`min-h-screen transition-colors duration-450 ${isDark ? 'bg-cosmic-void text-zinc-300 selection:bg-glowred-soft selection:text-white' : 'bg-cream text-stone-800 selection:bg-darkred-200 selection:text-darkred-950'}`}>
 
           <nav className={`fixed w-full z-50 transition-all duration-300 ${isScrolled ? (isDark ? 'nav-surface bg-cosmic-void/80 backdrop-blur-lg shadow-xl border-b border-white/[0.05] py-3' : 'nav-surface bg-cream/95 backdrop-blur-md shadow-sm border-b border-stone-200/70 py-3') : 'bg-transparent py-5'}`}>
-            <div className="max-w-5xl mx-auto px-6 flex justify-between items-center">
+            <div className="max-w-5xl mx-auto px-6 flex justify-between items-center gap-8">
               
               <a href="#" onClick={(e) => navigateTo(e, 'home')} className="flex items-center gap-3 group">
                 <div aria-hidden="true" className={`flex items-center justify-center transition-colors duration-300 ${isDark ? 'text-zinc-100 group-hover:text-glowred' : 'text-stone-900 group-hover:text-darkred-700'}`}><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg></div>
                 <div className="leading-tight">
                   <div className={`font-display font-semibold text-sm ${isDark ? 'text-zinc-100' : 'text-stone-900'}`}>Dr. Shivam Gola</div>
-                  <div className={`text-xs ${isDark ? 'text-zinc-400' : 'text-stone-500'}`}>Postdoctoral Fellow</div>
+                  <div className={`text-xs whitespace-nowrap ${isDark ? 'text-zinc-400' : 'text-stone-500'}`}>Postdoctoral Fellow</div>
                 </div>
               </a>
 
               <div className="flex items-center gap-6">
                 
-                <div className={`hidden lg:flex items-center gap-6 text-xs font-medium tracking-wide ${isDark ? 'text-zinc-400' : 'text-stone-500'}`}>
+                <div className={`hidden min-[1000px]:flex items-center gap-5 xl:gap-6 text-xs font-medium tracking-wide ${isDark ? 'text-zinc-400' : 'text-stone-500'}`}>
                   {navItems.map(({ label, page, section }) => {
                     const isActive = page === null
                       ? activeSection === 'contact'
                       : page === 'home'
-                        ? currentPage === 'home' && activeSection === section
+                        ? currentPage === 'home' && (activeSection === section || (section === 'about' && (activeSection === 'research' || activeSection === 'experience')))
                         : currentPage === page;
                     return (
                       <a
@@ -1424,11 +1597,11 @@ float sn3(vec3 v){const vec2 C=vec2(1.0/6.0,1.0/3.0);const vec4 D=vec4(0.0,0.5,1
                   })}
                 </div>
 
-                <button type="button" onClick={() => setIsMenuOpen(!isMenuOpen)} aria-label="Toggle navigation" aria-expanded={isMenuOpen} className={`lg:hidden w-9 h-9 rounded-full border transition-colors ${isDark ? 'border-white/[0.12] text-zinc-200 hover:border-glowred/60' : 'border-stone-300 text-stone-700 hover:border-darkred-400'}`}>
+                <button type="button" onClick={() => setIsMenuOpen(!isMenuOpen)} aria-label="Toggle navigation" aria-expanded={isMenuOpen} className={`min-[1000px]:hidden w-9 h-9 rounded-full border transition-colors ${isDark ? 'border-white/[0.12] text-zinc-200 hover:border-glowred/60' : 'border-stone-300 text-stone-700 hover:border-darkred-400'}`}>
                   <i className={`fa-solid ${isMenuOpen ? 'fa-xmark' : 'fa-bars'} text-xs`}></i>
                 </button>
 
-                <button onClick={() => setIsDark(!isDark)} className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-medium transition-all ${isDark ? 'bg-white/[0.04] border-white/[0.1] text-zinc-300 hover:bg-white/[0.1] hover:border-glowred/50 hover:text-white' : 'bg-cream-50 border-stone-300 text-stone-600 hover:bg-cream hover:border-darkred-400 hover:text-stone-950'}`} title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}>
+                <button onClick={() => setIsDark(!isDark)} className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-medium transition-all ${isDark ? 'bg-white/[0.035] border-white/[0.14] text-zinc-300 hover:border-glowred/50 hover:text-glowred' : 'bg-[#FDFBF5]/85 border-stone-300 text-stone-600 hover:border-darkred-300 hover:text-darkred-800'}`} title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}>
                   <i className={`fa-solid ${isDark ? 'fa-sun text-yellow-400' : 'fa-moon text-darkred-700'}`}></i>
                   <span className="hidden sm:inline font-display">{isDark ? 'Light' : 'Dark'}</span>
                 </button>
@@ -1437,7 +1610,7 @@ float sn3(vec3 v){const vec2 C=vec2(1.0/6.0,1.0/3.0);const vec4 D=vec4(0.0,0.5,1
             </div>
             
             {isMenuOpen && (
-              <div className={`lg:hidden mx-4 mb-3 rounded-xl border p-2 animate-fade-in ${isDark ? 'bg-cosmic-dust/95 border-white/[0.08]' : 'bg-cream-50 border-stone-200'}`}>
+              <div className={`min-[1000px]:hidden mx-4 mb-3 rounded-xl border p-2 animate-fade-in ${isDark ? 'bg-cosmic-dust/95 border-white/[0.08]' : 'bg-[#FDFBF5]/85 border-stone-200'}`}>
                 {[ ['About', 'home', 'about'], ['Research', 'home', 'research'], ['Education', 'home', 'experience'], ['Publications', 'home', 'publications'], ['Activities', 'activities'], ['Gallery', 'blog'], ['Resources', 'resources'] ].map(([label, page, section]) => (
                   <a key={label} href={section ? `#${section}` : '#'} onClick={(e) => navigateTo(e, page, section)} className={`block rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${isDark ? 'text-zinc-300 hover:bg-white/[0.06] hover:text-glowred' : 'text-stone-600 hover:bg-darkred-50 hover:text-darkred-800'}`}>{label}</a>
                 ))}
@@ -1463,7 +1636,7 @@ float sn3(vec3 v){const vec2 C=vec2(1.0/6.0,1.0/3.0);const vec4 D=vec4(0.0,0.5,1
                   <Reveal delay={280}>
                     <p className={`flex items-center gap-2.5 mb-5 text-xs font-medium ${isDark ? 'text-zinc-400' : 'text-stone-500'}`}>
                       <i className={`fa-solid fa-building-columns text-[11px] shrink-0 ${isDark ? 'text-glowred' : 'text-darkred-700'}`}></i>
-                      Department of Physics, Indian Institute of Technology Bombay
+                      Dept. of Physics, IIT Bombay
                     </p>
                   </Reveal>
 
@@ -1477,10 +1650,10 @@ float sn3(vec3 v){const vec2 C=vec2(1.0/6.0,1.0/3.0);const vec4 D=vec4(0.0,0.5,1
                     {/* Three tiers, not three buttons: filled primary, outlined secondary,
                         bare text link — so the eye lands on Publications first. */}
                     <div className="mt-9 flex flex-wrap items-center justify-center md:justify-start gap-x-3 gap-y-3">
-                      <a href="#publications" onClick={(e) => navigateTo(e, 'home', 'publications')} className={`px-6 py-3 rounded-full text-xs font-semibold tracking-wide whitespace-nowrap transition-all shadow-lg flex items-center gap-2 ${isDark ? 'bg-glowred text-white hover:bg-rose-700 shadow-glowred/20 glow-hover' : 'bg-darkred-700 text-cream hover:bg-darkred-900 shadow-darkred/20 glow-hover'}`}>
-                        Selected Publications
+                      <a href="#publications" onClick={(e) => navigateTo(e, 'home', 'publications')} className={`px-6 py-3 rounded-full text-xs font-semibold tracking-wide whitespace-nowrap transition-all shadow-lg flex items-center gap-2 ${isDark ? 'bg-[#B3202F] text-white hover:bg-[#8F1A26] shadow-[#B3202F]/20 glow-hover' : 'bg-[#B3202F] text-white hover:bg-[#8F1A26] shadow-[#B3202F]/20 glow-hover'}`}>
+                        Selected Research
                       </a>
-                      <a href={CV_URL} target="_blank" rel="noopener noreferrer" className={`px-6 py-3 rounded-full border text-xs font-semibold tracking-wide whitespace-nowrap transition-all flex items-center gap-2 backdrop-blur-md ${isDark ? 'text-zinc-300 border-white/[0.14] hover:border-glowred/50 hover:text-white' : 'text-stone-600 border-stone-300 hover:border-darkred-400 hover:text-darkred-800'}`}>
+                      <a href={CV_URL} target="_blank" rel="noopener noreferrer" className={`px-6 py-3 rounded-full border text-xs font-semibold tracking-wide whitespace-nowrap transition-all flex items-center gap-2 backdrop-blur-md ${isDark ? 'bg-white/[0.035] text-zinc-300 border-white/[0.14] hover:border-glowred/50 hover:text-glowred' : 'bg-[#FDFBF5]/85 text-stone-600 border-stone-200 hover:border-darkred-300 hover:text-darkred-800'}`}>
                         <i className="fa-solid fa-file-pdf text-[11px] opacity-70"></i> CV (PDF)
                       </a>
                     </div>
@@ -1518,10 +1691,10 @@ float sn3(vec3 v){const vec2 C=vec2(1.0/6.0,1.0/3.0);const vec4 D=vec4(0.0,0.5,1
                   <div className="grid md:grid-cols-3 gap-5">
                     {researchInterests.map((item, idx) => (
                       <Reveal key={item.id} instant className="h-full">
-                        <button onClick={() => setActiveResearch(item.id)} className={`group w-full h-full text-left p-6 rounded-xl transition-all duration-300 border ${isDark ? (activeResearch === item.id ? 'bg-white/[0.04] shadow-xl border-glowred/30 shadow-glowred/5' : 'bg-white/[0.01] hover:bg-white/[0.02] border-white/[0.06] hover:border-white/[0.12]') : (activeResearch === item.id ? 'bg-cream shadow-md border-darkred-200' : 'bg-cream/60 hover:bg-cream border-stone-200 hover:border-stone-300')}`}>
+                        <button onClick={() => setActiveResearch(item.id)} className={`group card-lift w-full h-full text-left p-6 rounded-xl border flex flex-col justify-start items-start ${isDark ? (activeResearch === item.id ? 'bg-white/[0.06] shadow-xl border-glowred/30 shadow-glowred/5' : 'bg-white/[0.035] border-white/[0.08] hover:bg-white/[0.05] hover:border-glowred/30') : (activeResearch === item.id ? 'bg-[#FDFBF5]/85 shadow-md border-darkred-200' : 'bg-[#FDFBF5]/85 border-stone-200 hover:border-darkred-300')}`}>
                           <div className={`mb-4 ${isDark ? 'text-glowred' : 'text-darkred-700'}`}><i className={`fa-solid ${item.icon} text-xl`}></i></div>
                           <h3 className={`text-sm font-semibold mb-1 transition-colors ${isDark ? (activeResearch === item.id ? 'text-white' : 'text-zinc-300') : (activeResearch === item.id ? 'text-darkred-800' : 'text-stone-700')}`}>{item.title}</h3>
-                          {activeResearch === item.id ? <p className={`text-xs leading-relaxed mt-3 animate-fade-in ${isDark ? 'text-zinc-400' : 'text-stone-500'}`}>{item.description}</p> : <p className={`text-xs mt-1 ${isDark ? 'text-zinc-600' : 'text-stone-300'}`}>Tap to read details</p>}
+                          {activeResearch === item.id ? <p className={`text-xs leading-relaxed mt-3 animate-fade-in ${isDark ? 'text-zinc-400' : 'text-stone-500'}`}>{item.description}</p> : <p className={`text-xs mt-1 ${isDark ? 'text-zinc-500' : 'text-stone-500'}`}>Tap to read details</p>}
                         </button>
                       </Reveal>
                     ))}
@@ -1541,16 +1714,16 @@ float sn3(vec3 v){const vec2 C=vec2(1.0/6.0,1.0/3.0);const vec4 D=vec4(0.0,0.5,1
                     </div>
                   </Reveal>
 
-                  <div className={`space-y-4 relative before:absolute before:inset-0 before:ml-[1.1rem] before:h-full before:w-px ${isDark ? 'before:bg-gradient-to-b before:from-white/[0.1] before:via-white/[0.03] before:to-transparent' : 'before:bg-gradient-to-b before:from-stone-200 before:via-stone-100 before:to-transparent'}`}>
+                  <div className={`mt-12 space-y-4 relative before:absolute before:inset-0 before:ml-[1.1rem] before:h-full before:w-px ${isDark ? 'before:bg-gradient-to-b before:from-white/[0.1] before:via-white/[0.03] before:to-transparent' : 'before:bg-gradient-to-b before:from-stone-200 before:via-stone-100 before:to-transparent'}`}>
                     {activeTab === 'tools' ? (
                       <Reveal instant>
                         <div className="relative flex items-start gap-5 group">
-                          <div className={`mt-1 flex items-center justify-center w-9 h-9 rounded-full border shrink-0 z-10 transition-all ${isDark ? 'border-white/[0.1] bg-cosmic-dust text-glowred group-hover:border-glowred/40' : 'border-2 border-stone-200 bg-cream text-darkred-600 group-hover:border-darkred-300 group-hover:bg-darkred-50'}`}><i className="fa-solid fa-code text-xs"></i></div>
-                          <div className={`flex-1 p-5 rounded-xl border transition-all ${isDark ? 'bg-white/[0.01] border-white/[0.05] group-hover:border-white/[0.1]' : 'bg-cream-50 border-stone-200 group-hover:border-stone-300'}`}>
+                          <div className={`mt-1 flex items-center justify-center w-9 h-9 rounded-full border shrink-0 z-10 transition-all ${isDark ? 'border-white/[0.1] bg-cosmic-dust text-glowred group-hover:border-glowred/50' : 'border-stone-300 bg-[#FDFBF5] text-darkred-700 group-hover:border-darkred-300'}`}><i className="fa-solid fa-code text-xs"></i></div>
+                          <div className={`flex-1 p-5 rounded-xl border transition-colors duration-300 ${isDark ? 'bg-white/[0.035] border-white/[0.08] group-hover:border-white/[0.14]' : 'bg-[#FDFBF5]/85 border-stone-200 group-hover:border-stone-300'}`}>
                             <p className={`eyebrow mb-4 ${isDark ? 'text-glowred' : 'text-darkred-700'}`}>Computational Tools</p>
                             <div className="flex flex-wrap gap-2">
                               {computationalTools.map((tool, i) => (
-                                <span key={i} className={`px-2.5 py-1 rounded-md text-xs whitespace-nowrap transition-colors cursor-default border ${isDark ? 'bg-white/[0.03] text-zinc-400 border-white/[0.06] hover:border-glowred/40 hover:text-white' : 'bg-cream text-stone-500 border-stone-200 hover:border-darkred-300 hover:text-darkred-700'}`}>{tool}</span>
+                                <span key={i} className={`px-2.5 py-1 rounded-full text-xs whitespace-nowrap transition-colors cursor-default border ${isDark ? 'bg-white/[0.035] text-zinc-400 border-white/[0.08] hover:border-glowred/50 hover:text-glowred' : 'bg-[#FDFBF5]/85 text-stone-500 border-stone-200 hover:border-darkred-300 hover:text-darkred-800'}`}>{tool}</span>
                               ))}
                             </div>
                           </div>
@@ -1560,8 +1733,8 @@ float sn3(vec3 v){const vec2 C=vec2(1.0/6.0,1.0/3.0);const vec4 D=vec4(0.0,0.5,1
                       achievements.map((item, idx) => (
                         <Reveal key={idx} instant>
                           <div className="relative flex items-start gap-5 group">
-                            <div className={`mt-1 flex items-center justify-center w-9 h-9 rounded-full border shrink-0 z-10 transition-all ${isDark ? 'border-white/[0.1] bg-cosmic-dust text-glowred group-hover:border-glowred/40' : 'border-2 border-stone-200 bg-cream text-darkred-600 group-hover:border-darkred-300 group-hover:bg-darkred-50'}`}><i className="fa-solid fa-award text-xs"></i></div>
-                            <div className={`flex-1 p-5 rounded-xl border transition-all ${isDark ? 'bg-white/[0.01] border-white/[0.05] group-hover:border-white/[0.1]' : 'bg-cream-50 border-stone-200 group-hover:border-stone-300'}`}><p className={`text-sm font-medium ${isDark ? 'text-zinc-200' : 'text-stone-700'}`}>{item}</p></div>
+                            <div className={`mt-1 flex items-center justify-center w-9 h-9 rounded-full border shrink-0 z-10 transition-all ${isDark ? 'border-white/[0.1] bg-cosmic-dust text-glowred group-hover:border-glowred/50' : 'border-stone-300 bg-[#FDFBF5] text-darkred-700 group-hover:border-darkred-300'}`}><i className="fa-solid fa-award text-xs"></i></div>
+                            <div className={`flex-1 p-5 rounded-xl border transition-colors duration-300 ${isDark ? 'bg-white/[0.035] border-white/[0.08] group-hover:border-white/[0.14]' : 'bg-[#FDFBF5]/85 border-stone-200 group-hover:border-stone-300'}`}><p className={`text-sm font-medium ${isDark ? 'text-zinc-200' : 'text-stone-700'}`}>{item}</p></div>
                           </div>
                         </Reveal>
                       ))
@@ -1569,16 +1742,16 @@ float sn3(vec3 v){const vec2 C=vec2(1.0/6.0,1.0/3.0);const vec4 D=vec4(0.0,0.5,1
                       (activeTab === 'experience' ? experience : education).map((item, idx) => (
                         <Reveal key={idx} instant>
                           <div className="relative flex items-start gap-5 group">
-                            <div className={`mt-1 flex items-center justify-center w-9 h-9 rounded-full border shrink-0 z-10 transition-all ${isDark ? 'border-white/[0.1] bg-cosmic-dust text-glowred group-hover:border-glowred/40' : 'border-2 border-stone-200 bg-cream text-darkred-600 group-hover:border-darkred-300 group-hover:bg-darkred-50'}`}>
+                            <div className={`mt-1 flex items-center justify-center w-9 h-9 rounded-full border shrink-0 z-10 transition-all ${isDark ? 'border-white/[0.1] bg-cosmic-dust text-glowred group-hover:border-glowred/50' : 'border-stone-300 bg-[#FDFBF5] text-darkred-700 group-hover:border-darkred-300'}`}>
                               {activeTab === 'experience' ? <i className="fa-solid fa-briefcase text-xs"></i> : <i className="fa-solid fa-graduation-cap text-xs"></i>}
                             </div>
-                            <div className={`flex-1 p-5 rounded-xl border transition-all ${isDark ? 'bg-white/[0.01] border-white/[0.05] group-hover:border-white/[0.1]' : 'bg-cream-50 border-stone-200 group-hover:border-stone-300'}`}>
+                            <div className={`flex-1 p-5 rounded-xl border transition-colors duration-300 ${isDark ? 'bg-white/[0.035] border-white/[0.08] group-hover:border-white/[0.14]' : 'bg-[#FDFBF5]/85 border-stone-200 group-hover:border-stone-300'}`}>
                               <div className="flex flex-col md:flex-row md:items-start justify-between gap-2 mb-2">
                                 <h4 className={`text-sm font-semibold ${isDark ? 'text-white' : 'text-stone-900'}`}>{item.role || item.degree}</h4>
-                                <span className={`text-xs px-2.5 py-1 rounded-full whitespace-nowrap font-medium ${isDark ? 'bg-white/[0.04] text-zinc-500' : 'bg-stone-100 text-stone-400'}`}>{item.period}</span>
+                                <span className={`text-xs px-2.5 py-1 rounded-full whitespace-nowrap font-medium ${isDark ? 'bg-white/[0.05] text-zinc-400' : 'bg-[#F3EFE3] text-stone-600'}`}>{item.period}</span>
                               </div>
-                              <p className={`text-xs font-medium mb-2 ${isDark ? 'text-zinc-400' : 'text-stone-400'}`}>{item.institution}</p>
-                              {(item.description || item.details) && <p className={`text-xs leading-relaxed pt-2 border-t ${isDark ? 'text-zinc-500 border-white/[0.04]' : 'text-stone-400 border-stone-100'}`}>{item.description || item.details}</p>}
+                              <p className={`text-xs font-medium mb-2 ${isDark ? 'text-zinc-400' : 'text-stone-500'}`}>{item.institution}</p>
+                              {(item.description || item.details) && <p className={`text-xs leading-relaxed pt-2 border-t ${isDark ? 'text-zinc-500 border-white/[0.04]' : 'text-stone-500 border-stone-100'}`}>{item.description || item.details}</p>}
                             </div>
                           </div>
                         </Reveal>
@@ -1588,13 +1761,13 @@ float sn3(vec3 v){const vec2 C=vec2(1.0/6.0,1.0/3.0);const vec4 D=vec4(0.0,0.5,1
                 </div>
               </section>
 
-              <section id="publications" className={`py-24 border-t ${isDark ? 'bg-cosmic-void border-white/[0.04]' : 'bg-cream-50 border-stone-200/50'}`}>
+              <section id="publications" className={`pt-24 pb-16 border-t ${isDark ? 'bg-cosmic-void border-white/[0.04]' : 'bg-cream-50 border-stone-200/50'}`}>
                 <div className="max-w-5xl mx-auto px-6">
                   <Reveal instant>
                     <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-5">
                       <div>
                         <p className={`eyebrow mb-3 ${isDark ? 'text-glowred' : 'text-darkred-700'}`}>Research Output</p>
-                        <h2 className={`text-3xl font-semibold tracking-tight ${isDark ? 'text-zinc-100' : 'text-stone-900'}`}>Selected Publications</h2>
+                        <h2 className={`text-3xl font-semibold tracking-tight ${isDark ? 'text-zinc-100' : 'text-stone-900'}`}>Selected Research</h2>
                         <span className="section-rule"></span>
                       </div>
                       <div className="flex flex-wrap gap-2">
@@ -1603,9 +1776,9 @@ float sn3(vec3 v){const vec2 C=vec2(1.0/6.0,1.0/3.0);const vec4 D=vec4(0.0,0.5,1
                           { label: 'iNSPIRE-HEP', href: 'https://inspirehep.net/authors/1867679' },
                           { label: 'Google Scholar', href: 'https://scholar.google.com/scholar?q=%22Shivam+Gola%22' },
                         ].map(({ label, href }) => (
-                          <a key={label} href={href} target="_blank" rel="noopener noreferrer" className={`px-3.5 py-1.5 border rounded-full text-xs font-medium transition-all flex items-center gap-1.5 shrink-0 backdrop-blur-sm ${isDark ? 'bg-white/[0.02] border-white/[0.08] text-zinc-400 hover:text-glowred hover:border-glowred/40' : 'bg-cream border-stone-200 text-stone-500 hover:text-darkred-700 hover:border-darkred-200'}`}>
+                          <a key={label} href={href} target="_blank" rel="noopener noreferrer" className={`px-3.5 py-1.5 border rounded-full text-xs font-medium transition-all flex items-center gap-1.5 shrink-0 backdrop-blur-sm ${isDark ? 'bg-white/[0.035] border-white/[0.08] text-zinc-400 hover:text-glowred hover:border-glowred/50' : 'bg-[#FDFBF5]/85 border-stone-200 text-stone-500 hover:text-darkred-800 hover:border-darkred-300'}`}>
                             <span className="whitespace-nowrap">{label}</span>
-                            <i className="fa-solid fa-arrow-up-right-from-square text-[8px] opacity-60"></i>
+                            <i className="fa-solid fa-arrow-up-right-from-square text-[9px] opacity-60"></i>
                           </a>
                         ))}
                       </div>
@@ -1613,17 +1786,17 @@ float sn3(vec3 v){const vec2 C=vec2(1.0/6.0,1.0/3.0);const vec4 D=vec4(0.0,0.5,1
                   </Reveal>
 
                   <Reveal instant>
-                    <div className="space-y-3">
+                    <div className="mt-12 space-y-3">
                       {(showAllPubs ? publications : publications.slice(0, PUB_PREVIEW)).map((pub, idx) => (
                         <div key={idx} className="relative flex items-start gap-5 group">
-                          <div className={`mt-1 flex items-center justify-center w-9 h-9 rounded-full border shrink-0 z-10 transition-all ${isDark ? 'border-white/[0.1] bg-cosmic-dust text-glowred group-hover:border-glowred/40' : 'border-2 border-stone-200 bg-cream text-darkred-600 group-hover:border-darkred-300 group-hover:bg-darkred-50'}`}>
+                          <div className={`mt-1 flex items-center justify-center w-9 h-9 rounded-full border shrink-0 z-10 transition-all ${isDark ? 'border-white/[0.1] bg-cosmic-dust text-glowred group-hover:border-glowred/50' : 'border-stone-300 bg-[#FDFBF5] text-darkred-700 group-hover:border-darkred-300'}`}>
                             <i className="fa-regular fa-file-lines text-xs"></i>
                           </div>
-                          <div className={`flex-1 p-6 rounded-xl border transition-all duration-300 ${isDark ? 'bg-white/[0.01] border-white/[0.05] group-hover:border-glowred/30 group-hover:bg-white/[0.02]' : 'bg-cream border-stone-200 group-hover:border-stone-300'}`}>
+                          <div className={`flex-1 p-6 rounded-xl border transition-colors duration-300 ${isDark ? 'bg-white/[0.035] border-white/[0.08] group-hover:border-glowred/30 group-hover:bg-white/[0.05]' : 'bg-[#FDFBF5]/85 border-stone-200 group-hover:border-darkred-300'}`}>
                           <div>
                             <a href={pub.link} target="_blank" rel="noopener noreferrer" className={`text-sm font-semibold transition-colors leading-snug block mb-1.5 ${isDark ? 'text-zinc-100 group-hover:text-glowred' : 'text-stone-800 group-hover:text-darkred-800'}`}>{pub.title}</a>
                             <p className={`text-xs mb-1 ${isDark ? 'text-zinc-400' : 'text-stone-500'}`}>{pub.authors}</p>
-                            <p className={`text-xs italic ${isDark ? 'text-zinc-500' : 'text-stone-400'}`}>{pub.journal}</p>
+                            <p className={`text-xs italic ${isDark ? 'text-zinc-500' : 'text-stone-500'}`}>{pub.journal}</p>
                           </div>
                           </div>
                         </div>
@@ -1635,7 +1808,7 @@ float sn3(vec3 v){const vec2 C=vec2(1.0/6.0,1.0/3.0);const vec4 D=vec4(0.0,0.5,1
                     <button
                       type="button"
                       onClick={() => setShowAllPubs(v => !v)}
-                      className={`mt-6 ml-[3.5rem] px-5 py-2.5 rounded-full border text-xs font-semibold tracking-wide transition-all flex items-center gap-2 ${isDark ? 'text-zinc-400 border-white/[0.12] hover:border-glowred/50 hover:text-white' : 'text-stone-500 border-stone-300 hover:border-darkred-400 hover:text-darkred-800'}`}
+                      className={`mt-6 ml-[3.5rem] px-5 py-2.5 rounded-full border text-xs font-semibold tracking-wide transition-all flex items-center gap-2 ${isDark ? 'bg-white/[0.035] text-zinc-400 border-white/[0.14] hover:border-glowred/50 hover:text-glowred' : 'bg-[#FDFBF5]/85 text-stone-500 border-stone-300 hover:border-darkred-300 hover:text-darkred-800'}`}
                     >
                       {showAllPubs ? 'Show fewer' : `Show all ${publications.length} publications`}
                       <i className={`fa-solid ${showAllPubs ? 'fa-chevron-up' : 'fa-chevron-down'} text-[9px] opacity-70`}></i>
@@ -1654,13 +1827,13 @@ float sn3(vec3 v){const vec2 C=vec2(1.0/6.0,1.0/3.0);const vec4 D=vec4(0.0,0.5,1
                 </div>
 
                 <div className={`mb-8 flex items-center gap-7 border-b ${isDark ? 'border-white/[0.08]' : 'border-stone-200'}`}>
-                  <button onClick={() => setActiveActivityTab('conferences')} className={`tab-underline flex items-center gap-2 text-sm font-medium ${activeActivityTab === 'conferences' ? (isDark ? 'is-active text-glowred' : 'is-active text-darkred-800') : (isDark ? 'text-zinc-500 hover:text-zinc-300' : 'text-stone-400 hover:text-stone-700')}`}>
+                  <button onClick={() => setActiveActivityTab('conferences')} className={`tab-underline flex items-center gap-2 text-sm font-medium ${activeActivityTab === 'conferences' ? (isDark ? 'is-active text-glowred' : 'is-active text-darkred-800') : (isDark ? 'text-zinc-500 hover:text-zinc-300' : 'text-stone-500 hover:text-stone-700')}`}>
                     <i className="fa-solid fa-graduation-cap text-xs"></i> Conferences & Seminars
                   </button>
-                  <button onClick={() => setActiveActivityTab('visits')} className={`tab-underline flex items-center gap-2 text-sm font-medium ${activeActivityTab === 'visits' ? (isDark ? 'is-active text-glowred' : 'is-active text-darkred-800') : (isDark ? 'text-zinc-500 hover:text-zinc-300' : 'text-stone-400 hover:text-stone-700')}`}>
+                  <button onClick={() => setActiveActivityTab('visits')} className={`tab-underline flex items-center gap-2 text-sm font-medium ${activeActivityTab === 'visits' ? (isDark ? 'is-active text-glowred' : 'is-active text-darkred-800') : (isDark ? 'text-zinc-500 hover:text-zinc-300' : 'text-stone-500 hover:text-stone-700')}`}>
                     <i className="fa-solid fa-flask text-xs"></i> Research Visits
                   </button>
-                  <button onClick={() => setActiveActivityTab('talks')} className={`tab-underline flex items-center gap-2 text-sm font-medium ${activeActivityTab === 'talks' ? (isDark ? 'is-active text-glowred' : 'is-active text-darkred-800') : (isDark ? 'text-zinc-500 hover:text-zinc-300' : 'text-stone-400 hover:text-stone-700')}`}>
+                  <button onClick={() => setActiveActivityTab('talks')} className={`tab-underline flex items-center gap-2 text-sm font-medium ${activeActivityTab === 'talks' ? (isDark ? 'is-active text-glowred' : 'is-active text-darkred-800') : (isDark ? 'text-zinc-500 hover:text-zinc-300' : 'text-stone-500 hover:text-stone-700')}`}>
                     <i className="fa-solid fa-display text-xs"></i> Presentations
                   </button>
                 </div>
@@ -1675,14 +1848,14 @@ float sn3(vec3 v){const vec2 C=vec2(1.0/6.0,1.0/3.0);const vec4 D=vec4(0.0,0.5,1
                             <Reveal key={talk.title} instant>
                               <Tag
                                 {...(hasLink ? { href: talk.link, target: '_blank', rel: 'noopener noreferrer' } : {})}
-                                className={`group card-lift block rounded-xl border p-5 ${hasLink ? 'cursor-pointer' : 'cursor-default'} ${isDark ? 'bg-white/[0.015] border-white/[0.06] hover:bg-white/[0.03] hover:border-glowred/30' : 'bg-cream-50 border-stone-200 hover:border-darkred-300'}`}
+                                className={`group card-lift block rounded-xl border p-5 ${hasLink ? 'cursor-pointer' : 'cursor-default'} ${isDark ? 'bg-white/[0.035] border-white/[0.08] hover:bg-white/[0.05] hover:border-glowred/30' : 'bg-[#FDFBF5]/85 border-stone-200 hover:border-darkred-300'}`}
                               >
                                 <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                                   <div className="min-w-0">
-                                    <p className={`eyebrow mb-2 ${isDark ? 'text-glowred' : 'text-darkred-600'}`}>Slides</p>
+                                    <p className={`eyebrow mb-2 ${isDark ? 'text-glowred' : 'text-darkred-700'}`}>Slides</p>
                                     <h3 className={`text-base font-semibold leading-snug transition-colors ${isDark ? 'text-white group-hover:text-glowred' : 'text-stone-900 group-hover:text-darkred-800'}`}>{talk.title}</h3>
                                   </div>
-                                  <span className={`shrink-0 text-xs font-medium ${isDark ? 'text-zinc-500' : 'text-stone-400'}`}>{talk.date}</span>
+                                  <span className={`shrink-0 text-xs font-medium ${isDark ? 'text-zinc-500' : 'text-stone-500'}`}>{talk.date}</span>
                                 </div>
                                 <p className={`mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 border-t pt-3 text-sm leading-relaxed ${isDark ? 'border-white/[0.06] text-zinc-400' : 'border-stone-100 text-stone-500'}`}>
                                   {talk.venue}
@@ -1716,7 +1889,7 @@ float sn3(vec3 v){const vec2 C=vec2(1.0/6.0,1.0/3.0);const vec4 D=vec4(0.0,0.5,1
                   <div className="grid gap-4 sm:grid-cols-2">
                     {resourceBooks.map((book) => (
                       <Reveal key={book.title} instant>
-                        <div className={`h-full rounded-xl border p-5 transition-all ${isDark ? 'bg-white/[0.015] border-white/[0.06] hover:border-white/[0.12]' : 'bg-cream-50 border-stone-200 hover:border-stone-300'}`}>
+                        <div className={`h-full rounded-xl border p-5 transition-colors duration-300 ${isDark ? 'bg-white/[0.035] border-white/[0.08] hover:border-white/[0.14]' : 'bg-[#FDFBF5]/85 border-stone-200 hover:border-stone-300'}`}>
                           <h3 className={`text-base font-semibold leading-snug ${isDark ? 'text-white' : 'text-stone-900'}`}>{book.title}</h3>
                           <p className={`mt-1 text-xs font-medium ${isDark ? 'text-zinc-400' : 'text-stone-500'}`}>{book.author}</p>
                           {book.note && <p className={`mt-3 border-t pt-3 text-sm leading-relaxed ${isDark ? 'border-white/[0.06] text-zinc-400' : 'border-stone-100 text-stone-500'}`}>{book.note}</p>}
@@ -1738,7 +1911,7 @@ float sn3(vec3 v){const vec2 C=vec2(1.0/6.0,1.0/3.0);const vec4 D=vec4(0.0,0.5,1
                             href={item.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className={`group card-lift block rounded-xl border p-5 ${isDark ? 'bg-white/[0.015] border-white/[0.06] hover:bg-white/[0.03] hover:border-glowred/30' : 'bg-cream-50 border-stone-200 hover:border-darkred-300'}`}
+                            className={`group card-lift block rounded-xl border p-5 ${isDark ? 'bg-white/[0.035] border-white/[0.08] hover:bg-white/[0.05] hover:border-glowred/30' : 'bg-[#FDFBF5]/85 border-stone-200 hover:border-darkred-300'}`}
                           >
                             <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4">
                               <h3 className={`flex items-center gap-2 text-base font-semibold leading-snug transition-colors ${isDark ? 'text-white group-hover:text-glowred' : 'text-stone-900 group-hover:text-darkred-800'}`}>
@@ -1760,37 +1933,47 @@ float sn3(vec3 v){const vec2 C=vec2(1.0/6.0,1.0/3.0);const vec4 D=vec4(0.0,0.5,1
 
           {currentPage === 'blog' && (
             <div className={`pt-28 pb-16 min-h-screen animate-fade-in ${isDark ? 'bg-cosmic-void' : 'bg-cream'}`}>
-              <div className="max-w-5xl mx-auto px-6">
-                <div className="mb-12"><SectionHeader instant eyebrow="Gallery" title="Travel & Photography" /><p className={`text-xs mt-4 ${isDark ? 'text-zinc-500' : 'text-stone-400'}`}>Memories from various trips and places.</p></div>
+              <div className="max-w-6xl mx-auto px-6">
+                <div className="mb-12"><SectionHeader instant eyebrow="Gallery" title="Travel & Photography" /><p className={`text-xs mt-4 ${isDark ? 'text-zinc-500' : 'text-stone-500'}`}>Memories from various trips and places.</p></div>
 
-                <div className="grid grid-cols-1 gap-10">
-                  {blogPosts.map((post, idx) => (
-                    <Reveal key={post.id} instant>
-                      <div className={`rounded-xl border overflow-hidden transition-all duration-300 ${isDark ? 'bg-white/[0.01] border-white/[0.05] hover:border-white/[0.1]' : 'bg-cream-50 border-stone-200 hover:border-stone-300'}`}>
+                {/* Single-photo posts pair up side by side; multi-photo albums span the full row. */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-5 md:gap-6 grid-flow-row-dense">
+                  {blogPosts.map((post, idx) => {
+                    const single = !post.images || post.images.length <= 1;
+                    // Only big albums need the full row; small ones (≤3, e.g. portraits) share a row.
+                    const wide = post.images && post.images.length > 3;
+                    return (
+                    <Reveal key={post.id} instant className={wide ? 'md:col-span-2 lg:col-span-6' : single ? 'h-full lg:col-span-2' : 'h-full lg:col-span-4'}>
+                      <div className={`h-full flex flex-col rounded-xl border overflow-hidden transition-colors duration-300 ${isDark ? 'bg-white/[0.035] border-white/[0.08] hover:border-white/[0.14]' : 'bg-[#FDFBF5]/85 border-stone-200 hover:border-stone-300'}`}>
                         {post.images && post.images.length > 0 && (
-                          <div className={`p-6 md:p-8 border-b ${isDark ? 'bg-white/[0.01] border-white/[0.04]' : 'bg-stone-100/80'}`}>
-                            <div className={`grid gap-4 ${post.images.length === 1 ? 'grid-cols-1 max-w-2xl mx-auto' : post.images.length === 2 ? 'grid-cols-2' : 'grid-cols-2 sm:grid-cols-3'}`}>
+                          <div className={`${wide ? 'p-3 md:p-4' : 'p-2 md:p-3'} border-b ${isDark ? 'bg-white/[0.01] border-white/[0.04]' : 'bg-[#F3EFE3] border-stone-200'}`}>
+                            {post.images.length >= 3 ? (
+                              <PhotoSlider images={post.images} title={post.title} isDark={isDark} onOpen={setSelectedImage} />
+                            ) : (
+                            <div className={`grid gap-2 ${post.images.length === 1 ? 'grid-cols-1' : post.images.length === 2 ? 'grid-cols-2' : 'grid-cols-2 sm:grid-cols-3'}`}>
                               {post.images.map((imgUrl, index) => {
                                 const rotations = ['rotate-[-1deg]', 'rotate-[1deg]', 'rotate-[-0.5deg]', 'rotate-[0.5deg]'];
                                 const rotClass = post.images.length > 1 ? rotations[index % 4] : '';
                                 return (
-                                  <div key={index} className={`relative aspect-[4/3] overflow-hidden rounded-lg shadow-md cursor-pointer group/img transition-all duration-500 hover:z-20 hover:scale-[1.03] hover:rotate-0 border-2 ${isDark ? 'bg-zinc-900 border-white/10' : 'bg-stone-200 border-white'} ${rotClass}`} onClick={() => setSelectedImage(imgUrl)}>
+                                  <div key={index} className={`relative aspect-[4/3] overflow-hidden rounded-lg shadow-md cursor-pointer group/img transition-all duration-500 hover:z-20 hover:scale-[1.03] hover:rotate-0 border-2 ${isDark ? 'bg-zinc-900 border-white/10' : 'bg-[#EBE5D6] border-[#FDFBF5]'} ${rotClass}`} onClick={() => setSelectedImage(imgUrl)}>
                                     <img src={imgUrl} alt={`${post.title} ${index + 1}`} className="w-full h-full object-cover transition-transform duration-500 group-hover/img:scale-105" onError={(e) => { if (!e.target.dataset.fallbackTriggered) { e.target.dataset.fallbackTriggered = "true"; e.target.src = "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80"; }}} />
                                     <div className="absolute inset-0 bg-cosmic-void/0 group-hover/img:bg-cosmic-void/30 transition-all duration-300 flex items-center justify-center"><div className={`w-8 h-8 rounded-full backdrop-blur-md flex items-center justify-center opacity-0 group-hover/img:opacity-100 transition-all duration-300 ${isDark ? 'bg-white/10' : 'bg-white/20'}`}><i className="fa-solid fa-expand text-white text-xs drop-shadow"></i></div></div>
                                   </div>
                                 );
                               })}
                             </div>
+                            )}
                           </div>
                         )}
-                        <div className="p-6 md:p-8 bg-white/[0.005]">
-                          <div className="flex items-center gap-2 mb-2"><span className={`eyebrow ${isDark ? 'text-glowred' : 'text-darkred-600'}`}>{post.type}</span><span className={`text-xs ${isDark ? 'text-white/[0.1]' : 'text-stone-300'}`}>·</span><span className={`text-xs ${isDark ? 'text-zinc-500' : 'text-stone-400'}`}>{post.date}</span></div>
-                          <h3 className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-stone-900'}`}>{post.title}</h3>
-                          {post.content && post.content.trim() !== "" && <p className={`text-sm leading-relaxed mt-2 ${isDark ? 'text-zinc-400' : 'text-stone-400'}`}>{post.content}</p>}
+                        <div className={`${wide ? 'px-4 py-2.5 md:px-5' : 'px-3 py-2 md:px-4 md:py-2.5'} flex-1`}>
+                          <div className="flex items-center gap-2 mb-1"><span className={`eyebrow ${isDark ? 'text-glowred' : 'text-darkred-700'}`}>{post.type}</span><span className={`text-xs ${isDark ? 'text-white/[0.1]' : 'text-stone-500'}`}>·</span><span className={`text-xs ${isDark ? 'text-zinc-500' : 'text-stone-500'}`}>{post.date}</span></div>
+                          <h3 className={`text-base font-semibold ${isDark ? 'text-white' : 'text-stone-900'}`}>{post.title}</h3>
+                          {post.content && post.content.trim() !== "" && <p className={`text-sm leading-relaxed mt-2 ${isDark ? 'text-zinc-400' : 'text-stone-500'}`}>{post.content}</p>}
                         </div>
                       </div>
                     </Reveal>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             </div>
@@ -1798,7 +1981,7 @@ float sn3(vec3 v){const vec2 C=vec2(1.0/6.0,1.0/3.0);const vec4 D=vec4(0.0,0.5,1
 
           {selectedImage && (
             <div className={`fixed inset-0 z-[100] flex items-center justify-center backdrop-blur-md p-4 md:p-12 animate-fade-in-modal cursor-zoom-out ${isDark ? 'bg-black/95' : 'bg-stone-950/97'}`} onClick={() => setSelectedImage(null)}>
-              <button className="absolute top-4 right-4 md:top-6 md:right-6 text-zinc-400 hover:text-white z-10 w-9 h-9 flex items-center justify-center rounded-full bg-white/5 hover:bg-glowred transition-all duration-200" onClick={() => setSelectedImage(null)}><i className="fa-solid fa-xmark text-xs"></i></button>
+              <button className="absolute top-4 right-4 md:top-6 md:right-6 text-zinc-300 hover:text-glowred z-10 w-9 h-9 flex items-center justify-center rounded-full border border-white/[0.14] bg-white/5 hover:border-glowred/50 transition-colors duration-300" onClick={() => setSelectedImage(null)}><i className="fa-solid fa-xmark text-xs"></i></button>
               <img src={selectedImage} alt="Expanded view" className="max-w-full max-h-full rounded-lg shadow-2xl object-contain animate-scale-up-modal cursor-default border border-white/10" onClick={(e) => e.stopPropagation()} onError={(e) => { if (!e.target.dataset.fallbackTriggered) { e.target.dataset.fallbackTriggered = "true"; e.target.src = "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1600&q=80"; }}} />
             </div>
           )}
@@ -1810,9 +1993,9 @@ float sn3(vec3 v){const vec2 C=vec2(1.0/6.0,1.0/3.0);const vec4 D=vec4(0.0,0.5,1
                   <p className={`eyebrow mb-4 ${isDark ? 'text-zinc-600' : 'text-darkred-300'}`}>Contact</p>
                   <h2 className="font-display text-2xl font-semibold text-white mb-6">Get in Touch</h2>
                   <div className="flex flex-col gap-4">
-                    <a href="mailto:shivamg.phy@gmail.com" className="flex items-center gap-3 text-sm transition-colors group hover:text-white">
-                      <div className={`w-8 h-8 rounded-full border flex items-center justify-center transition-all shrink-0 ${isDark ? 'bg-white/[0.03] border-white/[0.08] group-hover:bg-glowred group-hover:border-glowred/40' : 'bg-white/10 border-white/20 group-hover:bg-darkred-900 group-hover:border-darkred-950'}`}>
-                        <i className={`fa-solid fa-envelope text-xs group-hover:text-white ${isDark ? 'text-zinc-400' : 'text-darkred-100'}`}></i>
+                    <a href="mailto:shivamg.phy@gmail.com" className={`flex items-center gap-3 text-sm transition-colors group ${isDark ? 'hover:text-glowred' : 'hover:text-white'}`}>
+                      <div className={`w-8 h-8 rounded-full border flex items-center justify-center transition-all shrink-0 ${isDark ? 'bg-white/[0.03] border-white/[0.08] group-hover:border-glowred/50' : 'bg-white/10 border-white/20 group-hover:border-white/60'}`}>
+                        <i className={`fa-solid fa-envelope text-xs transition-colors ${isDark ? 'text-zinc-400 group-hover:text-glowred' : 'text-darkred-100 group-hover:text-white'}`}></i>
                       </div>
                       shivamg.phy@gmail.com
                     </a>
@@ -1827,12 +2010,11 @@ float sn3(vec3 v){const vec2 C=vec2(1.0/6.0,1.0/3.0);const vec4 D=vec4(0.0,0.5,1
               </Reveal>
             </div>
             <Reveal instant>
-              <div className={`max-w-5xl mx-auto px-6 mt-10 pt-6 border-t text-xs flex flex-col sm:flex-row justify-between items-center gap-4 ${isDark ? 'border-white/[0.05] text-zinc-600' : 'border-white/10 text-darkred-200'}`}>
-                <p>© 2026 Dr. Shivam Gola. </p>
+              <div className={`max-w-5xl mx-auto px-6 mt-10 pt-6 border-t text-xs flex flex-col sm:flex-row justify-between items-center gap-4 ${isDark ? 'border-white/[0.05] text-zinc-500' : 'border-white/10 text-darkred-200'}`}>
+                <p className="whitespace-nowrap">© 2026 Dr. Shivam Gola</p>
                 <div className="flex gap-5">
-                  <a href="https://inspirehep.net/authors/1867679" target="_blank" rel="noopener noreferrer" className={`transition-colors ${isDark ? 'hover:text-white' : 'hover:text-white'}`}>iNSPIRE-HEP</a>
-                  <a href="https://arxiv.org/search/?query=%22Shivam+Gola%22&searchtype=author" target="_blank" rel="noopener noreferrer" className={`transition-colors ${isDark ? 'hover:text-white' : 'hover:text-white'}`}>arXiv</a>
-                  <a href="https://scholar.google.com/scholar?q=%22Shivam+Gola%22" target="_blank" rel="noopener noreferrer" className={`transition-colors ${isDark ? 'hover:text-white' : 'hover:text-white'}`}>Google Scholar</a>
+                  <a href="https://inspirehep.net/authors/1867679" target="_blank" rel="noopener noreferrer" className={`transition-colors ${isDark ? 'hover:text-glowred' : 'hover:text-white'}`}>iNSPIRE-HEP</a>
+                  <a href="https://scholar.google.com/scholar?q=%22Shivam+Gola%22" target="_blank" rel="noopener noreferrer" className={`transition-colors ${isDark ? 'hover:text-glowred' : 'hover:text-white'}`}>Google Scholar</a>
                 </div>
               </div>
             </Reveal>
